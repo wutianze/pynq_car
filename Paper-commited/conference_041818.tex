@@ -99,6 +99,18 @@ Since these three parts are separated, so it's easy to modify one module without
 \label{sa}
 \end{figure}
 
+\subsection{Work flow}
+
+Fig.~\ref{wf} shows the control flow of our autonomous driving. The car can run in two mode, one is that the car will be in total control of machine learning methods, the other means that the traditional computer vision methods will be used when the car runs into the situation in which neural network is not able to handle.
+
+The whole system will have one worker for running computer vision methods like objects recognition and one worker for taking photos. The number of the workers for machine learning tasks can be specified since it's meaningful to run parallel tasks in DPU.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{workFlow.jpg}}
+\caption{Work Flow}
+\label{wf}
+\end{figure}
+
 \subsection{AI model}
 
 The network we use is a simple end-to-end model. Since the DNNDK kit doesn't support some AI functions, we adapt our model to DNNDK. The structure of the model is shown in Fig.~\ref{ms}.
@@ -115,7 +127,7 @@ Although the current model is not the perfect one and it cannot be accelerated b
 
 \subsection{Algorithms}
 \begin{itemize}
-\item Crossroad control. Since the AI model cannot handle the situation when the car meets a crossroad. We will help the car decide which direction to take according to the competition's request. The car will use neutral network or cv algorithms to recognize all the scenes that need it to make a choice, for example the crossroad. After the car meets these scenes, first the main controller will tell the car which direction to take, then the car will use predefined control commands to drive through the crossroad. When this progress is finished, the AI model will retake the control of the car.
+\item Crossroad control. Since the AI model cannot handle the situation when the car meets a crossroad. We will help the car decide which direction to take according to the competition's request. The car will use neural network or cv algorithms to recognize all the scenes that need it to make a choice, for example the crossroad. After the car meets these scenes, first the main controller will tell the car which direction to take, then the car will use predefined control commands to drive through the crossroad. When this progress is finished, the AI model will retake the control of the car.
 \item Image process. Although our solution is end-to-end, the training data needs to be processed. Now we just do the normalization to the input images, later we will try some more according to the evaluation of the model's performance.
 \item Obstacle avoidance. For obstacle avoidance, traditional methods will first recognize the objects from the image and then use the state machine functions to make decisions. Our solution is quite different from it, we will add the obstacle avoidance scenes to the step of collecting training data. As a result, when the training step is finished, the AI model can avoid the obstacle automatically.
 \end{itemize}

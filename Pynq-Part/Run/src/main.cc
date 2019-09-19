@@ -92,7 +92,7 @@ using namespace cv;
 using namespace std;
 using namespace std::chrono;
 
-string model;
+string mode;
 
 #define NNCONTROL 0
 #define CVCONTROL 1
@@ -212,7 +212,7 @@ void run_model(DPUTask* task){
 }
 
 void run_cv(){
-    if(model == "nn")return;
+    if(mode == "nn")return;
     Mat tmpImage;
     while(true){
         queueLock.lock();
@@ -281,7 +281,7 @@ int main(int argc, char **argv)
         return -1;
       }
     // nn means just use ml, cv means use ml & cv.
-    model = argv[1];
+    mode = argv[1];
 
     /* The main procress of using DPU kernel begin. */
     DPUKernel *kernelConv;
