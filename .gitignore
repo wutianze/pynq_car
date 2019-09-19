@@ -1,0 +1,13 @@
+Host-part/images/
+Host-part/logs/
+Host-part/training_data_npz/
+**/__pycache__/
+.vscode/
+Host-part/decent/quantize_results/
+Host-part/decent/compile/
+Pynq-Part/system/
+**/rootfs.tar.gz
+**/system.zip
+Paper-commited/conference*
+!Paper-commited/*.tex
+
