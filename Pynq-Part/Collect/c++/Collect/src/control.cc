@@ -3,19 +3,19 @@ PYNQZ2::PYNQZ2(){
     status = 0;
     int fd = open("/dev/mem",O_RDWR);
     
-    throttle = (int*)mmap(0, 30, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x42800000);
+    throttle = (int*)mmap(0, 30, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x82800000);
     throttle[4] = 0b001010010110;
     throttle[0] = 0b011010010110;
     throttle[1] = 500000;
     throttle[5] = 140000;
 
-    steer = (int*)mmap(0, 30, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x42810000);
+    steer = (int*)mmap(0, 30, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x82810000);
     steer[4] = 0b001010010110;
     steer[0] = 0b011010010110;
     steer[1] = 2000000;
     steer[5] = 100000;
 
-    leds = (char*)mmap(0, 8, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x41210000);
+    leds = (char*)mmap(0, 8, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x81210000);
     leds[4] = 0x00;
     leds[0] = 0x0F;
 }
@@ -59,13 +59,17 @@ bool PYNQZ2::command(int c){
     return true;
 }
 
+void PYNQZ2::throttleSet(int value){
+    throttle[5] = value;
+}
+
+void PYNQZ2::steerSet(int value){
+    steer[5] = value;
+}
+
+
 PYNQZ2::~PYNQZ2(){
     throttle[0] = 0b000000010110;
     steer[0] = 0b000000010110;
     leds[0] = 0x00;
-    
-    /*delete []throttle;
-    delete []steer;
-    delete []leds;*/
-
 }

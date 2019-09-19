@@ -9,7 +9,7 @@ class Controller{
     virtual void right() = 0;
     virtual void stop() = 0;   
     virtual bool command(int) = 0;
-}
+};
 class PYNQZ2: public Controller{
     private:
     int* throttle;
@@ -29,4 +29,4 @@ class PYNQZ2: public Controller{
     void throttleSet(int);
     void steerSet(int);
 
-}
+};

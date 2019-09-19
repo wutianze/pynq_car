@@ -92,6 +92,13 @@ using namespace cv;
 using namespace std;
 using namespace std::chrono;
 
+string model;
+
+#define NNCONTROL 0
+#define CVCONTROL 1
+int commander = NNCONTROL;
+mutex commanderLock;
+
 mutex queueLock;
 mutex controlLock;
 time_t timeGet;
@@ -152,6 +159,19 @@ int command(const float *d, int size)
     return result;
 }
 
+#define COMMANDMAXLEN 5
+void addCommand(int com){
+    controlLock.lock();
+    int nowSize = generatedCommands.size();
+    if( nowSize >= COMMANDMAXLEN){
+        for(int i=0;i<nowSize;i++){
+            generatedCommands.pop();
+        }
+    }
+    generatedCommands.push(com);
+    controlLock.unlock();
+}
+
 void run_model(DPUTask* task){
     int channel = kinds.size();
     vector<float> smRes(channel);
@@ -160,7 +180,7 @@ void run_model(DPUTask* task){
     while (1)
     {
         queueLock.lock();
-        if(takenImages.empty()){
+        if(takenImages.empty() || commander == CVCONTROL){
             queueLock.unlock();
             continue;
         }else{
@@ -187,12 +207,38 @@ void run_model(DPUTask* task){
         _T(dpuRunSoftmax(fcRes, smRes.data(), channel, 1, scale));
         //_T(TopK(smRes.data(),channel,4,kinds,"nowCap"));
         int toDo = command(smRes.data(), channel);
-        controlLock.lock();
-        generatedCommands.push(toDo);
-        controlLock.unlock();
+        addCommand(toDo);        
     }
 }
 
+void run_cv(){
+    if(model == "nn")return;
+    Mat tmpImage;
+    while(true){
+        queueLock.lock();
+        if(takenImages.empty()){
+            queueLock.unlock();
+            continue;
+        }else{
+            tmpImage = takenImages.top();
+            takenImages.pop();
+            time_t now = time(0);
+            if(now < timeGet){
+                queueLock.unlock();
+                continue;
+            }else{
+                timeGet = now;
+            }
+        }
+        queueLock.unlock();
+        //commander = bool judgeSituation()
+        if(commander == CVCONTROL){
+
+        }
+    }
+}
+
+#define IMAGEMAXLEN 5
 void run_Camera(){
     VideoCapture cap(0);
     cap.set(CV_CAP_PROP_FRAME_WIDTH, 160);
@@ -201,6 +247,12 @@ void run_Camera(){
     while(true){
         cap >> image;
         queueLock.lock();
+        int nowSize = takenImages.size();
+        if(nowSize >= IMAGEMAXLEN){
+            for(int i=0;i<nowSize;i++){
+                takenImages.pop();
+            }
+        }
         takenImages.push(image);
         queueLock.unlock();
     }
@@ -223,7 +275,14 @@ void run_Command(){
 
 int main(int argc, char **argv)
 {
-    
+     if (argc != 3) {
+          cout << "Usage of this exe: ./car cv/nn"
+             << endl;
+        return -1;
+      }
+    // nn means just use ml, cv means use ml & cv.
+    model = argv[1];
+
     /* The main procress of using DPU kernel begin. */
     DPUKernel *kernelConv;
 
@@ -235,14 +294,16 @@ int main(int argc, char **argv)
     vector<DPUTask*> tasks(TASKNUM);
     generate(tasks.begin(),task.end(),std::bind(dpuCreateTask,kernelConv,0));    
     //DPUTask *taskMnist = dpuCreateTask(kernelConv, 0);
-    array<thread,TASKNUM + 2> threads = {
+    int threadNum = TASKNUM + 3;
+    array<thread,threadNum> threads = {
         thread(run_model, tasks[0]),
         thread(run_model, tasks[1]),
         thread(run_model, tasks[2]),
         thread(run_command),
-        thread(run_camera)
+        thread(run_camera),
+        thread(run_cv)
     };
-    for(int i = 0; i < TASKNUM; i++){
+    for(int i = 0; i < threadNum; i++){
         threads[i].join();
     }
     for_each(tasks.begin(),tasks.end(),dpuDestroyTask);

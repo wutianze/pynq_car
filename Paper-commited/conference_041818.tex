@@ -58,17 +58,18 @@ This time we build our own auto-driving car based on Xilinx Pynq-Z2, it provides
 We find that in previous FPT competitions, many competitors use traditional computer vision methods or machine learning methods to detect objects and then make decisions based on the results. Our solution is quite different with theirs since we use a simple CNN model as our AI network and feed the model with pictures taken by the camera in the car and the model returns the control orders.
 The platform we use is Xilinx’s Pynq-Z2 board, there is a DPU IP in its FPGA, with DPU’s help, we can accelerate the inference process of the model and make it possible to run AI inference task in limited resource platform like Pynq-Z2.
 
-The rest of this paper is organized as follows. Section II describes the overview of our hardware structure and development environment. Section III presents the software architecture and details of methods we are going to use for the competition. Finally, Section IV mentions the current progress and makes an conclusion.
+The rest of this paper is organized as follows. Section II describes the overview of our hardware structure and development environment. Section III presents the software architecture and details of methods we are going to use for the competition. Finally, the paper mentions the current progress and makes an conclusion.
 
 \section{Overview of our car}
 
 \subsection{Hardware structure}
 
-The Fig 1 is our robot car's photograph. Its body size is Lcm x Wcm x Hcm. There is one Pynq-Z2 board as the controller, it has a DPU IP for acceleration, the sensors we use now contains a camera. The car has one capstan motor and one electric steering engine. Two rear wheels provide power while two front wheels provide steering capacity.
+The Fig.~\ref{co} is our robot car's photograph. Its body is made of acrylic board. There is one Pynq-Z2 board as the controller, it has a DPU IP for acceleration, the sensors we use now contains a camera only. The car has one capstan motor and one electric steering engine. Two rear wheels provide power while two front wheels provide steering capacity. We use two batteries to provide power, one for the Pynq board and one for the motors.
+
 \begin{figure}[htbp]
 %\centerline{\includegraphics{fig1.png}}
 \caption{Car overview.}
-\label{fig}
+\label{co}
 \end{figure}
 
 \subsection{Development environment}
@@ -95,12 +96,18 @@ Since these three parts are separated, so it's easy to modify one module without
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.5\textwidth]{software-architecture.jpg}}
 \caption{Software Architecture}
-\label{fig}
+\label{sa}
 \end{figure}
 
 \subsection{AI model}
 
-The network we use is a simple end-to-end model. Since the DNNDK kit doesn't support some AI functions, we adapt our model to DNNDK. The structure of the model is shown in Fig.  
+The network we use is a simple end-to-end model. Since the DNNDK kit doesn't support some AI functions, we adapt our model to DNNDK. The structure of the model is shown in Fig.~\ref{ms}.
+
+\begin{figure}[htbp]
+%\centerline{\includegraphics{fig1.png}}
+\caption{Model Structure.}
+\label{ms}
+\end{figure}
 
 The main part of the model is CNN layers, they can extract features from the images taken by the car's front camera. Some fully connected layers follow the CNN layers, they can finally extract the command information needed for auto-driving. The activation function we use is Relu because it works well and can be accelerated by DPU. The last layer is a Softmax layer, it can provide classification and normalization functions for the model.  
 
@@ -115,20 +122,13 @@ Although the current model is not the perfect one and it cannot be accelerated b
 
 \section{Development status}
 
-Until now, we have built the whole system, the AI model works well in simple scenes. We are busy implementing the cv functions and optimizing the hardware structure of the car. Later we will try to make some improvements to the model and do some tests and modifications according to the competition's rules. If possible, we will build a simulator to generate training data and evaluate the system.
+Until now, we have built the whole system, the AI model works well in simple scenes. We are busy implementing the cv functions and optimizing the hardware structure of the car. Later we will try to make some improvements to the model and do some tests and modifications according to the competition's rules. If possible, we will build a simulator to generate training data and evaluate the system. Our goal is not only winning the competition, but also building a general and easy-to-use platform for those who want to try their own ideas about auto-driving.
 
 \section{Conclusion}
 
+The DPU embedded in FPGA accelerates the inference progress of AI algorithms. Our team wants to use this great power to build an autonomous driving system, with the help of Xilinx's Pynq-Z2 and DNNDK, our project will provide people with a new version of end-to-end autonomous driving solution.
 
-
-
-\subsection{Figures and Tables}
-\paragraph{Positioning Figures and Tables} Place figures and tables at the top and 
-bottom of columns. Avoid placing them in the middle of columns. Large 
-figures and tables may span across both columns. Figure captions should be 
-below the figures; table heads should appear above the tables. Insert 
-figures and tables after they are cited in the text. Use the abbreviation 
-``Fig.~\ref{fig}'', even at the beginning of a sentence.
+We will focus on the stability of the system and the cooperations between AI network and traditional methods in the next step.
 
 \begin{table}[htbp]
 \caption{Table Type Styles}
@@ -146,17 +146,6 @@ copy& More table copy$^{\mathrm{a}}$& &  \\
 \label{tab1}
 \end{center}
 \end{table}
-
-
-Figure Labels: Use 8 point Times New Roman for Figure labels. Use words 
-rather than symbols or abbreviations when writing Figure axis labels to 
-avoid confusing the reader. As an example, write the quantity 
-``Magnetization'', or ``Magnetization, M'', not just ``M''. If including 
-units in the label, present them within parentheses. Do not label axes only 
-with units. In the example, write ``Magnetization (A/m)'' or ``Magnetization 
-\{A[m(1)]\}'', not just ``A/m''. Do not label axes with a ratio of 
-quantities and units. For example, write ``Temperature (K)'', not 
-``Temperature/K''.
 
 \section*{Acknowledgment}
 
@@ -196,7 +185,5 @@ citation first, followed by the original foreign-language citation \cite{b6}.
 \bibitem{b7} M. Young, The Technical Writer's Handbook. Mill Valley, CA: University Science, 1989.
 \end{thebibliography}
 \vspace{12pt}
-\color{red}
-IEEE conference templates contain guidance text for composing and formatting conference papers. Please ensure that all template text is removed from your conference paper prior to submission to the conference. Failure to remove the template text from your paper may result in your paper not being published.
 
 \end{document}

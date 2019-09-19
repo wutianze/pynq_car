@@ -26,4 +26,7 @@ class PYNQZ2: public Controller{
     void stop();
     bool command(int);
 
+    void throttleSet(int);
+    void steerSet(int);
+
 };
