@@ -18,19 +18,19 @@ should not be used}
 }
 
 \author{\IEEEauthorblockN{1\textsuperscript{st} Tianze Wu}
-\IEEEauthorblockA{\textit{Xilinx} \\
+\IEEEauthorblockA{
 \textit{ICT}\\
 Shanghai, China \\
-1369130123@qq.com}
+wutianze@ict.ac.cn}
 \and
 \IEEEauthorblockN{2\textsuperscript{nd} Weiyi Liu}
-\IEEEauthorblockA{\textit{Xilinx} \\
+\IEEEauthorblockA{
 \textit{Shanghai JiaoTong University}\\
 Shanghai, China \\
 liuweiyi@sjtu.edu.cn}
 \and
 \IEEEauthorblockN{3\textsuperscript{rd} Given Name Surname}
-\IEEEauthorblockA{\textit{Xilinx} \\
+\IEEEauthorblockA{
 \textit{Xidian University}\\
 Shanghai, China \\
 yongweijin@outlook.com}
@@ -130,6 +130,7 @@ Although the current model is not the perfect one and it cannot be accelerated b
 \item Crossroad control. Since the AI model cannot handle the situation when the car meets a crossroad. We will help the car decide which direction to take according to the competition's request. The car will use neural network or cv algorithms to recognize all the scenes that need it to make a choice, for example the crossroad. After the car meets these scenes, first the main controller will tell the car which direction to take, then the car will use predefined control commands to drive through the crossroad. When this progress is finished, the AI model will retake the control of the car.
 \item Image process. Although our solution is end-to-end, the training data needs to be processed. Now we just do the normalization to the input images, later we will try some more according to the evaluation of the model's performance.
 \item Obstacle avoidance. For obstacle avoidance, traditional methods will first recognize the objects from the image and then use the state machine functions to make decisions. Our solution is quite different from it, we will add the obstacle avoidance scenes to the step of collecting training data. As a result, when the training step is finished, the AI model can avoid the obstacle automatically.
+\item TODO:OPENCV PART
 \end{itemize}
 
 \section{Development status}
