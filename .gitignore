@@ -11,3 +11,17 @@ Pynq-Part/system/
 Paper-commited/conference*
 !Paper-commited/*.tex
 
+sdsandbox/*.pyc
+sdsandbox/*.h5
+sdsandbox/sdsim/Library
+sdsandbox/sdsim/log/*
+sdsandbox/sdsim/obj
+sdsandbox/sdsim/*.sln
+sdsandbox/sdsim/*.userprefs
+sdsandbox/sdsim/Temp
+sdsandbox/sdsim/Build
+sdsandbox/sdsim/Log
+sdsandbox/sdsim/Packages
+sdsandbox/sdsim/.vs
+sdsandbox/*.csproj
+sdsandbox/env
