@@ -32,6 +32,8 @@ namespace tk
         float ai_throttle = 0.0f;
         float ai_brake = 0.0f;
 
+        char commandGet = 's';
+
         bool asynchronous = true;
         float time_step = 0.1f;
         bool bResetCar = false;
@@ -70,6 +72,8 @@ namespace tk
             client.dispatcher.Register("step_mode", new tk.Delegates.OnMsgRecv(OnStepModeRecv));
             client.dispatcher.Register("quit_app", new tk.Delegates.OnMsgRecv(OnQuitApp));
             client.dispatcher.Register("regen_road", new tk.Delegates.OnMsgRecv(OnRegenRoad));
+
+            client.dispatcher.Register("pynq_control",new tk.Delegates.OnMsgRecv(OnPynqControlsRecv));
 
         }
 
@@ -150,7 +154,19 @@ namespace tk
                 Debug.Log(e.ToString());
             }
         }
+    void OnPynqControlsRecv(JSONObject json)
+        {
+            try
+            {
+                commandGet = (json["command"].str)[0];
 
+                car.RequestCommand(commandGet);
+            }
+            catch(Exception e)
+            {
+                Debug.Log(e.ToString());
+            }
+        }
         void OnExitSceneRecv(JSONObject json)
         {
             SceneManager.LoadSceneAsync(0);

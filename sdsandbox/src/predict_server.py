@@ -1,3 +1,12 @@
+'''
+@Author: Sauron Wu
+@GitHub: wutianze
+@Email: 1369130123qq@gmail.com
+@Date: 2019-09-23 10:12:28
+@LastEditors: Sauron Wu
+@LastEditTime: 2019-09-23 15:29:59
+@Description: 
+'''
 #!/usr/bin/env python
 '''
 Predict Server
@@ -5,7 +14,7 @@ Create a server to accept image inputs and run them against a trained neural net
 This then sends the steering output back to the client.
 Author: Tawn Kramer
 '''
-from __future__ import print_function
+#from __future__ import print_function
 import os
 import argparse
 import json
@@ -147,16 +156,131 @@ class DonkeySimMsgHandler(IMesgHandler):
     def on_close(self):
         pass
 
+class PynqSimMsgHandler(IMesgHandler):
+
+    def __init__(self, model, port=0, num_cars=1, rand_seed=0):
+        self.model = model
+        #self.constant_throttle = constant_throttle
+        self.sock = None
+        self.image_folder = None
+        self.steering_angle = 0.
+        self.throttle = 0.
+        self.num_cars = 0
+        self.port = port
+        self.target_num_cars = num_cars
+        self.rand_seed = rand_seed
+        self.fns = {'telemetry' : self.on_telemetry,\
+                    'car_loaded' : self.on_car_created,\
+                    'on_disconnect' : self.on_disconnect}
+
+    def on_connect(self, socketHandler):
+        self.sock = socketHandler
+
+    def on_disconnect(self):
+        self.num_cars = 0
+
+    def on_recv_message(self, message):
+        if not 'msg_type' in message:
+            print('expected msg_type field')
+            return
+
+        msg_type = message['msg_type']
+        if msg_type in self.fns:
+            self.fns[msg_type](message)
+        else:
+            print('unknown message type', msg_type)
+
+    def on_car_created(self, data):
+        if self.rand_seed != 0:
+            self.send_regen_road(0, self.rand_seed, 1.0)
+
+        self.num_cars += 1
+        if self.num_cars < self.target_num_cars:
+            print("requesting another car..")
+            self.request_another_car()
+
+    def on_telemetry(self, data):
+        imgString = data["image"]
+        image = Image.open(BytesIO(base64.b64decode(imgString)))
+        image_array = np.asarray(image)
+        self.predict(image_array)
+
+        # maybe save frame
+        if self.image_folder is not None:
+            timestamp = datetime.utcnow().strftime('%Y_%m_%d_%H_%M_%S_%f')[:-3]
+            image_filename = os.path.join(self.image_folder, timestamp)
+            image.save('{}.jpg'.format(image_filename))
+
+
+    def predict(self, image_array):
+        #outputs = self.model.predict(image_array[None, :, :, :])
+        outputs = np.array([0,1,0,0])
+        #print(outputs.shape)
+        self.on_parsed_outputs(outputs.tolist())
+        
+    def on_parsed_outputs(self, outputs):
+        comSend = ''
+        toSend = 0
+        nowMax = 0
+        for i in range(len(outputs)):
+            if outputs[i] > nowMax:
+                nowMax = outputs[i] 
+                toSend = i
+        if toSend == 0:
+            comSend = 'a'
+        elif toSend == 1:
+            comSend = 'w'
+        elif toSend == 2:
+            comSend = 'd'
+        else:
+            comSend = 's'
+        self.send_control(comSend)
+
+    def send_control(self, command):
+        msg = { 'msg_type' : 'pynq_control', 'command':command }
+        self.sock.queue_message(msg)
+
+    def send_regen_road(self, road_style=0, rand_seed=0, turn_increment=0.0):
+        '''
+        Regenerate the road, where available. For now only in level 0.
+        In level 0 there are currently 5 road styles. This changes the texture on the road
+        and also the road width.
+        The rand_seed can be used to get some determinism in road generation.
+        The turn_increment defaults to 1.0 internally. Provide a non zero positive float
+        to affect the curviness of the road. Smaller numbers will provide more shallow curves.
+        '''
+        msg = { 'msg_type' : 'regen_road',
+            'road_style': road_style.__str__(),
+            'rand_seed': rand_seed.__str__(),
+            'turn_increment': turn_increment.__str__() }
+        
+        self.sock.queue_message(msg)
+
+    def request_another_car(self):
+        port = self.port + self.num_cars
+        address = ("0.0.0.0", port)
+        
+        #spawn a new message handler serving on the new port.
+        handler = DonkeySimMsgHandler(self.model, 0., num_cars=(self.target_num_cars - 1), port=address[1])
+        server = SimServer(address, handler)
+
+        msg = { 'msg_type' : 'new_car', 'host': '127.0.0.1', 'port' : port.__str__() }
+        self.sock.queue_message(msg)   
+
+    def on_close(self):
+        pass
 
 def go(filename, address, constant_throttle=0, num_cars=1, image_cb=None, rand_seed=None):
 
-    model = load_model(filename)
+    #model = load_model(filename)
 
     #looks like we have to compile it before use. These optimizers don't matter for inference.
-    model.compile("sgd", "mse")
+    #model.compile("sgd", "mse")
   
     #setup the server
-    handler = DonkeySimMsgHandler(model, constant_throttle, port=address[1], num_cars=num_cars, image_cb=image_cb, rand_seed=rand_seed)
+    #handler = DonkeySimMsgHandler(model, constant_throttle, port=address[1], num_cars=num_cars, image_cb=image_cb, rand_seed=rand_seed)
+    model = None
+    handler = PynqSimMsgHandler(model)
     server = SimServer(address, handler)
 
     try:

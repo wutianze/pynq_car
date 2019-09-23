@@ -36,6 +36,8 @@ public class UnityStandardCarAdapter : MonoBehaviour, ICar {
 	public void RequestHandBrake(float val) { handBrake = val; }
 
 	//Pynq car control
+	public char comNow;
+	public char GetComNow(){return comNow;}
 	public void RequestCommand(char c){return;}
 
 	//query last input given.

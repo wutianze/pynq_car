@@ -184,16 +184,23 @@ public class Logger : MonoBehaviour {
 		{
 			if(PynqStyle){
                 string image_filename = GetPynqStyleImageFilename();
-				int commandGet = 1;
-                float steering = car.GetSteering() / car.GetMaxSteering();
-                if(steering < 0){
-                    commandGet = 0;
-                }else if(steering >0){
-                    commandGet = 2;
-                }else if(steering == 0 && car.GetThrottle() != 0){
-                    commandGet = 1;
-                }else{
-                    commandGet = 3;
+                char comNow = car.GetComNow();
+                int commandGet = 0;
+                switch(comNow){
+                    case 'w':
+                        commandGet = 1;
+                        break;
+                    case 's':
+                        commandGet = 3;
+                        break;
+                    case 'a':
+                        commandGet = 0;
+                        break;
+                    case 'd':
+                        commandGet = 2;
+                        break;
+                    default:
+                        return;
                 }
 				writer.WriteLine(string.Format("{0},{1}", image_filename,commandGet.ToString()));
             }

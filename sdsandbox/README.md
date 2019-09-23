@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-23 10:12:28
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-09-23 10:12:28
+ * @LastEditTime: 2019-09-23 14:44:57
  * @Description: 
  -->
 # SdSandbox
@@ -135,6 +135,7 @@ python src/predict_server.py --model=outputs/mymodel.h5
 1. The Control commands can be changed in JoystickCarControl.cs
 2. The training data style can be changed in Logger.cs
 3. You should enable the hidden buttons in Canvas/Panel Menu like ManualTraingData
+4. The tcp control can be changed in Script/tcp/TcpCarHandler.cs, and you need to change the predict_server.py too
 
 ## Credits
 

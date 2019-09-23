@@ -68,8 +68,10 @@ public class Car : MonoBehaviour, ICar {
 		Set(startPos, startRot);
 	}
 
+	public char comNow = 'w';
 	//Pynq command manager
 	public void RequestCommand(char c){
+		comNow = c;
 		switch(c){
 			case 'w':
 				requestSteering = 0.0f;
@@ -92,6 +94,10 @@ public class Car : MonoBehaviour, ICar {
 				requestBrake = 1.0f;
 				break;
 			}
+	}
+
+	public char GetComNow(){
+		return comNow;
 	}
 
 	public void RequestThrottle(float val)
