@@ -35,6 +35,8 @@ public class UnityStandardCarAdapter : MonoBehaviour, ICar {
 
 	public void RequestHandBrake(float val) { handBrake = val; }
 
+	//Pynq car control
+	public void RequestCommand(char c){return;}
 
 	//query last input given.
 	public float GetSteering() { return steering; }

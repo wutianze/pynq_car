@@ -38,7 +38,7 @@ public class Car : MonoBehaviour, ICar {
 
 	//name of the last object we hit.
 	public string last_collision = "none";
-
+	
 	// Use this for initialization
 	void Awake () 
 	{
@@ -66,6 +66,32 @@ public class Car : MonoBehaviour, ICar {
 	public void RestorePosRot()
 	{
 		Set(startPos, startRot);
+	}
+
+	//Pynq command manager
+	public void RequestCommand(char c){
+		switch(c){
+			case 'w':
+				requestSteering = 0.0f;
+				requestTorque = 1.0f;
+				requestBrake = 0f;
+				break;
+			case 'a':
+				requestSteering = -7.0f;
+				requestTorque = 0.5f;
+				requestBrake = 0f;
+				break;
+			case 'd':
+				requestSteering = 7.0f;
+				requestTorque = 0.5f;
+				requestBrake = 0f;
+				break;
+			case 's':
+				requestSteering = 0.0f;
+				requestTorque = 0.0f;
+				requestBrake = 1.0f;
+				break;
+			}
 	}
 
 	public void RequestThrottle(float val)

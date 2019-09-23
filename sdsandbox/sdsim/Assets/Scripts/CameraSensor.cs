@@ -5,8 +5,8 @@ using UnityEngine;
 public class CameraSensor : MonoBehaviour {
 
 	public Camera sensorCam;
-	public int width = 256;
-	public int height = 256;
+	public int width = 160;
+	public int height = 120;
 
 	Texture2D tex;
 	RenderTexture ren;

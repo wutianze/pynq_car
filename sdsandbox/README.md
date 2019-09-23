@@ -1,3 +1,12 @@
+<!--
+ * @Author: Sauron Wu
+ * @GitHub: wutianze
+ * @Email: 1369130123qq@gmail.com
+ * @Date: 2019-09-23 10:12:28
+ * @LastEditors: Sauron Wu
+ * @LastEditTime: 2019-09-23 10:12:28
+ * @Description: 
+ -->
 # SdSandbox
 
 Self Driving Car Sandbox
@@ -122,7 +131,10 @@ python src/predict_server.py --model=outputs/mymodel.h5
 * [pillow](https://python-pillow.org/)  
 * [Unity](https://unity3d.com/get-unity/download)  
 
-
+## How to edit Unity3d to use your own model
+1. The Control commands can be changed in JoystickCarControl.cs
+2. The training data style can be changed in Logger.cs
+3. You should enable the hidden buttons in Canvas/Panel Menu like ManualTraingData
 
 ## Credits
 

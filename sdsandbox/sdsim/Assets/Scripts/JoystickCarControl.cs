@@ -7,8 +7,11 @@ public class JoystickCarControl : MonoBehaviour
 {
 	public GameObject carObj;
 	private ICar car;
+	//public float h;
+	//public float v;
+	public char nowKey = 'w';
 
-	public float MaximumSteerAngle = 25.0f; //has to be kept in sync with the car, as that's a private var.
+	public float MaximumSteerAngle = 16.0f; //has to be kept in sync with the car, as that's a private var.
 	
 	void Awake()
 	{
@@ -19,12 +22,26 @@ public class JoystickCarControl : MonoBehaviour
 	private void FixedUpdate()
 	{
 		// pass the input to the car!
-		float h = CrossPlatformInputManager.GetAxis("Horizontal");
-		float v = CrossPlatformInputManager.GetAxis("Vertical");
-		float handbrake = CrossPlatformInputManager.GetAxis("Jump");
-		car.RequestSteering(h * MaximumSteerAngle);
-		car.RequestThrottle(v);
+		//h = CrossPlatformInputManager.GetAxis("Horizontal");
+		//v = CrossPlatformInputManager.GetAxis("Vertical");
+		//float handbrake = CrossPlatformInputManager.GetAxis("Jump");
+		if(Input.GetKeyDown(KeyCode.W)){
+			nowKey = 'w';
+			car.RequestCommand(nowKey);
+		}else if(Input.GetKeyDown(KeyCode.A)){
+			nowKey = 'a';
+			car.RequestCommand(nowKey);
+		}else if(Input.GetKeyDown(KeyCode.D)){
+			nowKey = 'd';
+			car.RequestCommand(nowKey);
+		}else if(Input.GetKeyDown(KeyCode.S)){
+			nowKey = 's';
+			car.RequestCommand(nowKey);
+		}else{
+				car.RequestCommand(nowKey);
+		}
+		
 		//car.RequestFootBrake(v);
-		car.RequestHandBrake(handbrake);
+		//car.RequestHandBrake(handbrake);
 	}
 }

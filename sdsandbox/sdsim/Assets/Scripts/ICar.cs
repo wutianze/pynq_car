@@ -16,6 +16,8 @@ public interface ICar
 
 	void RequestHandBrake(float val);
 
+	//Pynq car control
+	void RequestCommand(char c);
 
 	//query last input given.
 	float GetSteering();
