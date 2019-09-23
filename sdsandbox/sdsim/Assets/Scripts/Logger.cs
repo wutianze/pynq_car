@@ -79,8 +79,11 @@ public class Logger : MonoBehaviour {
 
     float timeSinceLastCapture = 0.0f;
 
+    //The style for xilinx pynq_car
+    public bool PynqStyle = true;
+
     //We can output our logs in the style that matched the output from the shark robot car platform - github/tawnkramer/shark
-    public bool SharkStyle = true;
+    public bool SharkStyle = false;
 
 	//We can output our logs in the style that matched the output from the udacity simulator
 	public bool UdacityStyle = false;
@@ -119,7 +122,10 @@ public class Logger : MonoBehaviour {
 
 		if(bDoLog && car != null)
 		{
-			if(UdacityStyle)
+			if(PynqStyle){
+                outputFilename = "train.csv";
+            }
+            if(UdacityStyle)
 			{
 				outputFilename = "driving_log.csv";
 			}
@@ -176,7 +182,22 @@ public class Logger : MonoBehaviour {
 
 		if(writer != null)
 		{
-			if(UdacityStyle)
+			if(PynqStyle){
+                string image_filename = GetPynqStyleImageFilename();
+				int commandGet = 1;
+                float steering = car.GetSteering() / car.GetMaxSteering();
+                if(steering < 0){
+                    commandGet = 0;
+                }else if(steering >0){
+                    commandGet = 2;
+                }else if(steering == 0 && car.GetThrottle() != 0){
+                    commandGet = 1;
+                }else{
+                    commandGet = 3;
+                }
+				writer.WriteLine(string.Format("{0},{1}", image_filename,commandGet.ToString()));
+            }
+            else if(UdacityStyle)
 			{
 				string image_filename = GetUdacityStyleImageFilename();
 				float steering = car.GetSteering() / car.GetMaxSteering();
@@ -248,8 +269,13 @@ public class Logger : MonoBehaviour {
         if (logDisplay != null)
             logDisplay.text = "Log:" + frameCounter;
 	}
-
-	string GetUdacityStyleImageFilename()
+    
+    string GetPynqStyleImageFilename()
+	{
+		return GetLogPath() + string.Format("images_{0,8:D8}.jpg", frameCounter);
+	}
+	
+    string GetUdacityStyleImageFilename()
 	{
 		return GetLogPath() + string.Format("IMG/center_{0,8:D8}.jpg", frameCounter);
 	}
