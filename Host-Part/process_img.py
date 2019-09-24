@@ -1,3 +1,12 @@
+'''
+@Author: Sauron Wu
+@GitHub: wutianze
+@Email: 1369130123qq@gmail.com
+@Date: 2019-09-20 14:23:08
+@LastEditors: Sauron Wu
+@LastEditTime: 2019-09-23 17:16:33
+@Description: 
+'''
 # 将图片处理为npz格式
 # 自动驾驶模型真实道路模拟行驶
 import os
@@ -16,7 +25,7 @@ def process_img(img_path, key):
     print(img_path)
     image = Image.open(img_path)
     image_array = np.array(image)
-    image_array = image_array/255.0
+    image_array = image_array/255.0 - 0.5
     image_array = np.expand_dims(image_array, axis=0)  # 增加一个维度
 
     print(image_array.shape)
@@ -28,7 +37,7 @@ def process_img(img_path, key):
 
 
 if __name__ == '__main__':
-    path = "/home/sauron/pynq-auto/images"
+    path = "/home/sauron/pynq_car/sdsandbox/sdsim/log"
     names = []
     keys = {}
     with open(path+"/train.csv") as f:

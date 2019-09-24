@@ -279,7 +279,7 @@ public class Logger : MonoBehaviour {
     
     string GetPynqStyleImageFilename()
 	{
-		return GetLogPath() + string.Format("images_{0,8:D8}.jpg", frameCounter);
+		return string.Format("images_{0,8:D8}.jpg", frameCounter);
 	}
 	
     string GetUdacityStyleImageFilename()
@@ -316,8 +316,10 @@ public class Logger : MonoBehaviour {
             Texture2D image = cs.GetImage();
 
             ImageSaveJob ij = new ImageSaveJob();
-
-			if(UdacityStyle)
+            if(PynqStyle){
+                ij.filename = GetLogPath()+GetPynqStyleImageFilename();
+                ij.bytes = image.EncodeToJPG();
+            }else if(UdacityStyle)
 			{
 				ij.filename = GetUdacityStyleImageFilename();
 

@@ -10,6 +10,7 @@ Pynq-Part/system/
 **/system.zip
 Paper-commited/conference*
 !Paper-commited/*.tex
+**/*.npz
 
 sdsandbox/*.pyc
 sdsandbox/*.h5

@@ -1,3 +1,12 @@
+'''
+@Author: Sauron Wu
+@GitHub: wutianze
+@Email: 1369130123qq@gmail.com
+@Date: 2019-09-20 14:23:08
+@LastEditors: Sauron Wu
+@LastEditTime: 2019-09-23 17:52:58
+@Description: 
+'''
 import keras
 import tensorflow
 import sys
@@ -47,7 +56,7 @@ def load_data():
     print("循环完了")
     X = image_array[1:, :]
     y = label_array[1:, :]
-    X = (X/255.0)
+    #X = (X/255.0) this is done in process_img
     print('Image array shape: ' + str(X.shape))
     print('Label array shape: ' + str(y.shape))
     print(np.mean(X))
@@ -142,9 +151,9 @@ def main():
 
     keep_prob = 0.5
     learning_rate = 0.0001
-    nb_epoch = 2
-    samples_per_epoch = 3000
-    batch_size = 30
+    nb_epoch = 100
+    samples_per_epoch = 5000
+    batch_size = 50
 
     print('keep_prob = ', keep_prob)
     print('learning_rate = ', learning_rate)

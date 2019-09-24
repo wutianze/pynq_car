@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.57481706, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1244,6 +1244,7 @@ MonoBehaviour:
   activity: keep_lane
   maxSteer: 16
   last_collision: none
+  comNow: 119
 --- !u!1 &436049969
 GameObject:
   m_ObjectHideFlags: 0
@@ -2590,6 +2591,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   carObj: {fileID: 847032903}
+  nowKey: 119
   MaximumSteerAngle: 25
 --- !u!4 &1092671586
 Transform:
@@ -2999,9 +3001,10 @@ MonoBehaviour:
   maxFramesToLog: 50000
   bDoLog: 1
   limitFPS: 30
+  PynqStyle: 1
   SharkStyle: 0
   UdacityStyle: 0
-  DonkeyStyle: 1
+  DonkeyStyle: 0
   DonkeyStyle2: 0
   logDisplay: {fileID: 0}
 --- !u!4 &1432446450
@@ -3528,7 +3531,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1734817941
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3545,8 +3548,8 @@ RectTransform:
   m_Father: {fileID: 224832681113032549}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.026737984, y: 0.024352212}
-  m_AnchorMax: {x: 0.9670822, y: 0.20772898}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3662,7 +3665,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1736266013
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3679,8 +3682,8 @@ RectTransform:
   m_Father: {fileID: 224832681113032549}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.029753944, y: 0.58033323}
-  m_AnchorMax: {x: 0.9691719, y: 0.79203945}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

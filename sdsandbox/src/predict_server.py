@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-23 10:12:28
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-23 15:29:59
+@LastEditTime: 2019-09-23 17:16:52
 @Description: 
 '''
 #!/usr/bin/env python
@@ -24,9 +24,10 @@ import socket
 from io import BytesIO
 import base64
 import datetime
+import tensorflow as tf
 
 import numpy as np
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 from PIL import Image
 
 from tcp_server import IMesgHandler, SimServer
@@ -160,6 +161,7 @@ class PynqSimMsgHandler(IMesgHandler):
 
     def __init__(self, model, port=0, num_cars=1, rand_seed=0):
         self.model = model
+        self.graph = tf.get_default_graph()
         #self.constant_throttle = constant_throttle
         self.sock = None
         self.image_folder = None
@@ -203,6 +205,8 @@ class PynqSimMsgHandler(IMesgHandler):
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
         image_array = np.asarray(image)
+        image_array = image_array/255.0 - 0.5
+        #print(image_array)
         self.predict(image_array)
 
         # maybe save frame
@@ -213,15 +217,24 @@ class PynqSimMsgHandler(IMesgHandler):
 
 
     def predict(self, image_array):
-        #outputs = self.model.predict(image_array[None, :, :, :])
-        outputs = np.array([0,1,0,0])
-        #print(outputs.shape)
-        self.on_parsed_outputs(outputs.tolist())
-        
+        with self.graph.as_default():
+            outputs = self.model.predict(image_array[None, :, :, :])
+        #outputs = np.array([0,1,0,0])
+        print(outputs)
+        self.parse_outputs(outputs)
+    
+    def parse_outputs(self, outputs):
+        res = []
+        for output in outputs:            
+            for i in range(output.shape[0]):
+                res.append(output[i])
+
+        self.on_parsed_outputs(res)
+
     def on_parsed_outputs(self, outputs):
         comSend = ''
         toSend = 0
-        nowMax = 0
+        nowMax = 0.0
         for i in range(len(outputs)):
             if outputs[i] > nowMax:
                 nowMax = outputs[i] 
@@ -272,14 +285,14 @@ class PynqSimMsgHandler(IMesgHandler):
 
 def go(filename, address, constant_throttle=0, num_cars=1, image_cb=None, rand_seed=None):
 
-    #model = load_model(filename)
+    model = load_model(filename)
 
     #looks like we have to compile it before use. These optimizers don't matter for inference.
     #model.compile("sgd", "mse")
   
     #setup the server
     #handler = DonkeySimMsgHandler(model, constant_throttle, port=address[1], num_cars=num_cars, image_cb=image_cb, rand_seed=rand_seed)
-    model = None
+    #model = None
     handler = PynqSimMsgHandler(model)
     server = SimServer(address, handler)
 
