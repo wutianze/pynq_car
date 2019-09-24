@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-23 10:12:28
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-24 15:23:14
+@LastEditTime: 2019-09-24 18:01:23
 @Description: 
 '''
 #!/usr/bin/env python
@@ -34,7 +34,7 @@ from tcp_server import IMesgHandler, SimServer
 
 class PynqSimMsgHandler(IMesgHandler):
 
-    def __init__(self, model, port=0, num_cars=1, rand_seed=0):
+    def __init__(self, model, port=0, num_cars=1, rand_seed=0, process_method=0):
         self.model = model
         self.graph = tf.get_default_graph()
         #self.constant_throttle = constant_throttle
@@ -46,6 +46,7 @@ class PynqSimMsgHandler(IMesgHandler):
         self.port = port
         self.target_num_cars = num_cars
         self.rand_seed = rand_seed
+        self.process_method = process_method
         self.fns = {'telemetry' : self.on_telemetry,\
                     'car_loaded' : self.on_car_created,\
                     'on_disconnect' : self.on_disconnect}
@@ -80,7 +81,12 @@ class PynqSimMsgHandler(IMesgHandler):
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
         image_array = np.asarray(image)
-        image_array = image_array/255.0
+        if self.process_method == 0:
+            image_array = image_array/255.0
+        elif self.process_method == 1:
+            image_array = image_array/255.0 - 0.5
+        elif self.process_method == 0:
+            image_array = image_array/127.5 - 1.0
         #print(image_array)
         self.predict(image_array)
 
@@ -144,21 +150,21 @@ class PynqSimMsgHandler(IMesgHandler):
         
         self.sock.queue_message(msg)
 
-    def request_another_car(self):
-        port = self.port + self.num_cars
-        address = ("0.0.0.0", port)
-        
-        #spawn a new message handler serving on the new port.
-        handler = DonkeySimMsgHandler(self.model, 0., num_cars=(self.target_num_cars - 1), port=address[1])
-        server = SimServer(address, handler)
-
-        msg = { 'msg_type' : 'new_car', 'host': '127.0.0.1', 'port' : port.__str__() }
-        self.sock.queue_message(msg)   
+#    def request_another_car(self):
+#        port = self.port + self.num_cars
+#        address = ("0.0.0.0", port)
+#        
+#        #spawn a new message handler serving on the new port.
+#        handler = PynqSimMsgHandler(self.model, 0., num_cars=(self.target_num_cars - 1), port=address[1])
+#        server = SimServer(address, handler)
+#
+#        msg = { 'msg_type' : 'new_car', 'host': '127.0.0.1', 'port' : port.__str__() }
+#        self.sock.queue_message(msg)   
 
     def on_close(self):
         pass
 
-def go(filename, address, constant_throttle=0, num_cars=1, image_cb=None, rand_seed=None):
+def go(filename, address, constant_throttle=0, num_cars=1, image_cb=None, rand_seed=None, process_method=0):
 
     model = load_model(filename)
 
@@ -168,7 +174,7 @@ def go(filename, address, constant_throttle=0, num_cars=1, image_cb=None, rand_s
     #setup the server
     #handler = DonkeySimMsgHandler(model, constant_throttle, port=address[1], num_cars=num_cars, image_cb=image_cb, rand_seed=rand_seed)
     #model = None
-    handler = PynqSimMsgHandler(model)
+    handler = PynqSimMsgHandler(model, process_method)
     server = SimServer(address, handler)
 
     try:
@@ -187,7 +193,8 @@ if __name__ == "__main__":
     parser.add_argument('--num_cars', type=int, default=1, help='how many cars to spawn')
     parser.add_argument('--constant_throttle', type=float, default=0.0, help='apply constant throttle')
     parser.add_argument('--rand_seed', type=int, default=0, help='set road generation random seed')
+    parser.add_argument('--process_method', type=int, default=0, help='process method like in process_img')
     args = parser.parse_args()
 
     address = (args.host, args.port)
-    go(args.model, address, args.constant_throttle, num_cars=args.num_cars, rand_seed=args.rand_seed)
+    go(args.model, address, args.constant_throttle, num_cars=args.num_cars, rand_seed=args.rand_seed,process_method=args.process_method)

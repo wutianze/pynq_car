@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-24 16:55:24
+@LastEditTime: 2019-09-24 17:29:58
 @Description: 
 '''
 import keras
@@ -71,7 +71,8 @@ def build_model(keep_prob):
 # step3 训练模型
 def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
                 batch_size, train_list, valid_list):
-    
+    if not os.path.exists("model/"):
+        os.mkdir("model/")
     # 值保存最好的模型存下来
     checkpoint = ModelCheckpoint('model/model-{epoch:03d}.h5',
                                  monitor='val_acc',
@@ -123,6 +124,7 @@ def batch_generator(name_list, batch_size):
                 label_array = np.vstack((label_array, train_labels_temp))
         X = image_array[1:, :]
         y = label_array[1:, :]
+        #print(X[0])
         #X = (X/255.0) this is done in process_img
         #print('Image array shape: ' + str(X.shape))
         #print('Label array shape: ' + str(y.shape))
@@ -158,7 +160,7 @@ def main():
 
 
     keep_prob = 0.5
-    learning_rate = 0.01
+    learning_rate = 0.001
     nb_epoch = 50
     samples_per_epoch = 3000
     batch_size = 30

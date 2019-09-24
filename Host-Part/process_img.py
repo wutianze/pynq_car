@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-24 15:22:28
+@LastEditTime: 2019-09-24 17:55:16
 @Description: 
 '''
 # 将图片处理为npz格式
@@ -16,6 +16,7 @@ from time import time
 import math
 from PIL import Image
 import csv
+import argparse
 import config
 
 
@@ -23,9 +24,15 @@ import config
 def process_img(img_path, key):
 
     #print(img_path)
+    # the method for processing images,0:/255,1:/255-0.5,3:/127.5-1
     image = Image.open(img_path)
     image_array = np.array(image)
-    image_array = image_array/255.0
+    if config.PROCESS_METHOD == 0:
+        image_array = image_array/255.0
+    elif config.PROCESS_METHOD == 1:
+        image_array = image_array/255.0 - 0.5
+    elif config.PROCESS_METHOD == 2:
+        image_array = image_array/127.5 - 1.0
     image_array = np.expand_dims(image_array, axis=0)  # 增加一个维度
 
     #print(image_array.shape)
@@ -37,7 +44,10 @@ def process_img(img_path, key):
 
 
 if __name__ == '__main__':
-    path = "/home/sauron/pynq_car/sdsandbox/sdsim/log"
+    parser = argparse.ArgumentParser(description='prediction server')
+    parser.add_argument('--path', type=str, help='model filename', default="/home/sauron/pynq_car/sdsandbox/sdsim/log")
+    args = parser.parse_args()
+    path = args.path
     names = []
     keys = {}
     with open(path+"/train.csv") as f:
