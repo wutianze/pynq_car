@@ -56,7 +56,9 @@ specified algorithms.
 This time we build our own auto-driving car based on Xilinx Pynq-Z2\cite{b4}, it provides an end-to-end solution to autonomous driving and it uses the power of DPU\cite{b5} to accelerate the computing. 
 
 We find that in previous FPT competitions\cite{b6}, many competitors use traditional computer vision methods or machine learning methods to detect objects and then make decisions based on the results\cite{b7}\cite{b8}. Our solution is quite different with theirs since we use a simple CNN model as our AI network and feed the model with pictures taken by the camera in the car and the model returns the control orders.
-The platform we use is Xilinx’s Pynq-Z2 board, there is a DPU IP in its FPGA, with DPU’s help, we can accelerate the inference process of the model and make it possible to run AI inference task in limited resource platform like Pynq-Z2.
+The platform we use is Xilinx’s Pynq-Z2 board, there is a DPU IP in its FPGA, with DPU’s help, we can accelerate the inference process of the model and make it possible to run AI inference task in limited resource platform like Pynq-Z2. 
+
+We also build a simulator using Unity3d, we can collect training data, test the model's performance and pre-train the model in the simulator. It highly increase the efficiency and accelerate the project development. 
 
 The rest of this paper is organized as follows. Section II describes the overview of our hardware structure and development environment. Section III presents the software architecture and details of methods we are going to use for the competition. Finally, the paper mentions the current progress and makes an conclusion.
 
@@ -125,6 +127,20 @@ The main part of the model is CNN layers, they can extract features from the ima
 
 Although the current model is not the perfect one and it cannot be accelerated by DPU totally, it's easy to make changes and optimizations to the model. With the development of DNNDK, more portion of the model can be accelerated and the whole system can be more efficient and powerful.
 
+\subsection{Simulator}
+
+Now we have built a simulator to collect data for training, and we can also test our model using the simulator. With this tool, we can further separate software part from hardware part, even you don't have a real car, you can build and test your model in the virtual environment. The interface of our simulator is shown in Fig.~\ref{si}.  
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{net-structure.png}}
+\caption{Simulator Interface.}
+\label{si}
+\end{figure}
+
+The main part of the model is CNN layers, they can extract features from the images taken by the car's front camera. Some fully connected layers follow the CNN layers, they can finally extract the command information needed for auto-driving. The activation function we use is Relu because it works well and can be accelerated by DPU. The last layer is a Softmax layer, it can provide classification and normalization functions for the model.  
+
+Although the current model is not the perfect one and it cannot be accelerated by DPU totally, it's easy to make changes and optimizations to the model. With the development of DNNDK, more portion of the model can be accelerated and the whole system can be more efficient and powerful.
+
 \subsection{Algorithms}
 \begin{itemize}
 \item Crossroad control. Since the AI model cannot handle the situation when the car meets a crossroad. We will help the car decide which direction to take according to the competition's request. The car will use neural network or cv algorithms to recognize all the scenes that need it to make a choice, for example the crossroad. After the car meets these scenes, first the main controller will tell the car which direction to take, then the car will use predefined control commands to drive through the crossroad. When this progress is finished, the AI model will retake the control of the car.
@@ -135,7 +151,9 @@ Although the current model is not the perfect one and it cannot be accelerated b
 
 \section{Development status}
 
-Until now, we have built the whole system, the AI model works well in simple scenes. We are busy implementing the cv functions and optimizing the hardware structure of the car. Later we will try to make some improvements to the model and do some tests and modifications according to the competition's rules. If possible, we will build a simulator to generate training data and evaluate the system. Our goal is not only winning the competition, but also building a general and easy-to-use platform for those who want to try their own ideas about auto-driving.
+Until now, we have built the whole system, the AI model works well in simple scenes in virtual environment. We are busy implementing the cv functions and optimizing the hardware structure of the car. Later we will try to make some improvements to the model and do some tests and modifications according to the competition's rules. 
+
+Our goal is not only winning the competition, but also building a general and easy-to-use platform for those who want to try their own ideas about auto-driving.
 
 \section{Conclusion}
 
