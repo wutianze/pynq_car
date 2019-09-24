@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-24 14:23:44
+@LastEditTime: 2019-09-24 16:55:24
 @Description: 
 '''
 import keras
@@ -73,11 +73,11 @@ def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
                 batch_size, train_list, valid_list):
     
     # 值保存最好的模型存下来
-    checkpoint = ModelCheckpoint('model.h5',
-                                 monitor='val_loss',
+    checkpoint = ModelCheckpoint('model/model-{epoch:03d}.h5',
+                                 monitor='val_acc',
                                  verbose=0,
                                  save_best_only=True,
-                                 mode='min')
+                                 mode='max')
     # EarlyStopping patience：当earlystop被激活（如发现loss相比上一个epoch训练没有下降），
     # 则经过patience个epoch后停止训练。
     # mode：‘auto’，‘min’，‘max’之一，在min模式下，如果检测值停止下降则中止训练。在max模式下，当检测值不再上升则停止训练。
@@ -158,10 +158,10 @@ def main():
 
 
     keep_prob = 0.5
-    learning_rate = 0.0001
+    learning_rate = 0.01
     nb_epoch = 50
-    samples_per_epoch = 5000
-    batch_size = 50
+    samples_per_epoch = 3000
+    batch_size = 30
 
     print('keep_prob = ', keep_prob)
     print('learning_rate = ', learning_rate)

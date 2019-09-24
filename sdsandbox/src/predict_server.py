@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-23 10:12:28
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-24 14:04:16
+@LastEditTime: 2019-09-24 15:23:14
 @Description: 
 '''
 #!/usr/bin/env python
@@ -80,7 +80,7 @@ class PynqSimMsgHandler(IMesgHandler):
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
         image_array = np.asarray(image)
-        image_array = image_array/255.0 - 0.5
+        image_array = image_array/255.0
         #print(image_array)
         self.predict(image_array)
 
