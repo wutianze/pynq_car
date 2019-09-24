@@ -58,7 +58,7 @@ This time we build our own auto-driving car based on Xilinx Pynq-Z2\cite{b4}, it
 We find that in previous FPT competitions\cite{b6}, many competitors use traditional computer vision methods or machine learning methods to detect objects and then make decisions based on the results\cite{b7}\cite{b8}. Our solution is quite different with theirs since we use a simple CNN model as our AI network and feed the model with pictures taken by the camera in the car and the model returns the control orders.
 The platform we use is Xilinx’s Pynq-Z2 board, there is a DPU IP in its FPGA, with DPU’s help, we can accelerate the inference process of the model and make it possible to run AI inference task in limited resource platform like Pynq-Z2. 
 
-We also build a simulator using Unity3d, we can collect training data, test the model's performance and pre-train the model in the simulator. It highly increase the efficiency and accelerate the project development. 
+We also build a simulator based on sdsandbox\cite{b9} using Unity3d\cite{b10}, we can collect training data, test the model's performance and pre-train the model in the simulator. It highly increase the efficiency and accelerate the project development. 
 
 The rest of this paper is organized as follows. Section II describes the overview of our hardware structure and development environment. Section III presents the software architecture and details of methods we are going to use for the competition. Finally, the paper mentions the current progress and makes an conclusion.
 
@@ -76,9 +76,9 @@ The Fig.~\ref{co} is our robot car's photograph. Its body is made of acrylic boa
 
 \subsection{Development environment}
 
-The operating system we use in the car is created by PetaLinux\cite{b9}, it has opencv and dpu support. We control the motors by directly writing values to physical memory address of FPGA, the drivers are implemented in FPGA. Most of our AI inference computing tasks are run by DPU, the tasks which DPU doesn't support are run by arm core embedded in Pynq-Z2. The driving decisions are made by AI model while the central controller is run in arm core.  
+The operating system we use in the car is created by PetaLinux\cite{b11}, it has opencv and dpu support. We control the motors by directly writing values to physical memory address of FPGA, the drivers are implemented in FPGA. Most of our AI inference computing tasks are run by DPU, the tasks which DPU doesn't support are run by arm core embedded in Pynq-Z2. The driving decisions are made by AI model while the central controller is run in arm core.  
 
-We provide two language implementations for collect-data module, you can collect data for training in c++ or python environment. The c++ version is more commonly used while the python version has a good support in Pynq-Z2. The auto-run module is implemented in c++ since the DNNDK-v3.0\cite{b10} version has only APIs for c++ language.
+We provide two language implementations for collect-data module, you can collect data for training in c++ or python environment. The c++ version is more commonly used while the python version has a good support in Pynq-Z2. The auto-run module is implemented in c++ since the DNNDK-v3.0\cite{b12} version has only APIs for c++ language.
 
 \section{Software Implementation and algorithms}
 
@@ -132,7 +132,7 @@ Although the current model is not the perfect one and it cannot be accelerated b
 Now we have built a simulator to collect data for training, and we can also test our model using the simulator. With this tool, we can further separate software part from hardware part, even you don't have a real car, you can build and test your model in the virtual environment. The interface of our simulator is shown in Fig.~\ref{si}.  
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=0.5\textwidth]{net-structure.png}}
+\centerline{\includegraphics[width=0.5\textwidth]{simulator.png}}
 \caption{Simulator Interface.}
 \label{si}
 \end{figure}
@@ -192,8 +192,10 @@ The project is supported by Xilinx and Institute of Computing Technology Chinese
 \bibitem{b6} An FPGA design competition for developing autonomous driving robot cars is held in FPT2019 [ONLINE] Available at: http://fpt19.tju.edu.cn/Contest/FPT2019\_FPGA\_Design \_Competition/Contents\_and\_Conditions.htm
 \bibitem{b7} Kojima, A., \& Nose, Y. (2018, December). Development of an Autonomous Driving Robot Car Using FPGA. In 2018 International Conference on Field-Programmable Technology (FPT) (pp. 411-414). IEEE.
 \bibitem{b8} Aoto, M., Wada, Y., \& Numata, Y. (2018, December). Development of an FPGA Controlled" Mini-Car" Toward Autonomous Driving. In 2018 International Conference on Field-Programmable Technology (FPT) (pp. 400-402). IEEE.
-\bibitem{b9} TUL PetaLinux [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/xilinx2019 \_1/ug1144-petalinux-tools-reference-guide.pdf
-\bibitem{b10} TUL DNNDK [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/ai\_inference /v1\_5
+\bibitem{b9} Tawn Kramer. (2019, September) [ONLINE] Available at: https://github.com/tawnkramer/sdsandbox
+\bibitem{b10} TUL Unity3d Available at: https://unity.com/learn
+\bibitem{b11} TUL PetaLinux [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/xilinx2019 \_1/ug1144-petalinux-tools-reference-guide.pdf
+\bibitem{b12} TUL DNNDK [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/ai\_inference /v1\_5
 \end{thebibliography}
 \vspace{12pt}
 
