@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-23 17:52:58
+@LastEditTime: 2019-09-24 13:59:12
 @Description: 
 '''
 import keras
@@ -14,6 +14,7 @@ import os
 import h5py
 import numpy as np
 import glob
+import random
 from sklearn.model_selection import train_test_split
 from keras.models import Sequential
 from keras.layers import Lambda, Conv2D, MaxPooling2D, Dropout, Dense, Flatten
@@ -30,9 +31,6 @@ np.random.seed(0)
 # step1,载入数据，并且分割为训练和验证集
 # 问题，数据集太大了，已经超过计算机内存
 def load_data():
-    # load
-    image_array = np.zeros((1, config.IMAGE_HEIGHT, config.IMAGE_WIDTH, config.IMAGE_CHANNELS))               # 初始化
-    label_array = np.zeros((1, config.OUTPUT_NUM), 'float')
     training_data = glob.glob('training_data_npz/*.npz')
     # 匹配所有的符合条件的文件，并将其以list的形式返回。
     print("匹配完成。开始读入")
@@ -42,34 +40,16 @@ def load_data():
     if not training_data:
         print("No training data in directory, exit")
         sys.exit()
-    i = 0
-    for single_npz in training_data:
-        with np.load(single_npz) as data:
-            print(data.keys())
-            i = i + 1
-            print("在打印关键值", i)
-            train_temp = data['train_imgs']
-            train_labels_temp = data['train_labels']
-        image_array = np.vstack((image_array, train_temp)) # 把文件读取都放入，内存
-        label_array = np.vstack((label_array, train_labels_temp))
-        print("第%d轮完成"%i)
-    print("循环完了")
-    X = image_array[1:, :]
-    y = label_array[1:, :]
-    #X = (X/255.0) this is done in process_img
-    print('Image array shape: ' + str(X.shape))
-    print('Label array shape: ' + str(y.shape))
-    print(np.mean(X))
-    print(np.var(X))
+    cut = int(len(training_data)*0.8)
+    return training_data[0:cut], training_data[cut:]
 
-    # now we can split the data into a training (80), testing(20), and validation set
-    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2, random_state=0)
-
-    return X_train, X_valid, y_train, y_valid
 
 
 # step2 建立模型
 def build_model(keep_prob):
+    if os.path.exists("model.h5"):
+        model = load_model("model.h5")
+        return model
     print("开始编译模型")
     model = Sequential()
     #model.add(Lambda(lambda x: (x/102.83 - 1), input_shape = config.INPUT_SHAPE))
@@ -90,9 +70,9 @@ def build_model(keep_prob):
 
 # step3 训练模型
 def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
-                batch_size, X_train, X_valid, y_train, y_valid):
+                batch_size, train_list, valid_list):
     # 值保存最好的模型存下来
-    checkpoint = ModelCheckpoint('model-{epoch:03d}.h5',
+    checkpoint = ModelCheckpoint('model.h5',
                                  monitor='val_loss',
                                  verbose=0,
                                  save_best_only=True,
@@ -109,29 +89,52 @@ def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
     model.compile(loss='mean_squared_error', optimizer=keras.optimizers.Adam(lr=learning_rate), metrics=['accuracy'])
     # 训练神经网络模型，batch_size梯度下降时每个batch包含的样本数，epochs训练多少轮结束，
     # verbose是否显示日志信息，validation_data用来验证的数据集
-    model.fit_generator(batch_generator(X_train, y_train, batch_size),
+    model.fit_generator(batch_generator(train_list, batch_size),
                         steps_per_epoch=samples_per_epoch/batch_size,
                         epochs = nb_epoch,
                         max_queue_size=1,
-                        validation_data=batch_generator(X_valid, y_valid, batch_size),
-                        validation_steps=len(X_valid)/batch_size,
+                        validation_data=batch_generator(valid_list, batch_size),
+                        validation_steps=(len(valid_list)*config.CHUNK_SIZE)/batch_size,
                         callbacks=[tensorboard, checkpoint, early_stop],
                         verbose=2)
 
 # step4
 # 可以一个batch一个batch进行训练，CPU和GPU同时开工
-def batch_generator(X, y, batch_size):
-    images = np.empty([batch_size, config.IMAGE_HEIGHT, config.IMAGE_WIDTH, config.IMAGE_CHANNELS])
-    steers = np.empty([batch_size, config.OUTPUT_NUM])
+def batch_generator(name_list, batch_size):
+    i = 0
     while True:
-        i = 0
+        # load
+        image_array = np.zeros((1, config.IMAGE_HEIGHT, config.IMAGE_WIDTH, config.IMAGE_CHANNELS))               # 初始化
+        label_array = np.zeros((1, config.OUTPUT_NUM), 'float')
+        # every time read <=10 pack and shuffle
+        for read_num in range(10):
+            single_npz = name_list[random.randint(0,len(name_list)-1)]
+        
+            with np.load(single_npz) as data:
+            #print(data.keys())
+                train_temp = data['train_imgs']
+                train_labels_temp = data['train_labels']
+                image_array = np.vstack((image_array, train_temp)) # 把文件读取都放入，内存
+                label_array = np.vstack((label_array, train_labels_temp))
+        X = image_array[1:, :]
+        y = label_array[1:, :]
+        #X = (X/255.0) this is done in process_img
+        #print('Image array shape: ' + str(X.shape))
+        #print('Label array shape: ' + str(y.shape))
+        #print(np.mean(X))
+        #print(np.var(X))
+
+        images = np.empty([batch_size, config.IMAGE_HEIGHT, config.IMAGE_WIDTH, config.IMAGE_CHANNELS])
+        steers = np.empty([batch_size, config.OUTPUT_NUM])
         for index in np.random.permutation(X.shape[0]):
             images[i] = X[index]
             steers[i] = y[index]
             i += 1
             if i == batch_size:
-                break
-        yield (images, steers)
+                i = 0
+                yield (images, steers)
+
+    
 
 
 # step5 评估模型
@@ -151,7 +154,7 @@ def main():
 
     keep_prob = 0.5
     learning_rate = 0.0001
-    nb_epoch = 100
+    nb_epoch = 50
     samples_per_epoch = 5000
     batch_size = 50
 
@@ -163,12 +166,12 @@ def main():
     print('-' * 30)
 
     # 开始载入数据
-    data = load_data()
+    train_list, valid_list = load_data()
     print("数据加载完毕")
     # 编译模型
     model = build_model(keep_prob)
     # 在数据集上训练模型，保存成model.h5
-    train_model(model, learning_rate, nb_epoch, samples_per_epoch, batch_size, *data)
+    train_model(model, learning_rate, nb_epoch, samples_per_epoch, batch_size, train_list, valid_list)
     print("模型训练完毕")
 
 

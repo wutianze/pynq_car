@@ -11,6 +11,8 @@ Pynq-Part/system/
 Paper-commited/conference*
 !Paper-commited/*.tex
 **/*.npz
+**/logs
+**/log
 
 sdsandbox/*.pyc
 sdsandbox/*.h5

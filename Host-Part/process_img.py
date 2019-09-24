@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-23 17:16:33
+@LastEditTime: 2019-09-24 13:52:02
 @Description: 
 '''
 # 将图片处理为npz格式
@@ -22,13 +22,13 @@ import config
 # this function need you to specify
 def process_img(img_path, key):
 
-    print(img_path)
+    #print(img_path)
     image = Image.open(img_path)
     image_array = np.array(image)
     image_array = image_array/255.0 - 0.5
     image_array = np.expand_dims(image_array, axis=0)  # 增加一个维度
 
-    print(image_array.shape)
+    #print(image_array.shape)
     label_array = [0.,0.,0.,0.]
     label_array[int(key[0])] = 1.
 
@@ -57,7 +57,8 @@ if __name__ == '__main__':
         train_imgs = np.zeros([1, config.IMAGE_HEIGHT, config.IMAGE_WIDTH, config.IMAGE_CHANNELS])            # 初始化图像数组
 
         CHUNK_files = names[turn * config.CHUNK_SIZE: (turn + 1) * config.CHUNK_SIZE] # 取出当前这一轮图片
-        print("number of CHUNK files: {}".format(len(CHUNK_files)))
+        #print("number of CHUNK files: {}".format(len(CHUNK_files)))
+        print("Turn Now:%d"%turn)
         for file in CHUNK_files:
             # 不是文件夹，并且是jpg文件
             if not os.path.isdir(file) and file[len(file) - 3:len(file)] == 'jpg':
