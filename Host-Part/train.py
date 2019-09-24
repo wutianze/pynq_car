@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-24 13:59:12
+@LastEditTime: 2019-09-24 14:23:44
 @Description: 
 '''
 import keras
@@ -19,7 +19,7 @@ from sklearn.model_selection import train_test_split
 from keras.models import Sequential
 from keras.layers import Lambda, Conv2D, MaxPooling2D, Dropout, Dense, Flatten
 from keras.models import load_model, Model, Input
-from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard
+from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard, ReduceLROnPlateau
 from keras.optimizers import Adam, SGD
 import config
 np.random.seed(0)
@@ -71,6 +71,7 @@ def build_model(keep_prob):
 # step3 训练模型
 def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
                 batch_size, train_list, valid_list):
+    
     # 值保存最好的模型存下来
     checkpoint = ModelCheckpoint('model.h5',
                                  monitor='val_loss',
@@ -85,6 +86,10 @@ def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
     tensorboard = TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=20, write_graph=True,write_grads=True,
                               write_images=True, embeddings_freq=0, embeddings_layer_names=None,
                               embeddings_metadata=None)
+    # reduce learning rate
+    reduce_lr = ReduceLROnPlateau(monitor='acc', factor=0.1, patience=3, 
+                                  verbose=0, mode='max', min_delta=1e-4,cooldown=0, min_lr=0)
+
     # 编译神经网络模型，loss损失函数，optimizer优化器， metrics列表，包含评估模型在训练和测试时网络性能的指标
     model.compile(loss='mean_squared_error', optimizer=keras.optimizers.Adam(lr=learning_rate), metrics=['accuracy'])
     # 训练神经网络模型，batch_size梯度下降时每个batch包含的样本数，epochs训练多少轮结束，
@@ -95,7 +100,7 @@ def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
                         max_queue_size=1,
                         validation_data=batch_generator(valid_list, batch_size),
                         validation_steps=(len(valid_list)*config.CHUNK_SIZE)/batch_size,
-                        callbacks=[tensorboard, checkpoint, early_stop],
+                        callbacks=[tensorboard, checkpoint, early_stop, reduce_lr],
                         verbose=2)
 
 # step4
