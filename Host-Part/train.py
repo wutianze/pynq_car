@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-24 17:29:58
+@LastEditTime: 2019-09-25 15:35:48
 @Description: 
 '''
 import keras
@@ -22,16 +22,13 @@ from keras.models import load_model, Model, Input
 from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard, ReduceLROnPlateau
 from keras.optimizers import Adam, SGD
 import config
+import argparse
 np.random.seed(0)
-
-
-
-
 
 # step1,载入数据，并且分割为训练和验证集
 # 问题，数据集太大了，已经超过计算机内存
-def load_data():
-    training_data = glob.glob('training_data_npz/*.npz')
+def load_data(read_path):
+    training_data = glob.glob(read_path + '/*.npz')
     # 匹配所有的符合条件的文件，并将其以list的形式返回。
     print("匹配完成。开始读入")
     print("一共%d轮"%len(training_data))
@@ -46,9 +43,9 @@ def load_data():
 
 
 # step2 建立模型
-def build_model(keep_prob):
-    if os.path.exists("model.h5"):
-        model = load_model("model.h5")
+def build_model(keep_prob,model_path):
+    if os.path.exists(model_path+"/model.h5"):
+        model = load_model(model_path+"/model.h5")
         return model
     print("开始编译模型")
     model = Sequential()
@@ -70,15 +67,15 @@ def build_model(keep_prob):
 
 # step3 训练模型
 def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
-                batch_size, train_list, valid_list):
-    if not os.path.exists("model/"):
-        os.mkdir("model/")
+                batch_size, train_list, valid_list, model_path):
+    if not os.path.exists(model_path+'/'):
+        os.mkdir(model_path+'/')
     # 值保存最好的模型存下来
-    checkpoint = ModelCheckpoint('model/model-{epoch:03d}.h5',
-                                 monitor='val_acc',
+    checkpoint = ModelCheckpoint(model_path+'/model-{epoch:03d}.h5',
+                                 monitor='val_loss',
                                  verbose=0,
-                                 save_best_only=True,
-                                 mode='max')
+                                 save_best_only=False,
+                                 mode='min')
     # EarlyStopping patience：当earlystop被激活（如发现loss相比上一个epoch训练没有下降），
     # 则经过patience个epoch后停止训练。
     # mode：‘auto’，‘min’，‘max’之一，在min模式下，如果检测值停止下降则中止训练。在max模式下，当检测值不再上升则停止训练。
@@ -88,8 +85,8 @@ def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
                               write_images=True, embeddings_freq=0, embeddings_layer_names=None,
                               embeddings_metadata=None)
     # reduce learning rate
-    reduce_lr = ReduceLROnPlateau(monitor='acc', factor=0.1, patience=3, 
-                                  verbose=0, mode='max', min_delta=1e-4,cooldown=0, min_lr=0)
+    reduce_lr = ReduceLROnPlateau(monitor='acc', factor=0.1, patience=5, 
+                                  verbose=0, mode='max', min_delta=1e-6,cooldown=0, min_lr=0)
 
     # 编译神经网络模型，loss损失函数，optimizer优化器， metrics列表，包含评估模型在训练和测试时网络性能的指标
     model.compile(loss='mean_squared_error', optimizer=keras.optimizers.Adam(lr=learning_rate), metrics=['accuracy'])
@@ -133,7 +130,8 @@ def batch_generator(name_list, batch_size):
 
         images = np.empty([batch_size, config.IMAGE_HEIGHT, config.IMAGE_WIDTH, config.IMAGE_CHANNELS])
         steers = np.empty([batch_size, config.OUTPUT_NUM])
-        for index in np.random.permutation(X.shape[0]):
+        #for index in np.random.permutation(X.shape[0]):
+        for index in range(X.shape[0]):
             images[i] = X[index]
             steers[i] = y[index]
             i += 1
@@ -151,7 +149,8 @@ def batch_generator(name_list, batch_size):
     #print('Test accuracy:', score[1])
 
 
-def main():
+def main(model_path, read_path):
+
     # 打印出超参数
 
     print('-'*30)
@@ -160,10 +159,10 @@ def main():
 
 
     keep_prob = 0.5
-    learning_rate = 0.001
+    learning_rate = 0.0001
     nb_epoch = 50
-    samples_per_epoch = 3000
-    batch_size = 30
+    samples_per_epoch = 5000
+    batch_size = 50
 
     print('keep_prob = ', keep_prob)
     print('learning_rate = ', learning_rate)
@@ -173,15 +172,19 @@ def main():
     print('-' * 30)
 
     # 开始载入数据
-    train_list, valid_list = load_data()
+    train_list, valid_list = load_data(read_path)
     print("数据加载完毕")
     # 编译模型
-    model = build_model(keep_prob)
+    model = build_model(keep_prob,model_path)
     # 在数据集上训练模型，保存成model.h5
-    train_model(model, learning_rate, nb_epoch, samples_per_epoch, batch_size, train_list, valid_list)
+    train_model(model, learning_rate, nb_epoch, samples_per_epoch, batch_size, train_list, valid_list,model_path)
     print("模型训练完毕")
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='prediction server')
+    parser.add_argument('--model', type=str, help='model dir', default="./model")
+    parser.add_argument('--read', type=str, help='npz store dir', default="./training_data_npz")
+    args = parser.parse_args()
     print(config.INPUT_SHAPE)
-    main()
+    main(args.model,args.read)
