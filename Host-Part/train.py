@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-25 15:35:48
+@LastEditTime: 2019-09-26 12:52:56
 @Description: 
 '''
 import keras
@@ -51,15 +51,19 @@ def build_model(keep_prob,model_path):
     model = Sequential()
     #model.add(Lambda(lambda x: (x/102.83 - 1), input_shape = config.INPUT_SHAPE))
     model.add(Conv2D(24, (5, 5), activation='relu', strides=(2, 2), input_shape = config.INPUT_SHAPE))
+    model.add(Dropout(keep_prob))
     model.add(Conv2D(36, (5, 5), activation='relu', strides=(2, 2)))
+    model.add(Dropout(keep_prob))
     model.add(Conv2D(48, (5, 5), activation='relu', strides=(2, 2)))
+    model.add(Dropout(keep_prob))
     model.add(Conv2D(64, (3, 3),activation='relu'))
+    model.add(Dropout(keep_prob))
     model.add(Conv2D(64, (3, 3),activation='relu'))
     model.add(Dropout(keep_prob))  # Dropout将在训练过程中每次更新参数时随机断开一定百分比（p）的输入神经元连接
     model.add(Flatten())
-    #model.add(Dense(500, activation='elu'))
+    model.add(Dense(500, activation='relu'))
     model.add(Dense(250, activation='relu'))
-    #model.add(Dense(50, activation='elu'))
+    model.add(Dense(50, activation='relu'))
     model.add(Dense(config.OUTPUT_NUM, activation='softmax'))
     model.summary()
 
@@ -67,7 +71,7 @@ def build_model(keep_prob,model_path):
 
 # step3 训练模型
 def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
-                batch_size, train_list, valid_list, model_path):
+                batch_size, train_list, valid_list, model_path,method):
     if not os.path.exists(model_path+'/'):
         os.mkdir(model_path+'/')
     # 值保存最好的模型存下来
@@ -79,31 +83,31 @@ def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
     # EarlyStopping patience：当earlystop被激活（如发现loss相比上一个epoch训练没有下降），
     # 则经过patience个epoch后停止训练。
     # mode：‘auto’，‘min’，‘max’之一，在min模式下，如果检测值停止下降则中止训练。在max模式下，当检测值不再上升则停止训练。
-    early_stop = EarlyStopping(monitor='loss', min_delta=.0005, patience=10,
+    early_stop = EarlyStopping(monitor='loss', min_delta=.0005, patience=20,
                                verbose=1, mode='min')
     tensorboard = TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=20, write_graph=True,write_grads=True,
                               write_images=True, embeddings_freq=0, embeddings_layer_names=None,
                               embeddings_metadata=None)
     # reduce learning rate
-    reduce_lr = ReduceLROnPlateau(monitor='acc', factor=0.1, patience=5, 
+    reduce_lr = ReduceLROnPlateau(monitor='acc', factor=0.1, patience=10, 
                                   verbose=0, mode='max', min_delta=1e-6,cooldown=0, min_lr=0)
 
     # 编译神经网络模型，loss损失函数，optimizer优化器， metrics列表，包含评估模型在训练和测试时网络性能的指标
     model.compile(loss='mean_squared_error', optimizer=keras.optimizers.Adam(lr=learning_rate), metrics=['accuracy'])
     # 训练神经网络模型，batch_size梯度下降时每个batch包含的样本数，epochs训练多少轮结束，
     # verbose是否显示日志信息，validation_data用来验证的数据集
-    model.fit_generator(batch_generator(train_list, batch_size),
+    model.fit_generator(batch_generator(train_list, batch_size,method),
                         steps_per_epoch=samples_per_epoch/batch_size,
                         epochs = nb_epoch,
                         max_queue_size=1,
-                        validation_data=batch_generator(valid_list, batch_size),
+                        validation_data=batch_generator(valid_list, batch_size,method),
                         validation_steps=(len(valid_list)*config.CHUNK_SIZE)/batch_size,
                         callbacks=[tensorboard, checkpoint, early_stop, reduce_lr],
                         verbose=2)
 
 # step4
 # 可以一个batch一个batch进行训练，CPU和GPU同时开工
-def batch_generator(name_list, batch_size):
+def batch_generator(name_list, batch_size,method):
     i = 0
     while True:
         # load
@@ -121,6 +125,14 @@ def batch_generator(name_list, batch_size):
                 label_array = np.vstack((label_array, train_labels_temp))
         X = image_array[1:, :]
         y = label_array[1:, :]
+        if method == 0:
+            X = X/255.0
+        elif method == 1:
+            X = X/255.0 - 0.5
+        elif method == 2:
+            X = X/127.5 - 1.0
+        elif method == 3:
+            X = X/102.83 - 1.0
         #print(X[0])
         #X = (X/255.0) this is done in process_img
         #print('Image array shape: ' + str(X.shape))
@@ -149,7 +161,7 @@ def batch_generator(name_list, batch_size):
     #print('Test accuracy:', score[1])
 
 
-def main(model_path, read_path):
+def main(model_path, read_path,method):
 
     # 打印出超参数
 
@@ -177,7 +189,7 @@ def main(model_path, read_path):
     # 编译模型
     model = build_model(keep_prob,model_path)
     # 在数据集上训练模型，保存成model.h5
-    train_model(model, learning_rate, nb_epoch, samples_per_epoch, batch_size, train_list, valid_list,model_path)
+    train_model(model, learning_rate, nb_epoch, samples_per_epoch, batch_size, train_list, valid_list,model_path,method)
     print("模型训练完毕")
 
 
@@ -185,6 +197,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='prediction server')
     parser.add_argument('--model', type=str, help='model dir', default="./model")
     parser.add_argument('--read', type=str, help='npz store dir', default="./training_data_npz")
+    parser.add_argument('--method', type=int, help='how to process', default=0)
     args = parser.parse_args()
     print(config.INPUT_SHAPE)
-    main(args.model,args.read)
+    main(args.model,args.read,args.method)

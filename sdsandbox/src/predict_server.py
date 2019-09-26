@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-23 10:12:28
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-25 10:28:04
+@LastEditTime: 2019-09-26 15:18:09
 @Description: 
 '''
 #!/usr/bin/env python
@@ -87,6 +87,8 @@ class PynqSimMsgHandler(IMesgHandler):
             image_array = image_array/255.0 - 0.5
         elif self.process_method == 2:
             image_array = image_array/127.5 - 1.0
+        elif self.process_method == 3:
+            image_array = image_array/102.83 - 1.0
         #print(image_array)
         self.predict(image_array)
 

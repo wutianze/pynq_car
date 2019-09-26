@@ -12,12 +12,12 @@ Paper-commited/conference*
 !Paper-commited/*.tex
 **/*.npz
 **/logs
-**/log
+**/log*
 
 sdsandbox/*.pyc
 sdsandbox/*.h5
 sdsandbox/sdsim/Library
-sdsandbox/sdsim/log/*
+sdsandbox/sdsim/log*/*
 sdsandbox/sdsim/obj
 sdsandbox/sdsim/*.sln
 sdsandbox/sdsim/*.userprefs
