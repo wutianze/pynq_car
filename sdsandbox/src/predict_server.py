@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-23 10:12:28
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-27 16:03:35
+@LastEditTime: 2019-09-27 17:51:22
 @Description: 
 '''
 #!/usr/bin/env python
@@ -92,7 +92,7 @@ class PynqSimMsgHandler(IMesgHandler):
             image_array = image_array/102.83 - 1.0
         elif self.process_method == 4:
             image_array = image_array[40:,:]
-        #print(image_array)
+        #print(image_array.shape)
         self.predict(image_array)
 
         # maybe save frame
@@ -139,12 +139,12 @@ class PynqSimMsgHandler(IMesgHandler):
             self.send_control0(comSend)
         elif self.control_method == 1:
             #print("on parsed outputs")
-            #print(outputs)
+            print(outputs)
             self.send_control1(outputs[0], 0.3)
         elif self.control_method == 2:
             #print("on parsed outputs")
-            #print(outputs)
-            self.send_control1(outputs[0], outputs[1])
+            print(outputs)
+            self.send_control1(outputs[0], 0.3)
 
         
     def send_control0(self, command):
@@ -153,7 +153,12 @@ class PynqSimMsgHandler(IMesgHandler):
 
     def send_control1(self, steer, throttle):
         #print("steer outputs")
-        print(steer)
+        #print(steer)
+        #steer = steer * 5
+        if steer > 0:
+            steer = 0.7
+        elif steer <0:
+            steer = - 0.7
         msg = { 'msg_type' : 'control', 'steering': steer.__str__(), 'throttle':throttle.__str__(), 'brake': '0.0' }
         self.sock.queue_message(msg)
 
