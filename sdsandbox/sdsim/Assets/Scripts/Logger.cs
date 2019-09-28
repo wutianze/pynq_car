@@ -207,16 +207,18 @@ public class Logger : MonoBehaviour {
 				writer.WriteLine(string.Format("{0},{1}", image_filename,commandGet.ToString()));
             }else if(PynqStyle2){
                 string image_filename = GetPynqStyleImageFilename();
-                st = car.GetSteering()
-                float left = 0.0;
-                float right = 0.0;
-                if(st <= 0){
-                    left = 1.0;
+                float st = car.GetSteering();
+                float left = 0.0f;
+                float straight = 0.0f;
+                float right = 0.0f;
+                
+                if(st < 0){
+                    left = 1.0f;
                 }
-                else{
-                    right = 1.0;
-                }
-                writer.WriteLine(string.Format("{0},{1},{2}",image_filename,left.ToString(),right.ToString()));
+                else if(st > 0){
+                    right = 1.0f;
+                }else{straight = 1.0f;}
+                writer.WriteLine(string.Format("{0},{1},{2},{3}",image_filename,left.ToString(),straight.ToString(),right.ToString()));
             }
             else if(UdacityStyle)
 			{

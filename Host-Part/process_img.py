@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-27 15:51:44
+@LastEditTime: 2019-09-28 16:01:31
 @Description: 
 '''
 # 将图片处理为npz格式
@@ -37,22 +37,18 @@ def process_img(img_path, key, method):
     image_array = np.expand_dims(image_array, axis=0)  # 增加一个维度
 
     #print(image_array.shape)
-    if method == 0:
-        label_array = [0.,0.,0.,0.]
-        label_array[int(key[0])] = 1.
-    else:
-        label_array = []
-        for k in key:
-            label_array.append(float(k))
+    label_array = []
+    for k in key:
+        label_array.append(float(k)) 
     return (image_array, label_array)
     # 返回图片的数据（矩阵），和对应的标签值
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='prediction server')
-    parser.add_argument('--path', type=str, help='images dir', default="/home/sauron/pynq_car/sdsandbox/sdsim/log4")
-    parser.add_argument('--store', type=str, help='npz store dir', default="./training_data_npz2")
-    parser.add_argument('--method', type=int, help='how to process', default=1)
+    parser.add_argument('--path', type=str, help='images dir', default="/home/sauron/pynq_car/sdsandbox/sdsim/lsr-pid2")
+    parser.add_argument('--store', type=str, help='npz store dir', default="./training_lsr_npz3")
+    parser.add_argument('--method', type=int, help='how to process', default=0)
     args = parser.parse_args()
     path = args.path
     names = []

@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-23 10:12:28
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-27 17:51:22
+@LastEditTime: 2019-09-28 17:35:25
 @Description: 
 '''
 #!/usr/bin/env python
@@ -92,6 +92,7 @@ class PynqSimMsgHandler(IMesgHandler):
             image_array = image_array/102.83 - 1.0
         elif self.process_method == 4:
             image_array = image_array[40:,:]
+            image_array = image_array/255.0 - 0.5
         #print(image_array.shape)
         self.predict(image_array)
 
@@ -107,7 +108,7 @@ class PynqSimMsgHandler(IMesgHandler):
             outputs = self.model.predict(image_array[None, :, :, :])
         #outputs = np.array([0,1,0,0])
         #rint("predict outputs")
-        #print(outputs)
+        print(outputs)
         self.parse_outputs(outputs)
     
     def parse_outputs(self, outputs):
@@ -144,7 +145,20 @@ class PynqSimMsgHandler(IMesgHandler):
         elif self.control_method == 2:
             #print("on parsed outputs")
             print(outputs)
-            self.send_control1(outputs[0], 0.3)
+            comSend = ''
+            toSend = 0
+            nowMax = 0.0
+            outputs[1] = outputs[1] - 0.3
+            for i in range(len(outputs)):
+                if outputs[i] > nowMax:
+                    nowMax = outputs[i] 
+                    toSend = i
+            steerSend = 0.0
+            if toSend == 0:
+                steerSend = -0.5
+            elif toSend == 2:
+                steerSend = 0.5
+            self.send_control1(steerSend, 0.3)
 
         
     def send_control0(self, command):
@@ -155,10 +169,10 @@ class PynqSimMsgHandler(IMesgHandler):
         #print("steer outputs")
         #print(steer)
         #steer = steer * 5
-        if steer > 0:
-            steer = 0.7
-        elif steer <0:
-            steer = - 0.7
+        #if steer > 0:
+        #    steer = 0.5
+        #elif steer <0:
+        #    steer = - 0.5
         msg = { 'msg_type' : 'control', 'steering': steer.__str__(), 'throttle':throttle.__str__(), 'brake': '0.0' }
         self.sock.queue_message(msg)
 
@@ -197,7 +211,7 @@ def go(filename, address, constant_throttle=0, num_cars=1, image_cb=None, rand_s
     model = load_model(filename)
 
     #looks like we have to compile it before use. These optimizers don't matter for inference.
-    model.compile("sgd", "mse")
+    #model.compile("sgd", "mse")
   
     #setup the server
     #handler = DonkeySimMsgHandler(model, constant_throttle, port=address[1], num_cars=num_cars, image_cb=image_cb, rand_seed=rand_seed)
