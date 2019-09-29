@@ -48,7 +48,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='prediction server')
     parser.add_argument('--path', type=str, help='images dir', default="/home/sauron/pynq_car/sdsandbox/sdsim/lsr-pid2")
     parser.add_argument('--store', type=str, help='npz store dir', default="./training_lsr_npz3")
-    parser.add_argument('--method', type=int, help='how to process', default=0)
+    parser.add_argument('--method', type=int, help='whether to reduce some categories\' number, 0 for true', default=0)
     args = parser.parse_args()
     path = args.path
     names = []

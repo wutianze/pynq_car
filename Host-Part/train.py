@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-28 17:27:23
+@LastEditTime: 2019-09-28 18:13:30
 @Description: 
 '''
 import keras
@@ -91,7 +91,7 @@ def default_categorical(input_shape=(120, 160, 3)):
     return model
 
 # step2 建立模型
-def build_model(keep_prob,model_path):
+def build_model(keep_prob,model_path, input_shape=config.INPUT_SHAPE):
     if os.path.exists(model_path+"/model.h5"):
         model = load_model(model_path+"/model.h5")
         return model
@@ -117,7 +117,7 @@ def build_model(keep_prob,model_path):
 
     #model.add(Cropping2D(cropping=((40,0), (0,0)), input_shape=config.INPUT_SHAPE))
     #model.add(Lambda(lambda x: x/127.5 - 1.))
-    model.add(Conv2D(24, (5, 5), strides=(2, 2), activation="relu",input_shape=(config.IMAGE_HEIGHT-40, config.IMAGE_WIDTH, config.IMAGE_CHANNELS)))
+    model.add(Conv2D(24, (5, 5), strides=(2, 2), activation="relu",input_shape=input_shape))
     #model.add(BatchNormalization())
     model.add(Dropout(keep_prob))
     model.add(Conv2D(32, (5, 5), strides=(2, 2), activation="relu"))
@@ -139,7 +139,7 @@ def build_model(keep_prob,model_path):
 
 # step3 训练模型
 def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
-                batch_size, train_list, valid_list, model_path,method):
+                batch_size, train_list, valid_list, model_path,method,input_shape=config.INPUT_SHAPE):
     if not os.path.exists(model_path+'/'):
         os.mkdir(model_path+'/')
     # 值保存最好的模型存下来
@@ -165,11 +165,11 @@ def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
     model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),loss='mean_squared_error', metrics=['accuracy'])
     # 训练神经网络模型，batch_size梯度下降时每个batch包含的样本数，epochs训练多少轮结束，
     # verbose是否显示日志信息，validation_data用来验证的数据集
-    model.fit_generator(batch_generator(train_list, batch_size,method),
+    model.fit_generator(batch_generator(train_list, batch_size,method,input_shape),
                         steps_per_epoch=samples_per_epoch/batch_size,
                         epochs = nb_epoch,
                         max_queue_size=1,
-                        validation_data=batch_generator(valid_list, batch_size,method),
+                        validation_data=batch_generator(valid_list, batch_size,method,input_shape),
                         validation_steps=(len(valid_list)*config.CHUNK_SIZE)/batch_size,
                         callbacks=[tensorboard, checkpoint, early_stop, reduce_lr],
                         verbose=2)
@@ -206,7 +206,7 @@ def train_model2(model,verbose=1, min_delta=.0005, patience=5, use_early_stop=Tr
     
 # step4
 # 可以一个batch一个batch进行训练，CPU和GPU同时开工
-def batch_generator(name_list, batch_size,method):
+def batch_generator(name_list, batch_size,method,input_shape):
     i = 0
     while True:
         # load
@@ -247,10 +247,7 @@ def batch_generator(name_list, batch_size,method):
         #print(np.mean(X))
         #print(np.var(X))
 
-        if method == 4:
-           images = np.empty([batch_size, config.IMAGE_HEIGHT-40, config.IMAGE_WIDTH, config.IMAGE_CHANNELS])
-        else:
-           images = np.empty([batch_size, config.IMAGE_HEIGHT, config.IMAGE_WIDTH, config.IMAGE_CHANNELS])
+        images = np.empty([batch_size, input_shape[0], input_shape[1], input_shape[2]])
         steers = np.empty([batch_size, config.OUTPUT_NUM])
         #for index in np.random.permutation(X.shape[0]):
         for index in range(X.shape[0]):
@@ -298,10 +295,15 @@ def main(model_path, read_path,method):
     # 开始载入数据
     train_list, valid_list = load_data(read_path)
     print("数据加载完毕")
+    
+    if method == 4:
+        input_shape = (config.IMAGE_HEIGHT-40, config.IMAGE_WIDTH, config.IMAGE_CHANNELS)
+    else:
+        input_shape = config.INPUT_SHAPE
     # 编译模型
-    model = build_model(keep_prob,model_path)
+    model = build_model(keep_prob,model_path,input_shape)
     # 在数据集上训练模型，保存成model.h5
-    train_model(model, learning_rate, nb_epoch, samples_per_epoch, batch_size, train_list, valid_list,model_path,method)
+    train_model(model, learning_rate, nb_epoch, samples_per_epoch, batch_size, train_list, valid_list,model_path,method,input_shape)
     print("模型训练完毕")
 
 
