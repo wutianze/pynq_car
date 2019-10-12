@@ -1,10 +1,17 @@
+<!--
+ * @Author: Sauron Wu
+ * @GitHub: wutianze
+ * @Email: 1369130123qq@gmail.com
+ * @Date: 2019-09-03 16:28:15
+ * @LastEditors: Sauron Wu
+ * @LastEditTime: 2019-10-12 17:44:39
+ * @Description: 
+ -->
 # pynq-auto
 ## Material
 Pynq-Z2 with petalinux built image & pynq-z2-v2.4 image, for how to build please refer to [this](https://github.com/wutianze/dnndk3.0-pynqz2/blob/master/build-pynqz2-system.md), or you can just download the image we provided [here]().
+<!--
 ## Preparation if you want to collect data in pynq-z2-v2.4(recommend)
-### 1. Log in and run `sudo passwd root` to set your root password.
-### 2. Run `sudo vi /etc/ssh/sshd_config` and enable `PermitRootLogin yes` & `StrictModes yes`.
-### 3. Run `sudo service ssh restart` to restart ssh service.
 ### 4. Log in the board as root.
 ### 5. Run:
     ```shell
@@ -12,6 +19,7 @@ Pynq-Z2 with petalinux built image & pynq-z2-v2.4 image, for how to build please
     apt-get install network-manager
     ```
 ### 6. Reboot and run `nmtui`, now configure the wlan link and make sure you can log in the board using wireless network.
+-->
 ## Steps  
 ### 1. Copy the CarCollect directory to your Pynq
 ### 2. In Pynq `cd CarCollect/c++` and then run `make`, now you can run `./car` and use:
@@ -19,6 +27,7 @@ Pynq-Z2 with petalinux built image & pynq-z2-v2.4 image, for how to build please
     s for stop  
     a for turn left  
     d for turn right  
+    t for start recording
     Esc for quit  
   >
   The process will collect the data used for training automatically. When you finish, you can see the directory images in current directory. The image name and labels are stored in train.csv.  

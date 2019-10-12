@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-12 13:53:37
+ * @LastEditTime: 2019-10-12 15:00:35
  * @Description: 
  */
 /*
@@ -193,7 +193,7 @@ void run_model(DPUTask* task){
             queueLock.unlock();
             continue;
         }else{
-            tmpImage = takenImages.top();
+            tmpImage = takenImages.front();
             takenImages.pop();
             time_t now = time(0);
             if(now < timeGet){
@@ -229,7 +229,7 @@ void run_cv(){
             queueLock.unlock();
             continue;
         }else{
-            tmpImage = takenImages.top();
+            tmpImage = takenImages.front();
             takenImages.pop();
             time_t now = time(0);
             if(now < timeGet){
@@ -276,7 +276,7 @@ void run_Command(){
             controlLock.unlock();
             continue;
         }
-        controller.command(generatedCommands.top());
+        controller.command(generatedCommands.front());
         generatedCommands.pop();
         controlLock.unlock();
     }
