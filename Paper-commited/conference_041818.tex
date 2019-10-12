@@ -45,16 +45,16 @@ Autonomous Driving, Machine Learning, Pynq-Z2, Field programmable gate arrays, D
 
 \section{Introduction}
 Autonomous Driving is getting more and more attention recently. The main problem to be solved in this area is how to meet the need of real-time computing. 
-Though we now have many customed chips like GPU\cite{b1} and TPU\cite{b2} for machine learning acceleration, they are not able to provide both high performance and low power consumpation. Also they are not flexible enough to adapt to different scenes. 
+Though we now have many customed chips like GPU\cite{b1} and TPU\cite{b2} for machine learning acceleration, they are not able to provide both high performance and low power consumption. Also they are not flexible enough to adapt to different scenes. 
 
-To meet these requests, FPGA\cite{b3} is a good solution since it can provide high performance and low power consumpation, most importantly it's easy to custom accelerator for specified algorithms.
+To meet these requests, FPGA\cite{b3} is a good solution since it can provide high performance and low power consumption, most important, people can build accelerators for specified algorithms easily.
 
-This time we build our own auto-driving car based on Xilinx Pynq-Z2\cite{b4}, it provides an end-to-end solution to autonomous driving and it uses the power of DPU\cite{b5} to accelerate the computing. 
+This time we build our own auto-driving car based on Xilinx Pynq-Z2\cite{b4}, it provides an end-to-end solution to autonomous driving and it uses the power of DPU\cite{b5} to accelerate the computing. Our goal is to build a general and easy-to-use platform for those who want to try their own ideas about auto-driving.
 
-We find that in previous FPT competitions\cite{b6}, many competitors use traditional computer vision methods or machine learning methods to detect objects and then make decisions based on the results\cite{b7}\cite{b8}. Our solution is quite different with theirs since we use a simple CNN model as our AI network and feed the model with pictures taken by the camera in the car and the model returns the control orders.
+We find that in previous FPT competitions\cite{b6}, many competitors use traditional computer vision methods or machine learning methods to detect objects and then make decisions based on the results\cite{b7}\cite{b8}. Our solution is quite different from theirs since we use a simple CNN model as our AI network and feed the model with pictures taken by the camera in the car and the model returns the control orders.
 The platform we use is Xilinx’s Pynq-Z2 board, there is a DPU IP in its FPGA, with DPU’s help, we can accelerate the inference process of the model and make it possible to run AI inference task in limited resource platform like Pynq-Z2. 
 
-We also build a simulator based on sdsandbox\cite{b9} using Unity3d\cite{b10}, we can collect training data, test the model's performance and pre-train the model in the simulator. It highly increase the efficiency and accelerate the project development. 
+We also build a simulator based on sdsandbox\cite{b9} using Unity3d\cite{b10}, we can collect training data, test the model's performance and pre-train the model in the simulator. It highly increases the efficiency and accelerates the project development. 
 
 The rest of this paper is organized as follows. Section II describes the overview of our hardware structure and development environment. Section III presents the software architecture and details of methods we are going to use for the competition. Finally, the paper mentions the current progress and makes an conclusion.
 
@@ -114,7 +114,7 @@ The whole system will have one worker for running computer vision methods like o
 The network we use is a simple end-to-end model. Since the DNNDK kit doesn't support some AI functions, we adapt our model to DNNDK. The structure of the model is shown in Fig.~\ref{ms}.  
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=0.5\textwidth,height=0.6\textheight]{net-structure.png}}
+\centerline{\includegraphics[width=0.5\textwidth,height=0.5\textheight]{net-structure.png}}
 \caption{Model Structure.}
 \label{ms}
 \end{figure}
@@ -167,8 +167,6 @@ Traffic light recognition algorithm is implemented in C++ with OpenCV. Similarly
 \section{Development status}
 
 Until now, we have built the whole system, the AI model works well in simple scenes in virtual environment. We are busy implementing the cv functions and optimizing the hardware structure of the car. Later we will try to make some improvements to the model and do some tests and modifications according to the competition's rules. 
-
-Our goal is to build a general and easy-to-use platform for those who want to try their own ideas about auto-driving.
 
 \section{Conclusion}
 
