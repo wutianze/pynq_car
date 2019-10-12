@@ -11,16 +11,13 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{An End-to-End solution to Autonomous Driving based on Xilinx FPGA\\
-{\footnotesize \textsuperscript{*}Note: Sub-titles are not captured in Xplore and
-should not be used}
-\thanks{Identify applicable funding agency here. If none, delete this.}
-}
+\title{An End-to-End solution to Autonomous Driving based on Xilinx FPGA}
 
 \author{\IEEEauthorblockN{1\textsuperscript{st} Tianze Wu}
 \IEEEauthorblockA{
-\textit{ICT}\\
-Shanghai, China \\
+\textit{Insititute Of Computing Technology Chinese Academy Of Sciences}\\
+{University of Chinese Academy of Sciences}\\
+Beijing, China \\
 wutianze@ict.ac.cn}
 \and
 \IEEEauthorblockN{2\textsuperscript{nd} Weiyi Liu}
@@ -29,29 +26,28 @@ wutianze@ict.ac.cn}
 Shanghai, China \\
 liuweiyi@sjtu.edu.cn}
 \and
-\IEEEauthorblockN{3\textsuperscript{rd} Given Name Surname}
+\IEEEauthorblockN{3\textsuperscript{rd} Yongwei Jin}
 \IEEEauthorblockA{
 \textit{Xidian University}\\
-Shanghai, China \\
+Xian, China \\
 yongweijin@outlook.com}
 }
 
 \maketitle
 
 \begin{abstract}
-Nowadays, the autonomous driving topic is very hot, many people are trying to provide a solution to this problem. This time we build our own auto-driving car based on Xilinx Pynq-Z2, it provides an end-to-end solution to autonomous driving and it uses the power of DPU to accelerate the computing.
+Nowadays, the autonomous driving topic is very hot, many people are trying to provide a solution to this problem. This time we build our own auto-driving car based on Xilinx Pynq-Z2, it provides an end-to-end solution which inputs images from camera and outputs control instructions directly. The platform also uses the power of Deep learning Processing Unit(DPU) to accelerate the inference process and provides a simulator for training and testing in virtual environment. If the car meets some situations which cannot be handled by AI model, it's easy to add extra traditional computer vision functions to our control system. So our platform can help people who want to try autonomous driving build their own model and test it efficiently. We hope that our platform can be easy to use and extend.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Autonomous Driving, Machine Learning, PYNQ-Z2, Field programmable gate arrays, Computer Vision
+Autonomous Driving, Machine Learning, Pynq-Z2, Field programmable gate arrays, Deep Learning Processing Unit
 \end{IEEEkeywords}
 
 \section{Introduction}
 Autonomous Driving is getting more and more attention recently. The main problem to be solved in this area is how to meet the need of real-time computing. 
-Though we now have many customed chips like GPU\cite{b1} and TPU\cite{b2} for machine learning acceleration, they are not able to 
-provide both high performance and low power consumpation. Also they are not flexible enough to adapt to different scenes. 
-To meet these requests, FPGA\cite{b3} is a good solution since it can provide high performance and low power consumpation, most importantly it's easy to custom accelerator for 
-specified algorithms.
+Though we now have many customed chips like GPU\cite{b1} and TPU\cite{b2} for machine learning acceleration, they are not able to provide both high performance and low power consumpation. Also they are not flexible enough to adapt to different scenes. 
+
+To meet these requests, FPGA\cite{b3} is a good solution since it can provide high performance and low power consumpation, most importantly it's easy to custom accelerator for specified algorithms.
 
 This time we build our own auto-driving car based on Xilinx Pynq-Z2\cite{b4}, it provides an end-to-end solution to autonomous driving and it uses the power of DPU\cite{b5} to accelerate the computing. 
 
@@ -69,7 +65,7 @@ The rest of this paper is organized as follows. Section II describes the overvie
 The Fig.~\ref{co} is our robot car's photograph. Its body is made of acrylic board. There is one Pynq-Z2 board as the controller, it has a DPU IP for acceleration, the sensors we use now contains a camera only. The car has one capstan motor and one electric steering engine. Two rear wheels provide power while two front wheels provide steering capacity. We use two batteries to provide power, one for the Pynq board and one for the motors.
 
 \begin{figure}[htbp]
-%\centerline{\includegraphics{fig1.png}}
+\centerline{\includegraphics[width=0.5\textwidth]{car.jpg}}
 \caption{Car overview.}
 \label{co}
 \end{figure}
@@ -118,7 +114,7 @@ The whole system will have one worker for running computer vision methods like o
 The network we use is a simple end-to-end model. Since the DNNDK kit doesn't support some AI functions, we adapt our model to DNNDK. The structure of the model is shown in Fig.~\ref{ms}.  
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=0.5\textwidth]{net-structure.png}}
+\centerline{\includegraphics[width=0.5\textwidth,height=0.6\textheight]{net-structure.png}}
 \caption{Model Structure.}
 \label{ms}
 \end{figure}
@@ -129,7 +125,7 @@ Although the current model is not the perfect one and it cannot be accelerated b
 
 \subsection{Simulator}
 
-Now we have built a simulator to collect data for training, and we can also test our model using the simulator. With this tool, we can further separate software part from hardware part, even you don't have a real car, you can build and test your model in the virtual environment. The interface of our simulator is shown in Fig.~\ref{si}.  
+Now we have built a simulator based on sdsandbox\cite{b13} to collect data for training, and we can also test our model using the simulator. With this tool, we can further separate software part from hardware part, even you don't have a real car, you can build and test your model in the virtual environment. The interface of our simulator is shown in Fig.~\ref{si}.  
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.5\textwidth]{simulator.png}}
@@ -143,17 +139,36 @@ Although the current model is not the perfect one and it cannot be accelerated b
 
 \subsection{Algorithms}
 \begin{itemize}
-\item Crossroad control. Since the AI model cannot handle the situation when the car meets a crossroad. We will help the car decide which direction to take according to the competition's request. The car will use neural network or cv algorithms to recognize all the scenes that need it to make a choice, for example the crossroad. After the car meets these scenes, first the main controller will tell the car which direction to take, then the car will use predefined control commands to drive through the crossroad. When this progress is finished, the AI model will retake the control of the car.
-\item Image process. Although our solution is end-to-end, the training data needs to be processed. Now we just do the normalization to the input images, later we will try some more according to the evaluation of the model's performance.
-\item Obstacle avoidance. For obstacle avoidance, traditional methods will first recognize the objects from the image and then use the state machine functions to make decisions. Our solution is quite different from it, we will add the obstacle avoidance scenes to the step of collecting training data. As a result, when the training step is finished, the AI model can avoid the obstacle automatically.
-\item TODO:OPENCV PART
+\item Crossroad control. 
+
+Since the AI model cannot handle the situation when the car meets a crossroad. We will help the car decide which direction to take according to the competition's request. The car will use neural network or cv algorithms to recognize all the scenes that need it to make a choice, for example the crossroad. After the car meets these scenes, first the main controller will tell the car which direction to take, then the car will use predefined control commands to drive through the crossroad. When this progress is finished, the AI model will retake the control of the car.
+\item Image process. 
+
+Although our solution is end-to-end, the training data needs to be processed. Now we just do the normalization to the input images, later we will try some more according to the evaluation of the model's performance.
+\item Obstacle avoidance. 
+
+For obstacle avoidance, traditional methods will first recognize the objects from the image and then use the state machine functions to make decisions. Our solution is quite different from it, we will add the obstacle avoidance scenes to the step of collecting training data. As a result, when the training step is finished, the AI model can avoid the obstacle automatically.
+\item Road lane detection. 
+
+To detect road lane, we first use 5*5 Gaussian filter to remove the noise of the image. Then Canny edge detection\cite{b14} is applied to detect the edges of the image. Hough transform\cite{b15} is employed to detect the lines of the image. Based on the orientation and relative position of detected lines, side line and stop line of the road can be identified. 
+
+To improve the robustness and accuracy of the algorithm, more techniques will be added to the algorithm, such as K-Means clustering\cite{b16} for Hough lines, Kalman/Gabor filtering for sampled data, alternative IPM (inverse perspective mapping) lane detection method\cite{b17}.
+
+Road lane detection algorithm is implemented in C++ with OpenCV. And it can be very time consuming running in ARM Cortex-A9 in Xilinx PYNQ-Z2. Some measures are taken to alleviate the heavy computational task of the algorithm. Firstly, the images captured by camera are cropped and down-sampled to reduce the computation complexity. Some time consuming tasks such as Gaussian filter, Canny edge detection, Hough transform are moved to FPGA using Xilinx xfopencv library\cite{b18}.
+
+\item Traffic light recognition.
+
+To recognize the traffic light in the contest, we first use IHLS color space\cite{b19} to remove the disturbance of the color in complicated background. After obtaining the color information, Hough circle transform\cite{b20} is applied to get the shape information of the traffic light. Combing the shape and color information, traffic light or similar objects can be detected. Finally, a simple BP neural network is employed to accurately recognize the traffic light in the contest.
+
+Traffic light recognition algorithm is implemented in C++ with OpenCV. Similarly, it can be very time consuming running in ARM Cortex-A9 in Xilinx PYNQ-Z2. To reduce computation complexity, images captured by camera can be cropped as well since the traffic light only appear in the upper half of the image. Hough circle transform can be implemented in FPGA using Xilinx xfopencv library and BP neural network can be implemented in FPGA using Xilinx Vivado HLS.
+
 \end{itemize}
 
 \section{Development status}
 
 Until now, we have built the whole system, the AI model works well in simple scenes in virtual environment. We are busy implementing the cv functions and optimizing the hardware structure of the car. Later we will try to make some improvements to the model and do some tests and modifications according to the competition's rules. 
 
-Our goal is not only winning the competition, but also building a general and easy-to-use platform for those who want to try their own ideas about auto-driving.
+Our goal is to build a general and easy-to-use platform for those who want to try their own ideas about auto-driving.
 
 \section{Conclusion}
 
@@ -196,6 +211,14 @@ The project is supported by Xilinx and Institute of Computing Technology Chinese
 \bibitem{b10} TUL Unity3d Available at: https://unity.com/learn
 \bibitem{b11} TUL PetaLinux [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/xilinx2019 \_1/ug1144-petalinux-tools-reference-guide.pdf
 \bibitem{b12} TUL DNNDK [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/ai\_inference /v1\_5
+\bibitem{b13} Tawn Kramer, sdsandbox [ONLINE] Available at: https://github.com/tawnkramer/sdsandbox
+\bibitem{b14} John Canny, "A Computational Approach to Edge Detection, "IEEE Transactions on Pattern Analysis and Machine Intelligence, pp.679-698, 1986.
+\bibitem{b15} J. B. Burns, A. R. Hanson and E. M. Riseman, "Extracting Straight Lines," in IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. PAMI-8, no. 4, pp. 425-455, July 1986.
+\bibitem{b16} S. Selim, M. Ismail, "K-Means-Type Algorithms: A Generalized Convergence Theorem and Characterization of Local Optimality," Pattern Analysis and Machine Intelligence, IEEE Transactions on, vol. 6, no. 1, pp. 81-87, 1984. 
+\bibitem{b17} Jun Wang, Tao Mei, Bin Kong and Hu Wei, "An approach of lane detection based on Inverse Perspective Mapping," 17th International IEEE Conference on Intelligent Transportation Systems (ITSC), Qingdao, 2014, pp. 35-38.
+\bibitem{b18} Xilinx. (2019, Sep) Xilinx/xfopencv. [Online]. Available:  https://github.com/Xilinx/xfopencv
+\bibitem{b19} Allan Hanbury and Jean Serra, "A 3d-polar coordinate colour representation well adapted to image analysis," in Proceedings of the Scandinavian Conference on Image Analysis (SCIA), 2003, pp. 804–811.
+\bibitem{b20} M. Rizon et al., 2005, "Object Detection using Circular Hough Transform", American Journal of Applied Sciences 2, vol 12, pp. 1606-1609.
 \end{thebibliography}
 \vspace{12pt}
 
