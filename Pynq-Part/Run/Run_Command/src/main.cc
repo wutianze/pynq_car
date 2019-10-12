@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-09-23 09:13:20
+ * @LastEditTime: 2019-10-12 13:53:37
  * @Description: 
  */
 /*
@@ -113,12 +113,12 @@ mutex controlLock;
 time_t timeGet;
 queue<Mat> takenImages;
 queue<int> generatedCommands;
-vector<string> kinds = {"left", "forward", "right", "stop"};
+vector<string> kinds = {"left", "forward", "right"};
 #define KERNEL_CONV "mnist_0"
 #define CONV_INPUT_NODE "conv2d_1_convolution"
 #define CONV_OUTPUT_NODE "dense_2_MatMul"
 #define TASKNUM 3
-
+#define THREADNUM 6 //THREADNUM should be TASKNUM + 3
 //#define SHOWTIME
 #ifdef SHOWTIME
 #define _T(func)                                                              \
@@ -136,7 +136,7 @@ vector<string> kinds = {"left", "forward", "right", "stop"};
 #define _T(func) func;
 #endif
 
-void setInputImage(DPUTask *task, const string& inNode, const cv::Mat& image) {
+void setInputImage(DPUTask *task, const char* inNode, const cv::Mat& image) {
     DPUTensor* in = dpuGetInputTensor(task, inNode);
     //float scale = dpuGetTensorScale(in);
     //int width = dpuGetTensorWidth(in);
@@ -284,7 +284,7 @@ void run_Command(){
 
 int main(int argc, char **argv)
 {
-     if (argc != 3) {
+     if (argc != 2) {
           cout << "Usage of this exe: ./car cv/nn"
              << endl;
         return -1;
@@ -301,10 +301,9 @@ int main(int argc, char **argv)
     // Create the kernel for mnist
     kernelConv = dpuLoadKernel(KERNEL_CONV);
     vector<DPUTask*> tasks(TASKNUM);
-    generate(tasks.begin(),task.end(),std::bind(dpuCreateTask,kernelConv,0));    
+    generate(tasks.begin(),tasks.end(),std::bind(dpuCreateTask,kernelConv,0));    
     //DPUTask *taskMnist = dpuCreateTask(kernelConv, 0);
-    int threadNum = TASKNUM + 3;
-    array<thread,threadNum> threads = {
+    array<thread,THREADNUM> threads = {
         thread(run_model, tasks[0]),
         thread(run_model, tasks[1]),
         thread(run_model, tasks[2]),
@@ -312,7 +311,7 @@ int main(int argc, char **argv)
         thread(run_camera),
         thread(run_cv)
     };
-    for(int i = 0; i < threadNum; i++){
+    for(int i = 0; i < THREADNUM; i++){
         threads[i].join();
     }
     for_each(tasks.begin(),tasks.end(),dpuDestroyTask);
