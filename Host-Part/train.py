@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-10-12 14:06:51
+@LastEditTime: 2019-10-12 17:54:30
 @Description: 
 '''
 import keras
@@ -25,28 +25,26 @@ import config
 import argparse
 np.random.seed(0)
 
-# step1,载入数据，并且分割为训练和验证集
-# 问题，数据集太大了，已经超过计算机内存
+# step1,load data
 def load_data(read_path):
     training_data = glob.glob(read_path + '/*.npz')
-    # 匹配所有的符合条件的文件，并将其以list的形式返回。
-    print("匹配完成。开始读入")
-    print("一共%d轮"%len(training_data))
+    # match all the files return as list
+    print("Match Completed")
+    print("Total: %d Round"%len(training_data))
 
-    # if no data, exit，容错判断
+    # if no data, exit
     if not training_data:
         print("No training data in directory, exit")
         sys.exit()
     cut = int(len(training_data)*0.8)
     return training_data[0:cut], training_data[cut:]
 
-# step2 建立模型
+# step2 Build Model
 def build_model(keep_prob,model_path, input_shape=config.INPUT_SHAPE):
     if os.path.exists(model_path+"/model.h5"):
         model = load_model(model_path+"/model.h5")
         return model
-    print("开始编译模型")
-#    model.summary()
+    print("Start Compile")
     model = Sequential()
     model.add(Conv2D(24, (5, 5), strides=(2, 2), activation="relu",input_shape=input_shape))
     #model.add(BatchNormalization())
@@ -65,15 +63,15 @@ def build_model(keep_prob,model_path, input_shape=config.INPUT_SHAPE):
     model.add(Dense(50, activation="relu"))
     model.add(Dropout(keep_prob))
     model.add(Dense(config.OUTPUT_NUM,activation='softmax'))
-
+    model.summary()
     return model
 
-# step3 训练模型
+# step3 Train Model
 def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
                 batch_size, train_list, valid_list, model_path,method,input_shape=config.INPUT_SHAPE):
     if not os.path.exists(model_path+'/'):
         os.mkdir(model_path+'/')
-    # 值保存最好的模型存下来
+
     checkpoint = ModelCheckpoint(model_path+'/model-{epoch:03d}.h5',
                                  monitor='val_loss',
                                  verbose=0,
@@ -106,13 +104,12 @@ def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
                         verbose=2)
                         
 # step4
-# 可以一个batch一个batch进行训练，CPU和GPU同时开工
 def batch_generator(name_list, batch_size,method,input_shape):
     i = 0
     while True:
         # load
         if method == 4:
-            image_array = np.zeros((1, config.IMAGE_HEIGHT-40, config.IMAGE_WIDTH, config.IMAGE_CHANNELS))               # 初始化
+            image_array = np.zeros((1, config.IMAGE_HEIGHT-40, config.IMAGE_WIDTH, config.IMAGE_CHANNELS))              
         else:
             image_array = np.zeros((1, config.IMAGE_HEIGHT, config.IMAGE_WIDTH, config.IMAGE_CHANNELS))
         label_array = np.zeros((1, config.OUTPUT_NUM), 'float')
@@ -129,7 +126,7 @@ def batch_generator(name_list, batch_size,method,input_shape):
                 #print(train_temp[0])
                 train_labels_temp = data['train_labels']
                 #print(train_labels_temp[0])
-                image_array = np.vstack((image_array, train_temp)) # 把文件读取都放入，内存
+                image_array = np.vstack((image_array, train_temp)) 
                 label_array = np.vstack((label_array, train_labels_temp))
         X = image_array[1:, :]
         y = label_array[1:, :]
@@ -141,12 +138,6 @@ def batch_generator(name_list, batch_size,method,input_shape):
             X = X/127.5 - 1.0
         elif method == 3:
             X = X/102.83 - 1.0
-        #print(X[0])
-        #X = (X/255.0) this is done in process_img
-        #print('Image array shape: ' + str(X.shape))
-        #print('Label array shape: ' + str(y.shape))
-        #print(np.mean(X))
-        #print(np.var(X))
 
         images = np.empty([batch_size, input_shape[0], input_shape[1], input_shape[2]])
         steers = np.empty([batch_size, config.OUTPUT_NUM])
@@ -154,8 +145,6 @@ def batch_generator(name_list, batch_size,method,input_shape):
         for index in range(X.shape[0]):
             images[i] = X[index]
             steers[i] = y[index]
-            #steers[i] = [0,0]
-            #print(y[index])
             i += 1
             if i == batch_size:
                 i = 0
@@ -164,7 +153,7 @@ def batch_generator(name_list, batch_size,method,input_shape):
     
 
 
-# step5 评估模型
+# step5 
 #def evaluate(x_test, y_test):
     #score = model.evaluate(x_test, y_test, verbose=0)
     #print('Test loss:', score[0])
@@ -172,8 +161,6 @@ def batch_generator(name_list, batch_size,method,input_shape):
 
 
 def main(model_path, read_path,method):
-
-    # 打印出超参数
 
     print('-'*30)
     print('parameters')
@@ -196,7 +183,7 @@ def main(model_path, read_path,method):
 
     # 开始载入数据
     train_list, valid_list = load_data(read_path)
-    print("数据加载完毕")
+    print("Load Data Finished")
     
     if method == 4:
         input_shape = (config.IMAGE_HEIGHT-40, config.IMAGE_WIDTH, config.IMAGE_CHANNELS)
@@ -206,7 +193,7 @@ def main(model_path, read_path,method):
     model = build_model(keep_prob,model_path,input_shape)
     # 在数据集上训练模型，保存成model.h5
     train_model(model, learning_rate, nb_epoch, samples_per_epoch, batch_size, train_list, valid_list,model_path,method,input_shape)
-    print("模型训练完毕")
+    print("Model Train Finished")
 
 
 if __name__ == '__main__':
