@@ -21,27 +21,28 @@ public class JoystickCarControl : MonoBehaviour
 
 	private void FixedUpdate()
 	{
-		// pass the input to the car!
-		//h = CrossPlatformInputManager.GetAxis("Horizontal");
-		//v = CrossPlatformInputManager.GetAxis("Vertical");
-		//float handbrake = CrossPlatformInputManager.GetAxis("Jump");
-		if(Input.GetKeyDown(KeyCode.W)){
-			nowKey = 'w';
-			car.RequestCommand(nowKey);
-		}else if(Input.GetKeyDown(KeyCode.A)){
-			nowKey = 'a';
-			car.RequestCommand(nowKey);
-		}else if(Input.GetKeyDown(KeyCode.D)){
-			nowKey = 'd';
-			car.RequestCommand(nowKey);
-		}else if(Input.GetKeyDown(KeyCode.S)){
-			nowKey = 's';
-			car.RequestCommand(nowKey);
-		}else{
-				car.RequestCommand(nowKey);
-		}
-		
+		float h = CrossPlatformInputManager.GetAxis("Horizontal");
+		float v = CrossPlatformInputManager.GetAxis("Vertical");
+		float handbrake = CrossPlatformInputManager.GetAxis("Jump");
+		car.RequestSteering(h * MaximumSteerAngle);
+		car.RequestThrottle(v);
 		//car.RequestFootBrake(v);
-		//car.RequestHandBrake(handbrake);
+		car.RequestHandBrake(handbrake);
+
+//		if(Input.GetKeyDown(KeyCode.W)){
+//			nowKey = 'w';
+//			car.RequestCommand(nowKey);
+//		}else if(Input.GetKeyDown(KeyCode.A)){
+//			nowKey = 'a';
+//			car.RequestCommand(nowKey);
+//		}else if(Input.GetKeyDown(KeyCode.D)){
+//			nowKey = 'd';
+//			car.RequestCommand(nowKey);
+//		}else if(Input.GetKeyDown(KeyCode.S)){
+//			nowKey = 's';
+//			car.RequestCommand(nowKey);
+//		}else{
+//				car.RequestCommand(nowKey);
+//		}
 	}
 }

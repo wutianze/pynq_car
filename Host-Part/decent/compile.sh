@@ -19,7 +19,7 @@ dnnc \
        --output_dir=compile \
        --save_kernel \
        --mode normal \
-       --net_name=mnist
+       --net_name=testModel
 
 echo "#####################################"
 echo "COMPILATION COMPLETED"

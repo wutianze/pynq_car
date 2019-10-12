@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-24 17:55:16
+@LastEditTime: 2019-09-28 16:01:31
 @Description: 
 '''
 # 将图片处理为npz格式
@@ -18,34 +18,37 @@ from PIL import Image
 import csv
 import argparse
 import config
+import random
 
 
 # this function need you to specify
-def process_img(img_path, key):
+def process_img(img_path, key, method):
 
     #print(img_path)
     # the method for processing images,0:/255,1:/255-0.5,3:/127.5-1
     image = Image.open(img_path)
     image_array = np.array(image)
-    if config.PROCESS_METHOD == 0:
-        image_array = image_array/255.0
-    elif config.PROCESS_METHOD == 1:
-        image_array = image_array/255.0 - 0.5
-    elif config.PROCESS_METHOD == 2:
-        image_array = image_array/127.5 - 1.0
+   # if method == 0:
+   #     image_array = image_array/255.0
+   # elif method == 1:
+   #     image_array = image_array/255.0 - 0.5
+   # elif method == 2:
+   #     image_array = image_array/127.5 - 1.0
     image_array = np.expand_dims(image_array, axis=0)  # 增加一个维度
 
     #print(image_array.shape)
-    label_array = [0.,0.,0.,0.]
-    label_array[int(key[0])] = 1.
-
+    label_array = []
+    for k in key:
+        label_array.append(float(k)) 
     return (image_array, label_array)
     # 返回图片的数据（矩阵），和对应的标签值
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='prediction server')
-    parser.add_argument('--path', type=str, help='model filename', default="/home/sauron/pynq_car/sdsandbox/sdsim/log")
+    parser.add_argument('--path', type=str, help='images dir', default="/home/sauron/pynq_car/sdsandbox/sdsim/lsr-pid2")
+    parser.add_argument('--store', type=str, help='npz store dir', default="./training_lsr_npz3")
+    parser.add_argument('--method', type=int, help='whether to reduce some categories\' number, 0 for true', default=0)
     args = parser.parse_args()
     path = args.path
     names = []
@@ -53,6 +56,12 @@ if __name__ == '__main__':
     with open(path+"/train.csv") as f:
         files = csv.reader(f)
         for row in files:
+            if args.method == 0:
+                if row[1] == 1:
+                    randNum = random.randint(0,10)
+                    # delete some data randomly
+                    if randNum < 8:
+                       continue
             names.append(row[0])
             tmp = []
             for i in range(1,len(row)):
@@ -75,7 +84,7 @@ if __name__ == '__main__':
                 try:
                     key = keys[file]
 
-                    image_array, label_array = process_img(path + "/" + file,key)
+                    image_array, label_array = process_img(path + "/" + file,key, args.method)
                     train_imgs = np.vstack((train_imgs, image_array))
                     train_labels = np.vstack((train_labels, label_array))
                 except:
@@ -85,7 +94,7 @@ if __name__ == '__main__':
         train_imgs = train_imgs[1:, :]
         train_labels = train_labels[1:, :]
         file_name = str(int(time()))
-        directory = "training_data_npz"
+        directory = args.store
 
         if not os.path.exists(directory):
             os.makedirs(directory)

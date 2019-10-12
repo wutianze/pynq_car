@@ -79,8 +79,10 @@ public class Logger : MonoBehaviour {
 
     float timeSinceLastCapture = 0.0f;
 
-    //The style for xilinx pynq_car
-    public bool PynqStyle = true;
+    //The style for xilinx pynq_car using command
+    public bool PynqStyle = false;
+
+    public bool PynqStyle2 = true;
 
     //We can output our logs in the style that matched the output from the shark robot car platform - github/tawnkramer/shark
     public bool SharkStyle = false;
@@ -122,7 +124,7 @@ public class Logger : MonoBehaviour {
 
 		if(bDoLog && car != null)
 		{
-			if(PynqStyle){
+			if(PynqStyle || PynqStyle2){
                 outputFilename = "train.csv";
             }
             if(UdacityStyle)
@@ -203,6 +205,20 @@ public class Logger : MonoBehaviour {
                         return;
                 }
 				writer.WriteLine(string.Format("{0},{1}", image_filename,commandGet.ToString()));
+            }else if(PynqStyle2){
+                string image_filename = GetPynqStyleImageFilename();
+                float st = car.GetSteering();
+                float left = 0.0f;
+                float straight = 0.0f;
+                float right = 0.0f;
+                
+                if(st < 0){
+                    left = 1.0f;
+                }
+                else if(st > 0){
+                    right = 1.0f;
+                }else{straight = 1.0f;}
+                writer.WriteLine(string.Format("{0},{1},{2},{3}",image_filename,left.ToString(),straight.ToString(),right.ToString()));
             }
             else if(UdacityStyle)
 			{
@@ -316,7 +332,7 @@ public class Logger : MonoBehaviour {
             Texture2D image = cs.GetImage();
 
             ImageSaveJob ij = new ImageSaveJob();
-            if(PynqStyle){
+            if(PynqStyle || PynqStyle2){
                 ij.filename = GetLogPath()+GetPynqStyleImageFilename();
                 ij.bytes = image.EncodeToJPG();
             }else if(UdacityStyle)

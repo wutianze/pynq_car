@@ -18,8 +18,8 @@ echo "#####################################"
 decent_q quantize \
   --input_frozen_graph ../model.pb \
   --input_nodes conv2d_1_input \
-  --input_shapes ?,120,160,3 \
-  --output_nodes dense_2/Softmax \
+  --input_shapes ?,80,160,3 \
+  --output_nodes dense_3/Softmax \
   --method 1 \
   --input_fn graph_input_fn.calib_input \
   --gpu 0 \

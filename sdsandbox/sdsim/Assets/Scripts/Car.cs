@@ -8,7 +8,7 @@ public class Car : MonoBehaviour, ICar {
 	public Transform[] wheelMeshes;
 
 	public float maxTorque = 50f;
-	public float maxSpeed = 10f;
+	public float maxSpeed = 5f;
 
 	public Transform centrOfMass;
 
@@ -75,17 +75,17 @@ public class Car : MonoBehaviour, ICar {
 		switch(c){
 			case 'w':
 				requestSteering = 0.0f;
-				requestTorque = 1.0f;
+				requestTorque = 0.2f;
 				requestBrake = 0f;
 				break;
 			case 'a':
 				requestSteering = -7.0f;
-				requestTorque = 0.5f;
+				requestTorque = 0.2f;
 				requestBrake = 0f;
 				break;
 			case 'd':
 				requestSteering = 7.0f;
-				requestTorque = 0.5f;
+				requestTorque = 0.2f;
 				requestBrake = 0f;
 				break;
 			case 's':

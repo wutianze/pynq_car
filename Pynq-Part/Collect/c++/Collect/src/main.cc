@@ -1,4 +1,13 @@
 /*
+ * @Author: Sauron Wu
+ * @GitHub: wutianze
+ * @Email: 1369130123qq@gmail.com
+ * @Date: 2019-09-20 14:23:08
+ * @LastEditors: Sauron Wu
+ * @LastEditTime: 2019-09-20 14:23:08
+ * @Description: 
+ */
+/*
 -- (c) Copyright 2018 Xilinx, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
@@ -122,7 +131,19 @@ void storeImage()
             time_t now = time(0);
             string fileName = to_string(now) + to_string(count) + ".jpg";
    	        imwrite(path + fileName, tmpQ.second);
-            outFile << fileName << ',' << to_string(tmpQ.first) << endl;
+            outFile << fileName << ',';
+            switch(tmpQ.first){
+                case 0:
+                outFile<< "1,0,0";
+                break;
+                case 1:
+                outFile<<"0,1,0";
+                break;
+                case 2:
+                outFile<<"0,0,1";
+                break;
+            }
+            outFile<< endl;
             count = (count + 1)%100;
         }
             }
