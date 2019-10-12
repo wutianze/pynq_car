@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-09-28 18:13:30
+@LastEditTime: 2019-10-12 14:06:51
 @Description: 
 '''
 import keras
@@ -24,18 +24,6 @@ from keras.optimizers import Adam, SGD
 import config
 import argparse
 np.random.seed(0)
-# N is the number of output , R is the range(for steer is 2, for throttle is the max throttle)
-def linear_unbin(arr, N=15, offset=-1, R=2.0):
-    '''
-    preform inverse linear_bin, taking
-    one hot encoded arr, and get max value
-    rescale given R range and offset
-
-    For steer the offset should be -1 because the straight direction is 0
-    '''
-    b = np.argmax(arr)
-    a = b *(R/(N + offset)) + offset
-    return a
 
 # step1,载入数据，并且分割为训练和验证集
 # 问题，数据集太大了，已经超过计算机内存
@@ -52,71 +40,14 @@ def load_data(read_path):
     cut = int(len(training_data)*0.8)
     return training_data[0:cut], training_data[cut:]
 
-def default_categorical(input_shape=(120, 160, 3)):
-
-    #opt = keras.optimizers.Adam()
-    drop = 0.2
-
-    img_in = Input(shape=input_shape, name='img_in')                      # First layer, input layer, Shape comes from camera.py resolution, RGB
-    x = img_in
-    x = Conv2D(24, (5,5), strides=(2,2), activation='relu')(x)       # 24 features, 5 pixel x 5 pixel kernel (convolution, feauture) window, 2wx2h stride, relu activation
-    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
-    x = Conv2D(32, (5,5), strides=(2,2), activation='relu')(x)       # 32 features, 5px5p kernel window, 2wx2h stride, relu activatiion
-    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
-    if input_shape[0] > 32 :
-        x = Conv2D(64, (5,5), strides=(2,2), activation='relu')(x)       # 64 features, 5px5p kernal window, 2wx2h stride, relu
-    else:
-        x = Conv2D(64, (3,3), strides=(1,1), activation='relu')(x)       # 64 features, 5px5p kernal window, 2wx2h stride, relu
-    if input_shape[0] > 64 :
-        x = Conv2D(64, (3,3), strides=(2,2), activation='relu')(x)       # 64 features, 3px3p kernal window, 2wx2h stride, relu
-    elif input_shape[0] > 32 :
-        x = Conv2D(64, (3,3), strides=(1,1), activation='relu')(x)       # 64 features, 3px3p kernal window, 2wx2h stride, relu
-    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
-    x = Conv2D(64, (3,3), strides=(1,1), activation='relu')(x)       # 64 features, 3px3p kernal window, 1wx1h stride, relu
-    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
-    # Possibly add MaxPooling (will make it less sensitive to position in image).  Camera angle fixed, so may not to be needed
-
-    x = Flatten(name='flattened')(x)                                        # Flatten to 1D (Fully connected)
-    x = Dense(100, activation='relu')(x)                                    # Classify the data into 100 features, make all negatives 0
-    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
-    x = Dense(50, activation='relu')(x)                                     # Classify the data into 50 features, make all negatives 0
-    x = Dropout(drop)(x)                                                      # Randomly drop out 10% of the neurons (Prevent overfitting)
-    #categorical output of the angle
-    angle_out = Dense(15, activation='softmax', name='angle_out')(x)        # Connect every input with every output and output 15 hidden units. Use Softmax to give percentage. 15 categories and find best one based off percentage 0.0-1.0
-    
-    #continous output of throttle
-    throttle_out = Dense(20, activation='softmax', name='throttle_out')(x)      # Reduce to 1 number, Positive number only
-    
-    model = Model(inputs=[img_in], outputs=[angle_out, throttle_out])
-    return model
-
 # step2 建立模型
 def build_model(keep_prob,model_path, input_shape=config.INPUT_SHAPE):
     if os.path.exists(model_path+"/model.h5"):
         model = load_model(model_path+"/model.h5")
         return model
     print("开始编译模型")
-#    model = Sequential()
-#    model.add(Conv2D(24, (5, 5), activation='relu', strides=(2, 2), input_shape = config.INPUT_SHAPE))
-#    model.add(Dropout(keep_prob))
-#    model.add(Conv2D(36, (5, 5), activation='relu', strides=(2, 2)))
-#    model.add(Dropout(keep_prob))
-#    model.add(Conv2D(48, (5, 5), activation='relu', strides=(2, 2)))
-#    model.add(Dropout(keep_prob))
-#    model.add(Conv2D(64, (3, 3),activation='relu'))
-#    model.add(Dropout(keep_prob))
-#    model.add(Conv2D(64, (3, 3),activation='relu'))
-#    model.add(Dropout(keep_prob))  # Dropout将在训练过程中每次更新参数时随机断开一定百分比（p）的输入神经元连接
-#    model.add(Flatten())
-#    model.add(Dense(500, activation='relu'))
-#    model.add(Dense(250, activation='relu'))
-#    model.add(Dense(50, activation='relu'))
-#    model.add(Dense(config.OUTPUT_NUM, activation='softmax'))
 #    model.summary()
     model = Sequential()
-
-    #model.add(Cropping2D(cropping=((40,0), (0,0)), input_shape=config.INPUT_SHAPE))
-    #model.add(Lambda(lambda x: x/127.5 - 1.))
     model.add(Conv2D(24, (5, 5), strides=(2, 2), activation="relu",input_shape=input_shape))
     #model.add(BatchNormalization())
     model.add(Dropout(keep_prob))
@@ -173,37 +104,7 @@ def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
                         validation_steps=(len(valid_list)*config.CHUNK_SIZE)/batch_size,
                         callbacks=[tensorboard, checkpoint, early_stop, reduce_lr],
                         verbose=2)
-def train_model2(model,verbose=1, min_delta=.0005, patience=5, use_early_stop=True):
-    save_best = keras.callbacks.ModelCheckpoint(saved_model_path, 
-                                                    monitor='val_loss', 
-                                                    verbose=verbose, 
-                                                    save_best_only=True, 
-                                                    mode='min')
-        
-    #stop training if the validation error stops improving.
-    early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', 
-                                                   min_delta=min_delta, 
-                                                   patience=patience, 
-                                                   verbose=verbose, 
-                                                   mode='auto')
-        
-    callbacks_list = [save_best]
-
-    if use_early_stop:
-        callbacks_list.append(early_stop)
-    model.compile(optimizer=self.optimizer, metrics=['acc'],
-                  loss={'angle_out': 'categorical_crossentropy', 
-                        'throttle_out': 'categorical_crossentropy'},
-                  loss_weights={'angle_out': 0.5, 'throttle_out': 1.0})
-    model.fit_generator(
-                        batch_generator(train_list, batch_size,method),
-                        steps_per_epoch=samples_per_epoch/batch_size,
-                        epochs = nb_epoch,
-                        validation_data=batch_generator(valid_list, batch_size,method),
-                        validation_steps=(len(valid_list)*config.CHUNK_SIZE)/batch_size,
-                        callbacks=callbacks_list,
-                        verbose=1)
-    
+                        
 # step4
 # 可以一个batch一个batch进行训练，CPU和GPU同时开工
 def batch_generator(name_list, batch_size,method,input_shape):
@@ -253,6 +154,7 @@ def batch_generator(name_list, batch_size,method,input_shape):
         for index in range(X.shape[0]):
             images[i] = X[index]
             steers[i] = y[index]
+            #steers[i] = [0,0]
             #print(y[index])
             i += 1
             if i == batch_size:
