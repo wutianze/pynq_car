@@ -13,8 +13,7 @@
 #include<string>
 using namespace std;
 class Controller{
-    public:  
-    virtual bool command(int) = 0;
+    public: 
     virtual string to_record() = 0;
 };
 class PYNQZ2: public Controller{
@@ -34,14 +33,13 @@ class PYNQZ2: public Controller{
     void righter();
     
     public:
-    struct STATUS{
+    struct Status{
         float throttleRate;
         float steerRate;
     };
-    STATUS nowS;
-    STATUS nowStatus();
+    Status* nowS;
     PYNQZ2();
     ~PYNQZ2();
-    STATUS command(int);
+    Status* command(int);
     string to_record();
 };

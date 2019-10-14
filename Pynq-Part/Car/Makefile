@@ -19,9 +19,8 @@ MODEL   =   $(CUR_DIR)/model/dpu_test.elf
 CFLAGS  :=  -O2 -Wall -Wpointer-arith -std=c++11 -ffast-math -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon
 
 
-.PHONY: all clean
+.PHONY: clean
 
-#all: $(BUILD) $(PROJECT)
 
 $(COLLECT) : $(COLLECTOBJ)
 	$(CXX) $(CFLAGS) $(addprefix $(BUILD)/, $^) -o $(BUILD)/$@ $(COLLECTLDFLAGS)
@@ -33,7 +32,5 @@ $(RUN) : $(RUNOBJ)
 	$(CXX) -c $(CFLAGS) $< -o $(BUILD)/$@
 
 clean:
-	$(RM) -rf $(BUILD)
+	$(RM) -rf $(BUILD)/*
 
-$(BUILD) :
-	-mkdir -p $@

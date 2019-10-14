@@ -4,78 +4,9 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-09-23 09:13:20
+ * @LastEditTime: 2019-10-14 17:07:22
  * @Description: 
  */
-/*
--- (c) Copyright 2018 Xilinx, Inc. All rights reserved.
---
--- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
---
--- DISCLAIMER
--- This disclaimer is not a license and does not grant any
--- rights to the materials distributed herewith. Except as
--- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
--- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
--- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
--- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
--- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
--- including negligence, or under any other theory of
--- liability) for any loss or damage of any kind or nature
--- related to, arising under or in connection with these
--- materials, including for any direct, or any indirect,
--- special, incidental, or consequential loss or damage
--- (including loss of data, profits, goodwill, or any type of
--- loss or damage suffered as a result of any action brought
--- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
--- possibility of the same.
---
--- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
--- safe, or for use in any application requiring fail-safe
--- performance, such as life-support or safety devices or
--- systems, Class III medical devices, nuclear facilities,
--- applications related to the deployment of airbags, or any
--- other applications that could lead to death, personal
--- injury, or severe property or environmental damage
--- (individually and collectively, "Critical
--- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
--- Applications, subject only to applicable laws and
--- regulations governing limitations on product liability.
---
--- THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
--- PART OF THIS FILE AT ALL TIMES.
-*/
-/*#include <assert.h>
-#include <dirent.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <atomic>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <cassert>
-#include <chrono>
-#include <cmath>
-#include <cstdio>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <queue>
-#include <mutex>
-#include <string>
-#include <vector>
-#include <thread>
-#include <dnndk/dnndk.h>
-#include <opencv2/opencv.hpp>
-*/
 #include <assert.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -101,10 +32,12 @@ using namespace cv;
 using namespace std;
 using namespace std::chrono;
 
+//whether to use opencv, set by user
 string mode;
 
 #define NNCONTROL 0
 #define CVCONTROL 1
+// commander indicates the car is controlled by AI or opencv currently
 int commander = NNCONTROL;
 mutex commanderLock;
 
@@ -115,11 +48,14 @@ queue<Mat> takenImages;
 queue<int> generatedCommands;
 //vector<string> kinds = {"left", "forward", "right", "stop"};
 vector<string> kinds = {"steer"};
+
 #define KERNEL_CONV "testModel"
 #define CONV_INPUT_NODE "conv2d_1_convolution"
 #define CONV_OUTPUT_NODE "dense_2_MatMul"
+
 #define TASKNUM 3
 #define THREADNUM 6 //THREADNUM should be TASKNUM + 3
+
 //#define SHOWTIME
 #ifdef SHOWTIME
 #define _T(func)                                                              \
@@ -138,7 +74,6 @@ vector<string> kinds = {"steer"};
 #endif
 
 void setInputImage(DPUTask *task, const char* inNode, const cv::Mat& image) {
-    cout<<"setInputImage"<<endl;
     DPUTensor* in = dpuGetInputTensor(task, inNode);
     //float scale = dpuGetTensorScale(in);
     //int width = dpuGetTensorWidth(in);
@@ -154,9 +89,8 @@ void setInputImage(DPUTask *task, const char* inNode, const cv::Mat& image) {
     }
 }
 
-int command(const float *d, int size)
+int topKind(const float *d, int size)
 {
-    cout<<"command"<<endl;
     assert(d && size > 0);
     int result = 0;
     float maxx = d[0];
@@ -173,7 +107,6 @@ int command(const float *d, int size)
 
 #define COMMANDMAXLEN 5
 void addCommand(int com){
-    cout<<"addCommand"<<endl;
     controlLock.lock();
     int nowSize = generatedCommands.size();
     if( nowSize >= COMMANDMAXLEN){
@@ -186,7 +119,6 @@ void addCommand(int com){
 }
 
 void run_model(DPUTask* task){
-    cout<<"run_model"<<endl;
     int channel = kinds.size();
     vector<float> smRes(channel);
     int8_t *fcRes;
@@ -209,24 +141,21 @@ void run_model(DPUTask* task){
             }
         }
         queueLock.unlock();
-        //Mat image = imread("tmp.jpg",1);
-        //Scalar mM = mean(tmpImage);
-        //float meanV[3] = {mM.val[0], mM.val[1], mM.val[2]};
 
         _T(setInputImage(task, CONV_INPUT_NODE, tmpImage));
+        //dpuSetInputImage2(task,CONV_INPUT_NODE, tmpImage);
         _T(dpuRunTask(task));
         float scale = dpuGetOutputTensorScale(task, CONV_OUTPUT_NODE);
         DPUTensor *dpuOutTensor = dpuGetOutputTensor(task, CONV_OUTPUT_NODE);
         fcRes = dpuGetTensorAddress(dpuOutTensor);
         _T(dpuRunSoftmax(fcRes, smRes.data(), channel, 1, scale));
         //_T(TopK(smRes.data(),channel,4,kinds,"nowCap"));
-        int toDo = command(smRes.data(), channel);
-        addCommand(toDo);        
+
+        addCommand(topKind(smRes.data(), channel));        
     }
 }
 
 void run_cv(){
-    cout<<"run_cv"<<endl;
     if(mode == "nn")return;
     Mat tmpImage;
     while(true){
@@ -246,7 +175,6 @@ void run_cv(){
             }
         }
         queueLock.unlock();
-        //commander = bool judgeSituation()
         if(commander == CVCONTROL){
 		return;
         }
@@ -255,7 +183,6 @@ void run_cv(){
 
 #define IMAGEMAXLEN 5
 void run_camera(){
-    cout<<"run_camera"<<endl;
     VideoCapture cap(0);
     cap.set(CV_CAP_PROP_FRAME_WIDTH, 160);
     cap.set(CV_CAP_PROP_FRAME_HEIGHT, 80);
@@ -276,7 +203,6 @@ void run_camera(){
 }
 
 void run_command(){
-    cout<<"run_command"<<endl;
     PYNQZ2 controller = PYNQZ2();
     while(true){
         controlLock.lock();
@@ -305,11 +231,9 @@ int main(int argc, char **argv)
     DPUKernel *kernelConv;
 
     dpuOpen();
-    // Create the kernel for mnist
     kernelConv = dpuLoadKernel(KERNEL_CONV);
     vector<DPUTask*> tasks(TASKNUM);
     generate(tasks.begin(),tasks.end(),std::bind(dpuCreateTask,kernelConv,0));    
-    //DPUTask *taskMnist = dpuCreateTask(kernelConv, 0);
     array<thread,THREADNUM> threads = {
         thread(run_model, tasks[0]),
         thread(run_model, tasks[1]),
