@@ -4,7 +4,7 @@
  # @Email: 1369130123qq@gmail.com
  # @Date: 2019-09-19 12:44:02
  # @LastEditors: Sauron Wu
- # @LastEditTime: 2019-09-19 12:44:02
+ # @LastEditTime: 2019-10-15 15:25:14
  # @Description: 
  ###
 #!/bin/bash
@@ -32,7 +32,7 @@ decent_q quantize \
   --method 1 \
   --input_fn ../process_img.calib_input \
   --gpu 0 \
-  --calib_iter 1
+  --calib_iter 10
 
 echo "#####################################"
 echo "QUANTIZATION COMPLETED"

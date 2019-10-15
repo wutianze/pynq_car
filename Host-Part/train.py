@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-10-15 15:07:14
+@LastEditTime: 2019-10-15 15:14:05
 @Description: 
 '''
 import keras
@@ -83,7 +83,8 @@ def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
     if not os.path.exists(model_path+'/'):
         os.mkdir(model_path+'/')
 
-    checkpoint = ModelCheckpoint(model_path+'/model-{epoch:03d}.h5',
+    #checkpoint = ModelCheckpoint(model_path+'/model-{epoch:03d}.h5',
+    checkpoint = ModelCheckpoint(model_path+'/model.h5',
                                  monitor='val_loss',
                                  verbose=0,
                                  save_best_only=True,
