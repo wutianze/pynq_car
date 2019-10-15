@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-15 09:13:16
+ * @LastEditTime: 2019-10-15 10:19:34
  * @Description: 
  */
 #include <assert.h>
@@ -145,9 +145,8 @@ void run_model(DPUTask* task){
         //dpuSetInputImage2(task,CONV_INPUT_NODE, tmpImage);
         _T(dpuRunTask(task));
         float scale = dpuGetOutputTensorScale(task, CONV_OUTPUT_NODE);
-        DPUTensor *dpuOutTensor = dpuGetOutputTensor(task, CONV_OUTPUT_NODE);
-        fcRes = dpuGetTensorAddress(dpuOutTensor);
-        _T(dpuRunSoftmax(fcRes, smRes.data(), channel, 1, scale));
+        modelRes = dpuGetTensorAddress(dpuGetOutputTensor(task, CONV_OUTPUT_NODE));
+        _T(dpuRunSoftmax(modelRes, smRes.data(), channel, 1, scale));
 
         addCommand(topKind(smRes.data(), channel));        
     }
