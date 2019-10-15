@@ -1,3 +1,12 @@
+### 
+# @Author: Sauron Wu
+ # @GitHub: wutianze
+ # @Email: 1369130123qq@gmail.com
+ # @Date: 2019-09-19 12:44:02
+ # @LastEditors: Sauron Wu
+ # @LastEditTime: 2019-09-19 12:44:02
+ # @Description: 
+ ###
 #!/bin/bash
 
 
@@ -21,7 +30,7 @@ decent_q quantize \
   --input_shapes ?,80,160,3 \
   --output_nodes dense_3/Softmax \
   --method 1 \
-  --input_fn graph_input_fn.calib_input \
+  --input_fn ../process_img.calib_input \
   --gpu 0 \
   --calib_iter 1
 
