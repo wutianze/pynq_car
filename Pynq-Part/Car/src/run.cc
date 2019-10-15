@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-14 17:07:22
+ * @LastEditTime: 2019-10-15 09:13:16
  * @Description: 
  */
 #include <assert.h>
@@ -73,17 +73,16 @@ vector<string> kinds = {"steer"};
 #define _T(func) func;
 #endif
 
+// the input image is in BGR format(opencv default), and the '/255 - 0.5' must be the same when you 
+// train the model, don't forget to multiply the scale finally
 void setInputImage(DPUTask *task, const char* inNode, const cv::Mat& image) {
     DPUTensor* in = dpuGetInputTensor(task, inNode);
-    //float scale = dpuGetTensorScale(in);
-    //int width = dpuGetTensorWidth(in);
-    //int height = dpuGetTensorHeight(in);
-    //int size = dpuGetTensorSize(dpu_in);
+    float scale = dpuGetTensorScale(in);
     int8_t* data = dpuGetTensorAddress(in);
     for(int i = 0; i < 3; ++i) {
         for(int j = 0; j < image.rows; ++j) {
             for(int k = 0; k < image.cols; ++k) {
-               data[j*image.rows*3+k*3+2-i] = float(image.at<Vec3b>(j,k)[i])/255.0 - 0.5;
+               data[j*image.rows*3+k*3+i] = (float(image.at<Vec3b>(j,k)[i])/255.0 - 0.5)*scale;
             }
         }
     }
@@ -149,7 +148,6 @@ void run_model(DPUTask* task){
         DPUTensor *dpuOutTensor = dpuGetOutputTensor(task, CONV_OUTPUT_NODE);
         fcRes = dpuGetTensorAddress(dpuOutTensor);
         _T(dpuRunSoftmax(fcRes, smRes.data(), channel, 1, scale));
-        //_T(TopK(smRes.data(),channel,4,kinds,"nowCap"));
 
         addCommand(topKind(smRes.data(), channel));        
     }
