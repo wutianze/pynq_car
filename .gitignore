@@ -9,8 +9,8 @@ Pynq-Part/system/
 **/rootfs.tar.gz
 **/system.zip
 **/*.o
-Paper-commited/conference*
-!Paper-commited/*.tex
+Papers/**/conference*
+!Papers/**/*.tex
 **/*.npz
 **/logs
 #**/log*

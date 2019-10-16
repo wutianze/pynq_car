@@ -19,8 +19,7 @@
 {University of Chinese Academy of Sciences}\\
 Beijing, China \\
 wutianze@ict.ac.cn}
-\and
-
+}
 \maketitle
 
 \begin{abstract}
@@ -32,8 +31,17 @@ Autonomous driving is a hot topic currently, many companies and research institu
 %\end{IEEEkeywords}
 
 \section{Introduction}
-Autonomous Driving is getting more and more attention recently. The main problem to be solved in this area is how to meet the need of real-time computing. 
-Though we now have many customed chips like GPU\cite{b1} and TPU\cite{b2} for machine learning acceleration, they are not able to provide both high performance and low power consumption. Also they are not flexible enough to adapt to different scenes. 
+With the development of AI technology, many work can be done by robot instead of human. Driving is one of these tasks and autonomous driving has become more and more popular these years. We can see from Google Trends of the keyword 'autonomous driving' from 2010 to 2019 in Fig.~\ref{st}, it's obvious that autonomous driving technology will be one of the hot topics of AI. The reason why this topic is so hot is that autonomous driving is not one single technology, but rather a highly complex system that consists of many sub-systems\cite{b1}, it's the area where any researcher can make contributions.
+As a result, there will be more people trying to learn about autonomous driving technology. So, a platform for autonomous driving researching and learning is badly needed. 
+In the cloud computing domain, researchers usually want to have machines that have good computation performance. The data center based on virtualization technology\cite{b2} and distributed computing\cite{b3} nowadays usually has many powerful servers for data processing.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{search_result.PNG}}
+\caption{Search Trend.}
+\label{st}
+\end{figure}
+
+Though we now have many customized chips like GPU\cite{b1} and TPU\cite{b2} for machine learning acceleration, they are not able to provide both high performance and low power consumption. Also they are not flexible enough to adapt to different scenes. 
 
 To meet these requests, FPGA\cite{b3} is a good solution since it can provide high performance and low power consumption, most important, people can build accelerators for specified algorithms easily.
 
@@ -185,7 +193,14 @@ The project is supported by Xilinx and Institute of Computing Technology Chinese
 
 \begin{thebibliography}{00}
 
-\bibitem{b1} Nurvitadhi, E., Sheffield, D., Sim, J., Mishra, A., Venkatesh, G., \& Marr, D. (2016, December). Accelerating binarized neural networks: Comparison of FPGA, CPU, GPU, and ASIC. In 2016 International Conference on Field-Programmable Technology (FPT) (pp. 77-84). IEEE.
+\bibitem{b1} Liu, Shaoshan, Liyun Li, Jie Tang, Shuang Wu, and Jean-Luc Gaudiot. "Creating autonomous vehicle systems." Synthesis Lectures on Computer Science 6, no. 1 (2017): i-186.
+
+\bibitem{b2} Daniel Nurmi, Rich Wolski, Chris GrzegorczykGraziano Obertelli, Sunil Soman, Lamia Youseff, and Dmitrii Zagorodnov. The eucalyptus open-source cloud-computing system. In Cluster Computing and the Grid, 2009. CCGRID’09. 9th IEEE/ACM International Symposium on, pages 124–131. IEEE, 2009.
+
+\bibitem{b3} Jeffrey Dean and Sanjay Ghemawat. Mapreduce: simplified data processing on large clusters. Communications
+of the ACM, 51(1):107–113, 2008.
+
+%\bibitem{b1} Nurvitadhi, E., Sheffield, D., Sim, J., Mishra, A., Venkatesh, G., \& Marr, D. (2016, December). Accelerating binarized neural networks: Comparison of FPGA, CPU, GPU, and ASIC. In 2016 International Conference on Field-Programmable Technology (FPT) (pp. 77-84). IEEE.
 \bibitem{b2} Jouppi, N. P., Young, C., Patil, N., Patterson, D., Agrawal, G., Bajwa, R., ... \& Boyle, R. (2017, June). In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA) (pp. 1-12). IEEE.
 \bibitem{b3} Mahajan, Divya, et al. "Tabla: A unified template-based framework for accelerating statistical machine learning." 2016 IEEE International Symposium on High Performance Computer Architecture (HPCA). IEEE, 2016.
 \bibitem{b4} TUL PYNQ-Z2 [ONLINE] Available at: http://www.tul.com.tw/ProductsPYNQ-Z2.html  
