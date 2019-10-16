@@ -24,7 +24,6 @@ Virtual-Part/simulator/*.sln
 Virtual-Part/simulator/*.userprefs
 Virtual-Part/simulator/Temp
 Virtual-Part/simulator/Build
-Virtual-Part/simulator/Log
 Virtual-Part/simulator/Packages
 Virtual-Part/simulator/.vs
 Virtual-Part/*.csproj
