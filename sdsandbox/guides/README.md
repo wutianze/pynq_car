@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-23 10:12:28
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-16 09:42:54
+ * @LastEditTime: 2019-10-16 10:25:03
  * @Description: 
  -->
 # Introduction
@@ -39,27 +39,16 @@ python src/predict_server.py path-to-your-model/model.h5
 
 1) Load the Unity project sdsandbox/sdsim in Unity.  
 
-2) Create a dir sdsandbox/sdsim/log.  
+2) Create a dir for example sdsandbox/sdsim/log.  
 
 3) Hit the start arrow in Unity to launch project.  
 
 4) Hit button "Generate Training Data" to generate image and steering training data. See sdsim/log for output files.  
 
-5) Stop Unity sim by clicking run arrow again.  
+5) When the road comes to an end, just stop the generating process and generate another road, then start the process again.
 
-6) Run this python script to prepare raw data for training:  
+6) The default pictures to collect is 50000, the guide will teach you how to change it later.
 
-```bash
-cd sdsandbox
-python src/prepare_data.py --src=sdsim/log/*.* --dest=dataset
-```
-
-7) Repeat 4, 5, 6 until you have lots of training data. Over 50K images for best results.
-
-## How to edit Unity3d to use your own model
-1. The Control commands can be changed in JoystickCarControl.cs
-2. The training data style can be changed in Logger.cs
-3. You should enable the hidden buttons in Canvas/Panel Menu like ManualTraingData
-4. The tcp control can be changed in Script/tcp/TcpCarHandler.cs, and you need to change the predict_server.py too
+## If you want to make some changes to the simulator, please read custom_simulator.md.
 
 
