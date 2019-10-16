@@ -154,7 +154,7 @@ namespace tk
                 Debug.Log(e.ToString());
             }
         }
-    void OnPynqControlsRecv(JSONObject json)
+        void OnPynqControlsRecv(JSONObject json)
         {
             try
             {

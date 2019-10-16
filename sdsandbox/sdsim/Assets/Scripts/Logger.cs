@@ -6,55 +6,6 @@ using System.Threading;
 using System;
 using UnityEngine.UI;
 
-[Serializable]
-public class MetaJson
-{
-    public string[] inputs;
-    public string[] types;
-
-    public void Init(string[] _inputs, string[] _types)
-    {
-        inputs = _inputs;
-        types = _types;
-    }
-}
-
-[Serializable]
-public class DonkeyRecord
-{
-    public string cam_image_array;
-    public float user_throttle;
-    public float user_angle;
-    public string user_mode; 
-    public int track_lap;
-    public int track_loc;
-
-    public void Init(string image_name, float throttle, float angle, string mode, int lap, int loc)
-    {
-        cam_image_array = image_name;
-        user_throttle = throttle;
-        user_angle = angle;
-        user_mode = mode;
-        track_lap = lap;
-        track_loc = loc;
-    }
-
-    public string AsString()
-    {
-        string json = JsonUtility.ToJson(this);
-
-        //Can't name the variable names with a slash, so replace on output
-        json = json.Replace("cam_image", "cam/image");
-        json = json.Replace("user_throttle", "user/throttle");
-        json = json.Replace("user_angle", "user/angle");
-        json = json.Replace("user_mode", "user/mode");
-        json = json.Replace("track_lap", "track/lap");
-        json = json.Replace("track_lap", "track/lap");
-        json = json.Replace("track_loc", "track/loc");
-
-        return json;
-    }
-}
 public class Logger : MonoBehaviour {
 
 	public GameObject carObj;
@@ -84,21 +35,9 @@ public class Logger : MonoBehaviour {
 
     public bool PynqStyle2 = true;
 
-    //We can output our logs in the style that matched the output from the shark robot car platform - github/tawnkramer/shark
-    public bool SharkStyle = false;
-
-	//We can output our logs in the style that matched the output from the udacity simulator
-	public bool UdacityStyle = false;
-
-    //We can output our logs in the style that matched the output from the donkey robot car platform - donkeycar.com
-    public bool DonkeyStyle = false;
-
-    //Tub style as prefered by Donkey2
-    public bool DonkeyStyle2 = false;
-
     public Text logDisplay;
 
-	string outputFilename = "log_car_controls.txt";
+	string outputFilename = "train.csv";
 	private StreamWriter writer;
 
 	class ImageSaveJob {
@@ -127,10 +66,6 @@ public class Logger : MonoBehaviour {
 			if(PynqStyle || PynqStyle2){
                 outputFilename = "train.csv";
             }
-            if(UdacityStyle)
-			{
-				outputFilename = "driving_log.csv";
-			}
 
 			string filename = GetLogPath() + outputFilename;
 
@@ -138,22 +73,6 @@ public class Logger : MonoBehaviour {
 
 			Debug.Log("Opening file for log at: " + filename);
 
-			if(UdacityStyle)
-			{
-				writer.WriteLine("center,left,right,steering,throttle,brake,speed");
-			}
-
-            if(DonkeyStyle2)
-            {
-                MetaJson mjson = new MetaJson();
-                string[] inputs = {"cam/image_array", "user/angle", "user/throttle", "user/mode", "track/lap", "track/loc"};
-                string[] types = {"image_array", "float", "float", "str", "int", "int"};
-                mjson.Init(inputs, types);
-                string json = JsonUtility.ToJson(mjson);
-				var f = File.CreateText(GetLogPath() + "meta.json");
-				f.Write(json);
-				f.Close();
-            }
 		}
 
         Canvas canvas = GameObject.FindObjectOfType<Canvas>();
@@ -220,41 +139,6 @@ public class Logger : MonoBehaviour {
                 }else{straight = 1.0f;}
                 writer.WriteLine(string.Format("{0},{1},{2},{3}",image_filename,left.ToString(),straight.ToString(),right.ToString()));
             }
-            else if(UdacityStyle)
-			{
-				string image_filename = GetUdacityStyleImageFilename();
-				float steering = car.GetSteering() / car.GetMaxSteering();
-				writer.WriteLine(string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", image_filename, 
-                    "none", "none", steering.ToString(), 
-                    car.GetThrottle().ToString(), "0", "0", lapCounter));
-			}
-            else if(DonkeyStyle || SharkStyle)
-            {
-
-            }
-            else if(DonkeyStyle2)
-            {
-                DonkeyRecord mjson = new DonkeyRecord();
-                float steering = car.GetSteering() / car.GetMaxSteering();
-                float throttle = car.GetThrottle() * 10.0f;
-                int loc = 0;
-
-                //training code like steering clamped between -1, 1
-                steering = Mathf.Clamp(steering, -1.0f, 1.0f);
-
-                mjson.Init(string.Format("{0}_cam-image_array_.jpg", frameCounter),
-                    throttle, steering, "user", lapCounter, loc);
-
-                string json = mjson.AsString();
-                string filename = string.Format("record_{0}.json", frameCounter);
-				var f = File.CreateText(GetLogPath() + filename);
-				f.Write(json);
-				f.Close();
-            }
-			else
-			{
-				writer.WriteLine(string.Format("{0},{1},{2},{3}", frameCounter.ToString(), activity, car.GetSteering().ToString(), car.GetThrottle().ToString()));
-			}
 		}
 
 		if(lidar != null)
@@ -298,32 +182,6 @@ public class Logger : MonoBehaviour {
 		return string.Format("images_{0,8:D8}.jpg", frameCounter);
 	}
 	
-    string GetUdacityStyleImageFilename()
-	{
-		return GetLogPath() + string.Format("IMG/center_{0,8:D8}.jpg", frameCounter);
-	}
-
-    string GetDonkeyStyleImageFilename()
-    {
-        float steering = car.GetSteering() / car.GetMaxSteering();
-        float throttle = car.GetThrottle();
-        return GetLogPath() + string.Format("frame_{0,6:D6}_ttl_{1}_agl_{2}_mil_0.0.jpg", 
-            frameCounter, throttle, steering);
-    }
-
-	string GetSharkStyleImageFilename()
-    {
-        int steering = (int)(car.GetSteering() / car.GetMaxSteering() * 32768.0f);
-        int throttle = (int)(car.GetThrottle() * 32768.0f);
-        return GetLogPath() + string.Format("frame_{0,6:D6}_st_{1}_th_{2}.jpg", 
-            frameCounter, steering, throttle);
-    }
-
-    string GetDonkey2StyleImageFilename()
-    {
-        return GetLogPath() + string.Format("{0}_cam-image_array_.jpg", frameCounter);
-    }
-
     //Save the camera sensor to an image. Use the suffix to distinguish between cameras.
     void SaveCamSensor(CameraSensor cs, string prefix, string suffix)
     {
@@ -335,37 +193,7 @@ public class Logger : MonoBehaviour {
             if(PynqStyle || PynqStyle2){
                 ij.filename = GetLogPath()+GetPynqStyleImageFilename();
                 ij.bytes = image.EncodeToJPG();
-            }else if(UdacityStyle)
-			{
-				ij.filename = GetUdacityStyleImageFilename();
-
-				ij.bytes = image.EncodeToJPG();
-			}
-            else if (DonkeyStyle)
-            {
-                ij.filename = GetDonkeyStyleImageFilename();
-
-                ij.bytes = image.EncodeToJPG();
             }
-            else if (DonkeyStyle2)
-            {
-                ij.filename = GetDonkey2StyleImageFilename();
-
-                ij.bytes = image.EncodeToJPG();
-            }
-			else if(SharkStyle)
-            {
-                ij.filename = GetSharkStyleImageFilename();
-
-                ij.bytes = image.EncodeToJPG();
-            }
-			else
-			{
-            	ij.filename = GetLogPath() + string.Format("{0}_{1,8:D8}{2}.png", prefix, frameCounter, suffix);
-
-            	ij.bytes = image.EncodeToPNG();
-			}
-
             lock (this)
             {
                 imagesToSave.Add(ij);
