@@ -13,7 +13,7 @@ Paper-commited/conference*
 !Paper-commited/*.tex
 **/*.npz
 **/logs
-**/log*
+#**/log*
 **/images_*.jpg
 Virtual-Part/*.pyc
 Virtual-Part/*.h5
