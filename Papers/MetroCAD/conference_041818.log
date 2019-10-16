@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/W32TeX) (preloaded format=pdflatex 2019.9.12)  16 OCT 2019 14:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/W32TeX) (preloaded format=pdflatex 2019.9.12)  16 OCT 2019 15:17
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -460,9 +460,9 @@ you'd better type `E' or `X' now and fix your file.
 Here is how much of TeX's memory you used:
  4320 strings out of 492623
  62542 string characters out of 6133290
- 132203 words of memory out of 5000000
+ 131950 words of memory out of 5000000
  8201 multiletter control sequences out of 15000+600000
  24710 words of font info for 54 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,1n,35p,872b,102s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 41i,1n,35p,761b,102s stack positions out of 5000i,500n,10000p,200000b,80000s
 !  ==> Fatal error occurred, no output PDF file produced!
