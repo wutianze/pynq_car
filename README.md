@@ -12,7 +12,7 @@
 Enjoy your own autonomous driving car with the power of DPU and feel free to try your own AI model and new ideas.
 
 ## Material
-Download the image we provided [here]() and buy the car in [here]().
+Download the image we provided [here]() and buy the car [here]().
 
 ## Preparations
 - Power the Pynq-Z2 in your car and run `nmtui` to connect the car to your switch(make sure your PC connected to the same).
