@@ -31,9 +31,21 @@ Autonomous driving is a hot topic currently, many companies and research institu
 %\end{IEEEkeywords}
 
 \section{Introduction}
-With the development of AI technology, many work can be done by robot instead of human. Driving is one of these tasks and autonomous driving has become more and more popular these years. We can see from Google Trends of the keyword 'autonomous driving' from 2010 to 2019 in Fig.~\ref{st}, it's obvious that autonomous driving technology will be one of the hot topics of AI. The reason why this topic is so hot is that autonomous driving is not one single technology, but rather a highly complex system that consists of many sub-systems\cite{b1}, it's the area where any researcher can make contributions.
-As a result, there will be more people trying to learn about autonomous driving technology. So, a platform for autonomous driving researching and learning is badly needed. 
-In the cloud computing domain, researchers usually want to have machines that have good computation performance. The data center based on virtualization technology\cite{b2} and distributed computing\cite{b3} nowadays usually has many powerful servers for data processing.
+With the development of AI technology, many work can be done by robot instead of human. Driving is one of these tasks and autonomous driving(AD) has become more and more popular these years. We can see from Google Trends of the keyword 'autonomous driving' from 2010 to 2019 in Fig.~\ref{st}, it's obvious that AD technology will be one of the hot topics of AI. The reason why this topic is so hot is that AD is not one single technology, but rather a highly complex system that consists of many sub-systems\cite{b1}, it's the area where any researcher can make contributions.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{search_result.PNG}}
+\caption{Search Trend.}
+\label{st}
+\end{figure}
+
+As a result, there will be more people trying to learn about AD technology. So a platform for AD researching and learning is badly needed. 
+
+In the cloud computing domain, researchers usually want to own machines that have good computation performance. The data center based on virtualization technology\cite{b2} and distributed computing\cite{b3} nowadays usually has many powerful servers for data processing. Also, for AD tasks, accelerating the inference process through hardware is becoming more and more common and indispensable, it's the cornerstone of the development of AD and all the researchers and students should pay enough attention to it. However, when comes to systems in the car, we should care about not only the computing power but also the power consumption and cost. It's a pity that we can hardly find one product that can provide both enough computing power and hardware acceleration but remains affordable for most of the people.
+
+To make everyone have the opportunity to participate in the research of AD, we propose xxx, an indoor experimental research and education platform for AD. As shown in Fig.~\ref{}, xxx is a powerful and flexible platform from hardware to software. It depends on three main components: mechanical component, control system and FPGA accelerator. We also provide a simulator using Unity3d\cite{b4} based on sdsandbox\cite{b5} that can make the users test their design more conveniently. All the resources on xxx are managed by Pynq-Z2\cite{b6} system which is based on Ubuntu 18.04\cite{b7}. 
+
+Users can use the computing power in Pynq-Z2 includes both FPGA which can be used as a specialized hardware accelerator and an Arm 32-bit core\cite{b8} which is familiar to normal people. We believe that in the future the hardware acceleration will become an imperative for the modern cars to provide edge computing power, so it's necessary to embed FPGA which is flexible for researching in our platform. Users will find it easy to do research on multi-area of AD and develop their own algorithms and systems based on xxx.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.5\textwidth]{search_result.PNG}}
@@ -54,7 +66,11 @@ We also build a simulator based on sdsandbox\cite{b9} using Unity3d\cite{b10}, w
 
 The rest of this paper is organized as follows. Section II describes the overview of our hardware structure and development environment. Section III presents the software architecture and details of methods we are going to use for the competition. Finally, the paper mentions the current progress and makes an conclusion.
 
-\section{Overview of our car}
+\section{Related Work}
+
+In this section, we summarize the related work and some other similar platforms.
+
+
 
 \subsection{Hardware structure}
 
@@ -200,26 +216,35 @@ The project is supported by Xilinx and Institute of Computing Technology Chinese
 \bibitem{b3} Jeffrey Dean and Sanjay Ghemawat. Mapreduce: simplified data processing on large clusters. Communications
 of the ACM, 51(1):107–113, 2008.
 
+\bibitem{b4} TUL Unity3d Available at: https://unity.com/learn
+
+\bibitem{b5} Tawn Kramer, sdsandbox [ONLINE] Available at: https://github.com/tawnkramer/sdsandbox
+
+\bibitem{b6} TUL PYNQ-Z2 [ONLINE] Available at: http://www.tul.com.tw/ProductsPYNQ-Z2.html
+
+\bibitem{b7} ReleaseNotes Ubuntu 18.04 [ONLINE] Available at: https://wiki.ubuntu.com/BionicBeaver/ReleaseNotes?\_ga=2.236144449.1123485213.1571301241-1108469517.1569738000
+
+\bibitem{b8} TUL ARM [ONLINE] Available at: https://developer.arm.com/
 %\bibitem{b1} Nurvitadhi, E., Sheffield, D., Sim, J., Mishra, A., Venkatesh, G., \& Marr, D. (2016, December). Accelerating binarized neural networks: Comparison of FPGA, CPU, GPU, and ASIC. In 2016 International Conference on Field-Programmable Technology (FPT) (pp. 77-84). IEEE.
-\bibitem{b2} Jouppi, N. P., Young, C., Patil, N., Patterson, D., Agrawal, G., Bajwa, R., ... \& Boyle, R. (2017, June). In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA) (pp. 1-12). IEEE.
-\bibitem{b3} Mahajan, Divya, et al. "Tabla: A unified template-based framework for accelerating statistical machine learning." 2016 IEEE International Symposium on High Performance Computer Architecture (HPCA). IEEE, 2016.
-\bibitem{b4} TUL PYNQ-Z2 [ONLINE] Available at: http://www.tul.com.tw/ProductsPYNQ-Z2.html  
-\bibitem{b5} TUL DPU [ONLINE] Available at: https://www.xilinx.com/support/documentation/ ip\_documentation/dpu/v3\_0/pg338-dpu.pdf
-\bibitem{b6} An FPGA design competition for developing autonomous driving robot cars is held in FPT2019 [ONLINE] Available at: http://fpt19.tju.edu.cn/Contest/FPT2019\_FPGA\_Design \_Competition/Contents\_and\_Conditions.htm
-\bibitem{b7} Kojima, A., \& Nose, Y. (2018, December). Development of an Autonomous Driving Robot Car Using FPGA. In 2018 International Conference on Field-Programmable Technology (FPT) (pp. 411-414). IEEE.
-\bibitem{b8} Aoto, M., Wada, Y., \& Numata, Y. (2018, December). Development of an FPGA Controlled" Mini-Car" Toward Autonomous Driving. In 2018 International Conference on Field-Programmable Technology (FPT) (pp. 400-402). IEEE.
-\bibitem{b9} Tawn Kramer. (2019, September) [ONLINE] Available at: https://github.com/tawnkramer/sdsandbox
-\bibitem{b10} TUL Unity3d Available at: https://unity.com/learn
-\bibitem{b11} TUL PetaLinux [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/xilinx2019 \_1/ug1144-petalinux-tools-reference-guide.pdf
-\bibitem{b12} TUL DNNDK [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/ai\_inference /v1\_5
-\bibitem{b13} Tawn Kramer, sdsandbox [ONLINE] Available at: https://github.com/tawnkramer/sdsandbox
-\bibitem{b14} John Canny, "A Computational Approach to Edge Detection, "IEEE Transactions on Pattern Analysis and Machine Intelligence, pp.679-698, 1986.
-\bibitem{b15} J. B. Burns, A. R. Hanson and E. M. Riseman, "Extracting Straight Lines," in IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. PAMI-8, no. 4, pp. 425-455, July 1986.
-\bibitem{b16} S. Selim, M. Ismail, "K-Means-Type Algorithms: A Generalized Convergence Theorem and Characterization of Local Optimality," Pattern Analysis and Machine Intelligence, IEEE Transactions on, vol. 6, no. 1, pp. 81-87, 1984. 
-\bibitem{b17} Jun Wang, Tao Mei, Bin Kong and Hu Wei, "An approach of lane detection based on Inverse Perspective Mapping," 17th International IEEE Conference on Intelligent Transportation Systems (ITSC), Qingdao, 2014, pp. 35-38.
-\bibitem{b18} Xilinx. (2019, Sep) Xilinx/xfopencv. [Online]. Available:  https://github.com/Xilinx/xfopencv
-\bibitem{b19} Allan Hanbury and Jean Serra, "A 3d-polar coordinate colour representation well adapted to image analysis," in Proceedings of the Scandinavian Conference on Image Analysis (SCIA), 2003, pp. 804–811.
-\bibitem{b20} M. Rizon et al., 2005, "Object Detection using Circular Hough Transform", American Journal of Applied Sciences 2, vol 12, pp. 1606-1609.
+%\bibitem{b2} Jouppi, N. P., Young, C., Patil, N., Patterson, D., Agrawal, G., Bajwa, R., ... \& Boyle, R. (2017, June). In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA) (pp. 1-12). IEEE.
+%\bibitem{b3} Mahajan, Divya, et al. "Tabla: A unified template-based framework for accelerating statistical machine learning." 2016 IEEE International Symposium on High Performance Computer Architecture (HPCA). IEEE, 2016.
+%  
+%\bibitem{b5} TUL DPU [ONLINE] Available at: https://www.xilinx.com/support/documentation/ ip\_documentation/dpu/v3\_0/pg338-dpu.pdf
+%\bibitem{b6} An FPGA design competition for developing autonomous driving robot cars is held in FPT2019 [ONLINE] Available at: http://fpt19.tju.edu.cn/Contest/FPT2019\_FPGA\_Design \_Competition/Contents\_and\_Conditions.htm
+%\bibitem{b7} Kojima, A., \& Nose, Y. (2018, December). Development of an Autonomous Driving Robot Car Using FPGA. In 2018 International Conference on Field-Programmable Technology (FPT) (pp. 411-414). IEEE.
+%\bibitem{b8} Aoto, M., Wada, Y., \& Numata, Y. (2018, December). Development of an FPGA Controlled" Mini-Car" Toward Autonomous Driving. In 2018 International Conference on Field-Programmable Technology (FPT) (pp. 400-402). IEEE.
+%\bibitem{b9} Tawn Kramer. (2019, September) [ONLINE] Available at: https://github.com/tawnkramer/sdsandbox
+%\bibitem{b10} TUL Unity3d Available at: https://unity.com/learn
+%\bibitem{b11} TUL PetaLinux [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/xilinx2019 \_1/ug1144-petalinux-tools-reference-guide.pdf
+%\bibitem{b12} TUL DNNDK [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/ai\_inference /v1\_5
+%\bibitem{b13} Tawn Kramer, sdsandbox [ONLINE] Available at: https://github.com/tawnkramer/sdsandbox
+%\bibitem{b14} John Canny, "A Computational Approach to Edge Detection, "IEEE Transactions on Pattern Analysis and Machine Intelligence, pp.679-698, 1986.
+%\bibitem{b15} J. B. Burns, A. R. Hanson and E. M. Riseman, "Extracting Straight Lines," in IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. PAMI-8, no. 4, pp. 425-455, July 1986.
+%\bibitem{b16} S. Selim, M. Ismail, "K-Means-Type Algorithms: A Generalized Convergence Theorem and Characterization of Local Optimality," Pattern Analysis and Machine Intelligence, IEEE Transactions on, vol. 6, no. 1, pp. 81-87, 1984. 
+%\bibitem{b17} Jun Wang, Tao Mei, Bin Kong and Hu Wei, "An approach of lane detection based on Inverse Perspective Mapping," 17th International IEEE Conference on Intelligent Transportation Systems (ITSC), Qingdao, 2014, pp. 35-38.
+%\bibitem{b18} Xilinx. (2019, Sep) Xilinx/xfopencv. [Online]. Available:  https://github.com/Xilinx/xfopencv
+%\bibitem{b19} Allan Hanbury and Jean Serra, "A 3d-polar coordinate colour representation well adapted to image analysis," in Proceedings of the Scandinavian Conference on Image Analysis (SCIA), 2003, pp. 804–811.
+%\bibitem{b20} M. Rizon et al., 2005, "Object Detection using Circular Hough Transform", American Journal of Applied Sciences 2, vol 12, pp. 1606-1609.
 \end{thebibliography}
 \vspace{12pt}
 
