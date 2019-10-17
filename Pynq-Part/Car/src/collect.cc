@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-20 14:23:08
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-14 14:50:39
+ * @LastEditTime: 2019-10-17 14:47:35
  * @Description: 
  */
 #include <assert.h>
@@ -98,23 +98,24 @@ int main(int argc, char **argv)
         cap >> image;
         imshow("car see", image);
         char c = (char)waitKey(1);
+        cout << c << endl;
         switch (c)
         {
         case 'w':
-            commandGet = 1;
-            cout << c << endl;
+            controller.steerSet(0);
+            controller.throttleSet(0.5);
             break;
         case 'a':
-            commandGet = 0;
-            cout << c << endl;
+            controller.steerSet(-0.5);
+            controller.throttleSet(0.5);
             break;
         case 's':
-            commandGet = 3;
-            cout << c << endl;
+            controller.steerSet(0);
+            controller.throttleSet(0);
             break;
         case 'd':
-            commandGet = 2;
-            cout << c << endl;
+            controller.steerSet(0.5);
+            controller.throttleSet(0.5);
             break;
 	    case 't':
 	        startRecord = STARTRECORD;
@@ -122,13 +123,6 @@ int main(int argc, char **argv)
 	        break;
         case 27:
             startRecord = EXIT;
-            commandGet = 3;
-        }
-        PYNQZ2::Status* status = controller.command(commandGet);
-        if (status == NULL)
-        {
-            cout << "STOP ALL" << endl;
-	        return -1;
         }
         string oneRecord = controller.to_record();
         mtxQueueStore.lock();

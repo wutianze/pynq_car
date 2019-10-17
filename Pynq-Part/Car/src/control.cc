@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-14 09:10:53
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-14 11:35:09
+ * @LastEditTime: 2019-10-17 10:15:41
  * @Description: 
  */
 #include"control.h"
@@ -32,69 +32,32 @@ PYNQZ2::PYNQZ2(){
     leds[0] = 0x0F;
 }
 void PYNQZ2::throttleSet(float rate){
+    leds[0] = leds[0] & 0x04;
+    if(rate - nowS->throttleRate < 0.001)return;
     rate = (rate > 1.0?1.0:rate) < (-1.0)?(-1.0):rate;
     throttle[5] = THROTTLEZERO + rate * (THROTTLEMAX - THROTTLEZERO);
     nowS->throttleRate = rate;
 }
 
 void PYNQZ2::steerSet(float rate){
+    leds[0] = leds[0] & 0x08;
+    if(rate - nowS->steerRate < 0.001)return;
     rate = (rate > 1.0?1.0:rate) < (-1.0)?(-1.0):rate;
     steer[5] = STEERZERO + rate * (STEERMAX - STEERZERO);
     nowS->steerRate = rate;
 }
 
-void PYNQZ2::forward(){
-    throttleSet(0.5);
-    steerSet(0);
+void PYNQZ2::throttleChange(float rate){
     leds[0] = 0x01;
+    throttleSet(nowS->throttleRate + rate);
 }
 
-void PYNQZ2::left(){
-    throttleSet(0.3);
-    steerSet(-0.5);
+void PYNQZ2::steerChange(float rate){
     leds[0] = 0x02;
+    steerSet(nowS->steerRate + rate);
 }
 
-void PYNQZ2::right(){
-    throttleSet(0.3);
-    steerSet(0.5);
-    leds[0] = 0x04;
-}
-
-void PYNQZ2::stop(){
-    throttleSet(0);
-    steerSet(0);
-    leds[0] = 0x00;
-}
-
-void PYNQZ2::faster(){
-    throttleSet(nowS->throttleRate+0.1);
-}
-
-void PYNQZ2::slower(){
-    throttleSet(nowS->throttleRate-0.1);
-}
-
-void PYNQZ2::lefter(){
-    steerSet(nowS->steerRate-0.1);
-}
-
-void PYNQZ2::righter(){
-    steerSet(nowS->steerRate+0.1);
-}
-
-PYNQZ2::Status* PYNQZ2::command(int c){
-    switch(c){
-        case 0:left();break;
-        case 1:forward();break;
-        case 2:right();break;
-        case 3:stop();break;
-        case 4:faster();break;
-        case 5:slower();break;
-        case 6:lefter();break;
-        case 7:righter();break;
-        default:stop();return NULL;
-    }
+PYNQZ2::Status* getStatus(){
     return nowS;
 }
 

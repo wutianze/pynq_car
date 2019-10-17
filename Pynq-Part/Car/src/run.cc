@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-15 10:19:34
+ * @LastEditTime: 2019-10-17 14:53:49
  * @Description: 
  */
 #include <assert.h>
@@ -201,16 +201,28 @@ void run_camera(){
 
 void run_command(){
     PYNQZ2 controller = PYNQZ2();
+    controller.throttleSet(0.5);
     while(true){
         controlLock.lock();
         if(generatedCommands.empty()){
             controlLock.unlock();
             continue;
         }
-	cout<<"the command is:"<<generatedCommands.front()<<endl;
-        controller.command(generatedCommands.front());
+        int tmpC = generatedCommands.front();
         generatedCommands.pop();
         controlLock.unlock();
+        cout<<"the command is:"<<tmpC<<endl;
+        switch(tmpC){
+            case 0:
+            controller.steerSet(-0.5);
+            break;
+            case 1:
+            controller.steerSet(0);
+            break;
+            case 2:
+            controller.steerSet(0.5);
+            break;
+        }
     }
     }
 
