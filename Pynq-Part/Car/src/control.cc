@@ -4,13 +4,15 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-14 09:10:53
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-17 10:15:41
+ * @LastEditTime: 2019-10-21 18:02:58
  * @Description: 
  */
 #include"control.h"
-#define THROTTLEMAX 500000
-#define THROTTLEZERO 140000
-#define STEERMAX 2000000
+#define THROTTLEINIT 200000
+#define THROTTLEMAX 159500
+#define THROTTLEZERO 155000
+#define STEERINIT 2000000
+#define STEERMAX 130000
 #define STEERZERO 100000
 PYNQZ2::PYNQZ2(){
     int fd = open("/dev/mem",O_RDWR);
@@ -18,13 +20,13 @@ PYNQZ2::PYNQZ2(){
     throttle = (int*)mmap(0, 30, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x82800000);
     throttle[4] = 0b001010010110;
     throttle[0] = 0b011010010110;
-    throttle[1] = THROTTLEMAX;
+    throttle[1] = THROTTLEINIT;
     throttleSet(0);
 
     steer = (int*)mmap(0, 30, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x82810000);
     steer[4] = 0b001010010110;
     steer[0] = 0b011010010110;
-    steer[1] = STEERMAX;
+    steer[1] = STEERINIT;
     steerSet(0);
 
     leds = (char*)mmap(0, 8, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x81210000);

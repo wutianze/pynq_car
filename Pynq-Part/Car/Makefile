@@ -4,7 +4,7 @@ RUN = run
 CXX       :=   g++
 CC        :=   gcc 
 COLLECTOBJ :=   collect.o control.o
-RUNOBJ    :=   run.o control.o
+RUNOBJ    :=   run.o control.o queue.o
 
 # linking libraries of OpenCV
 COLLECTLDFLAGS   =   $(shell pkg-config --libs opencv) -lpthread
