@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-17 14:53:49
+ * @LastEditTime: 2019-10-21 16:23:41
  * @Description: 
  */
 #include <assert.h>
@@ -39,11 +39,10 @@ string mode;
 #define CVCONTROL 1
 // commander indicates the car is controlled by AI or opencv currently
 int commander = NNCONTROL;
-mutex commanderLock;
-
 mutex queueLock;
-mutex controlLock;
-time_t timeGet;
+mutex contrnolLock;
+
+time_t timeSet;
 queue<Mat> takenImages;
 queue<int> generatedCommands;
 //vector<string> kinds = {"left", "forward", "right", "stop"};
@@ -104,14 +103,19 @@ int topKind(const float *d, int size)
     return result;
 }
 
-#define COMMANDMAXLEN 5
+#define COMMANDMAXLEN 3
 void addCommand(int com){
     controlLock.lock();
+    time_t now = time(0);
+    if(now < timeSet){
+        controlLock.unlock();
+        return;
+    }else{
+        timeSet = now;
+    }
     int nowSize = generatedCommands.size();
     if( nowSize >= COMMANDMAXLEN){
-        for(int i=0;i<nowSize;i++){
-            generatedCommands.pop();
-        }
+        generatedCommands.pop();
     }
     generatedCommands.push(com);
     controlLock.unlock();
@@ -131,16 +135,8 @@ void run_model(DPUTask* task){
         }else{
             tmpImage = takenImages.front();
             takenImages.pop();
-            time_t now = time(0);
-            if(now < timeGet){
-                queueLock.unlock();
-                continue;
-            }else{
-                timeGet = now;
-            }
         }
         queueLock.unlock();
-
         _T(setInputImage(task, CONV_INPUT_NODE, tmpImage));
         //dpuSetInputImage2(task,CONV_INPUT_NODE, tmpImage);
         _T(dpuRunTask(task));
@@ -153,7 +149,7 @@ void run_model(DPUTask* task){
 }
 
 void run_cv(){
-    if(mode == "nn")return;
+    if(mode[0] == 'n')return;
     Mat tmpImage;
     while(true){
         queueLock.lock();
@@ -163,13 +159,6 @@ void run_cv(){
         }else{
             tmpImage = takenImages.front();
             takenImages.pop();
-            time_t now = time(0);
-            if(now < timeGet){
-                queueLock.unlock();
-                continue;
-            }else{
-                timeGet = now;
-            }
         }
         queueLock.unlock();
         if(commander == CVCONTROL){
@@ -189,7 +178,7 @@ void run_camera(){
         queueLock.lock();
         int nowSize = takenImages.size();
         if(nowSize >= IMAGEMAXLEN){
-            for(int i=0;i<nowSize;i++){
+            for(int i=0;i<nowSize - 2;i++){
                 takenImages.pop();
             }
         }
@@ -229,13 +218,11 @@ void run_command(){
 int main(int argc, char **argv)
 {
      if (argc != 2) {
-          cout << "Usage of this exe: ./car cv/nn"
-             << endl;
+        cout << "Usage of this exe: ./car c/n"<< endl;
         return -1;
       }
-    // nn means just use ml, cv means use ml & cv.
+    // n means just use ml, c means use ml & cv.
     mode = argv[1];
-
     /* The main procress of using DPU kernel begin. */
     DPUKernel *kernelConv;
 
@@ -251,6 +238,7 @@ int main(int argc, char **argv)
         thread(run_camera),
         thread(run_cv)
     };
+
     for(int i = 0; i < THREADNUM; i++){
         threads[i].join();
         cout<<"one exit"<<endl;
