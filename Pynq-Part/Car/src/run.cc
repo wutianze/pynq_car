@@ -135,7 +135,7 @@ void run_model(DPUTask* task){
             continue;
         }
         commanderLock.unlock();
-        tmpImage = takenImages.wait_and_pop();
+        takenImages.wait_and_pop(tmpImage);
         _T(setInputImage(task, CONV_INPUT_NODE, tmpImage));
         //dpuSetInputImage2(task,CONV_INPUT_NODE, tmpImage);
         _T(dpuRunTask(task));
@@ -155,7 +155,7 @@ void run_cv(){
     if(mode[0] == 'n')return;
     Mat tmpImage;
     while(true){
-        tmpImage = takenImages.wait_and_pop();
+        takenImages.wait_and_pop(tmpImage);
         int tmpCommand = cv_al1(tmpImage);
         if(tmpCommand == 0)continue;
         commanderLock.lock();
@@ -189,7 +189,8 @@ void run_command(){
     PYNQZ2 controller = PYNQZ2();
     controller.throttleSet(0.5);
     while(true){
-        int tmpC = generatedCommands.wait_and_pop();
+        int tmpC;
+        generatedCommands.wait_and_pop(tmpC);
         cout<<"the command is:"<<tmpC<<endl;
         switch(tmpC){
             case 0:

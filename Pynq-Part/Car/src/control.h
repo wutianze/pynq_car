@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-14 09:10:53
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-17 14:55:36
+ * @LastEditTime: 2019-10-22 11:37:40
  * @Description: 
  */
 #include<stdio.h>
@@ -36,6 +36,8 @@ class PYNQZ2: public Controller{
 
     void throttleChange(float);
     void steerChange(float);
+
+    void setLeds(int);
 
     PYNQZ2::Status* getStatus();
 
