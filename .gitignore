@@ -9,11 +9,11 @@ Pynq-Part/system/
 **/rootfs.tar.gz
 **/system.zip
 **/*.o
-Paper-commited/conference*
-!Paper-commited/*.tex
+Papers/**/conference*
+!Papers/**/*.tex
 **/*.npz
 **/logs
-**/log*
+#**/log*
 **/images_*.jpg
 Virtual-Part/*.pyc
 Virtual-Part/*.h5
@@ -24,8 +24,8 @@ Virtual-Part/simulator/*.sln
 Virtual-Part/simulator/*.userprefs
 Virtual-Part/simulator/Temp
 Virtual-Part/simulator/Build
-Virtual-Part/simulator/Log
 Virtual-Part/simulator/Packages
+Virtual-Part/simulator/Logs
 Virtual-Part/simulator/.vs
 Virtual-Part/*.csproj
 Virtual-Part/env

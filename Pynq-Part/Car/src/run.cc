@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-15 10:19:34
+ * @LastEditTime: 2019-10-21 17:51:30
  * @Description: 
  */
 #include <assert.h>
@@ -22,7 +22,7 @@
 #include <ctime>
 #include <fstream>
 #include <sstream>
-#include <queue>
+#include "safe_queue.h"
 #include <mutex>
 #include <string>
 #include <vector>
@@ -38,14 +38,12 @@ string mode;
 #define NNCONTROL 0
 #define CVCONTROL 1
 // commander indicates the car is controlled by AI or opencv currently
-int commander = NNCONTROL;
 mutex commanderLock;
-
-mutex queueLock;
-mutex controlLock;
-time_t timeGet;
-queue<Mat> takenImages;
-queue<int> generatedCommands;
+mutex timeLock;
+int commander = NNCONTROL;
+time_t timeSet;
+safe_queue<Mat> takenImages;
+safe_queue<int> generatedCommands;
 //vector<string> kinds = {"left", "forward", "right", "stop"};
 vector<string> kinds = {"steer"};
 
@@ -104,17 +102,24 @@ int topKind(const float *d, int size)
     return result;
 }
 
-#define COMMANDMAXLEN 5
+#define COMMANDMAXLEN 3
 void addCommand(int com){
-    controlLock.lock();
+    timeLock.lock();
+    time_t now = time(0);
+    if(now < timeSet){
+        timeLock.unlock();
+        return;
+    }else{
+        timeSet = now;
+    }
+    timeLock.unlock();
     int nowSize = generatedCommands.size();
     if( nowSize >= COMMANDMAXLEN){
-        for(int i=0;i<nowSize;i++){
-            generatedCommands.pop();
-        }
+        if(generatedCommands.try_pop())generatedCommands.push(com);
+        return;
+    }else{
+        generatedCommands.push(com);
     }
-    generatedCommands.push(com);
-    controlLock.unlock();
 }
 
 void run_model(DPUTask* task){
@@ -124,23 +129,13 @@ void run_model(DPUTask* task){
     Mat tmpImage;
     while (1)
     {
-        queueLock.lock();
-        if(takenImages.empty() || commander == CVCONTROL){
-            queueLock.unlock();
+        commanderLock.lock();
+        if(commander == CVCONTROL){
+            commanderLock.unlock();
             continue;
-        }else{
-            tmpImage = takenImages.front();
-            takenImages.pop();
-            time_t now = time(0);
-            if(now < timeGet){
-                queueLock.unlock();
-                continue;
-            }else{
-                timeGet = now;
-            }
         }
-        queueLock.unlock();
-
+        commanderLock.unlock();
+        takenImages.wait_and_pop(tmpImage);
         _T(setInputImage(task, CONV_INPUT_NODE, tmpImage));
         //dpuSetInputImage2(task,CONV_INPUT_NODE, tmpImage);
         _T(dpuRunTask(task));
@@ -152,29 +147,23 @@ void run_model(DPUTask* task){
     }
 }
 
+int cv_al1(Mat image){
+    return 0;
+}
+
 void run_cv(){
-    if(mode == "nn")return;
+    if(mode[0] == 'n')return;
     Mat tmpImage;
     while(true){
-        queueLock.lock();
-        if(takenImages.empty()){
-            queueLock.unlock();
-            continue;
-        }else{
-            tmpImage = takenImages.front();
-            takenImages.pop();
-            time_t now = time(0);
-            if(now < timeGet){
-                queueLock.unlock();
-                continue;
-            }else{
-                timeGet = now;
-            }
-        }
-        queueLock.unlock();
+        takenImages.wait_and_pop(tmpImage);
+        int tmpCommand = cv_al1(tmpImage);
+        if(tmpCommand == 0)continue;
+        commanderLock.lock();
         if(commander == CVCONTROL){
-		return;
+            commanderLock.unlock();
+            continue;
         }
+        commanderLock.unlock();
     }
 }
 
@@ -186,44 +175,45 @@ void run_camera(){
     Mat image;
     while(true){
         cap >> image;
-        queueLock.lock();
         int nowSize = takenImages.size();
         if(nowSize >= IMAGEMAXLEN){
-            for(int i=0;i<nowSize;i++){
-                takenImages.pop();
-            }
+            if(takenImages.try_pop())takenImages.push(image);
+        }else{
+            takenImages.push(image);
         }
-        takenImages.push(image);
-        queueLock.unlock();
     }
     cap.release();
 }
 
 void run_command(){
     PYNQZ2 controller = PYNQZ2();
+    controller.throttleSet(0.5);
     while(true){
-        controlLock.lock();
-        if(generatedCommands.empty()){
-            controlLock.unlock();
-            continue;
+        int tmpC;
+        generatedCommands.wait_and_pop(tmpC);
+        cout<<"the command is:"<<tmpC<<endl;
+        switch(tmpC){
+            case 0:
+            controller.steerSet(-0.5);
+            break;
+            case 1:
+            controller.steerSet(0);
+            break;
+            case 2:
+            controller.steerSet(0.5);
+            break;
         }
-	cout<<"the command is:"<<generatedCommands.front()<<endl;
-        controller.command(generatedCommands.front());
-        generatedCommands.pop();
-        controlLock.unlock();
     }
     }
 
 int main(int argc, char **argv)
 {
      if (argc != 2) {
-          cout << "Usage of this exe: ./car cv/nn"
-             << endl;
+        cout << "Usage of this exe: ./car c/n"<< endl;
         return -1;
       }
-    // nn means just use ml, cv means use ml & cv.
+    // n means just use ml, c means use ml & cv.
     mode = argv[1];
-
     /* The main procress of using DPU kernel begin. */
     DPUKernel *kernelConv;
 
@@ -239,6 +229,7 @@ int main(int argc, char **argv)
         thread(run_camera),
         thread(run_cv)
     };
+
     for(int i = 0; i < THREADNUM; i++){
         threads[i].join();
         cout<<"one exit"<<endl;

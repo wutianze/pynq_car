@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-14 09:10:53
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-14 11:22:32
+ * @LastEditTime: 2019-10-22 11:37:40
  * @Description: 
  */
 #include<stdio.h>
@@ -21,16 +21,6 @@ class PYNQZ2: public Controller{
     int* throttle;
     int* steer;
     char* leds;
-    void throttleSet(float);
-    void steerSet(float);
-    void forward();
-    void left();
-    void right();
-    void stop();
-    void faster();
-    void slower();
-    void lefter();
-    void righter();
     
     public:
     struct Status{
@@ -40,6 +30,16 @@ class PYNQZ2: public Controller{
     Status* nowS;
     PYNQZ2();
     ~PYNQZ2();
-    Status* command(int);
+
+    void throttleSet(float);
+    void steerSet(float);
+
+    void throttleChange(float);
+    void steerChange(float);
+
+    void setLeds(int);
+
+    PYNQZ2::Status* getStatus();
+
     string to_record();
 };

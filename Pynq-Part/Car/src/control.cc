@@ -4,98 +4,71 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-14 09:10:53
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-14 11:35:09
+ * @LastEditTime: 2019-10-22 11:35:14
  * @Description: 
  */
 #include"control.h"
-#define THROTTLEMAX 500000
-#define THROTTLEZERO 140000
-#define STEERMAX 2000000
+#include<cmath>
+#define THROTTLEINIT 200000
+#define THROTTLEMAX 169500
+#define THROTTLEZERO 155000
+#define STEERINIT 2000000
+#define STEERMAX 110000
 #define STEERZERO 100000
 PYNQZ2::PYNQZ2(){
     int fd = open("/dev/mem",O_RDWR);
     nowS = new PYNQZ2::Status();
+
+    leds = (char*)mmap(0, 8, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x81210000);
+    leds[4] = 0x00;
+    leds[0] = 0x0F;
+
     throttle = (int*)mmap(0, 30, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x82800000);
     throttle[4] = 0b001010010110;
     throttle[0] = 0b011010010110;
-    throttle[1] = THROTTLEMAX;
+    throttle[1] = THROTTLEINIT;
     throttleSet(0);
 
     steer = (int*)mmap(0, 30, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x82810000);
     steer[4] = 0b001010010110;
     steer[0] = 0b011010010110;
-    steer[1] = STEERMAX;
+    steer[1] = STEERINIT;
     steerSet(0);
 
-    leds = (char*)mmap(0, 8, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x81210000);
-    leds[4] = 0x00;
-    leds[0] = 0x0F;
+    
 }
 void PYNQZ2::throttleSet(float rate){
+    //leds[0] = leds[0] & 0x04;
+    if(abs(rate - nowS->throttleRate) < 0.001)return;
     rate = (rate > 1.0?1.0:rate) < (-1.0)?(-1.0):rate;
     throttle[5] = THROTTLEZERO + rate * (THROTTLEMAX - THROTTLEZERO);
     nowS->throttleRate = rate;
 }
 
 void PYNQZ2::steerSet(float rate){
+    //leds[0] = leds[0] & 0x08;
+    if(abs(rate - nowS->steerRate) < 0.001)return;
     rate = (rate > 1.0?1.0:rate) < (-1.0)?(-1.0):rate;
     steer[5] = STEERZERO + rate * (STEERMAX - STEERZERO);
     nowS->steerRate = rate;
 }
 
-void PYNQZ2::forward(){
-    throttleSet(0.5);
-    steerSet(0);
-    leds[0] = 0x01;
+void PYNQZ2::throttleChange(float rate){
+    //leds[0] = 0x01;
+    throttleSet(nowS->throttleRate + rate);
 }
 
-void PYNQZ2::left(){
-    throttleSet(0.3);
-    steerSet(-0.5);
-    leds[0] = 0x02;
+void PYNQZ2::steerChange(float rate){
+    //leds[0] = 0x02;
+    steerSet(nowS->steerRate + rate);
 }
 
-void PYNQZ2::right(){
-    throttleSet(0.3);
-    steerSet(0.5);
-    leds[0] = 0x04;
-}
-
-void PYNQZ2::stop(){
-    throttleSet(0);
-    steerSet(0);
-    leds[0] = 0x00;
-}
-
-void PYNQZ2::faster(){
-    throttleSet(nowS->throttleRate+0.1);
-}
-
-void PYNQZ2::slower(){
-    throttleSet(nowS->throttleRate-0.1);
-}
-
-void PYNQZ2::lefter(){
-    steerSet(nowS->steerRate-0.1);
-}
-
-void PYNQZ2::righter(){
-    steerSet(nowS->steerRate+0.1);
-}
-
-PYNQZ2::Status* PYNQZ2::command(int c){
-    switch(c){
-        case 0:left();break;
-        case 1:forward();break;
-        case 2:right();break;
-        case 3:stop();break;
-        case 4:faster();break;
-        case 5:slower();break;
-        case 6:lefter();break;
-        case 7:righter();break;
-        default:stop();return NULL;
-    }
+PYNQZ2::Status* PYNQZ2::getStatus(){
     return nowS;
+}
+
+void PYNQZ2::setLeds(int num){
+    leds[0] = num;
 }
 
 string PYNQZ2::to_record(){

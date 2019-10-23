@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-14 14:57:47
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-14 14:57:47
+ * @LastEditTime: 2019-10-17 14:48:18
  * @Description: 
  -->
 # What you will learn:
@@ -42,4 +42,17 @@ In `src/control.h&control.cc`, you can see the current controller class PYNQZ2, 
 ***Tip: The label file's format is csv which means values should be separated by ','***
 ## 2. Modify the keyboard settings
 You can choose a more comfortable way to play the car. The function you need to change in this part is in `collect.cc/main`. You will see a `switch(c)` in `main`, read the code and I'm sure you can define your own settings quickly.  
-***Tip: The key-command mapping table is in src/controll.cc/command()***
+
+# Pynq-Control API
+1. void throttleSet(float)
+- Set the throttle value of the car. The value range from -1.0 to 1.0. 0 means stop, > 0.0 means forward and < 0.0 means backward. The third led will be lighted.
+1. void steerSet(float)
+- Set the steer value of the car. The value range from -1.0 to 1.0. 0 means straight forward, > 0.0 means right and < 0.0 means left. The fourth led will be lighted.
+3. void throttleChange(float)
+- Add to the throttle value of the car. The max of input value is 1.0 and the min is -1.0. The first and third leds will be lighted.
+4. void steerChange(float)
+- Add to the steer value of the car. The max of input value is 1.0 and the min is -1.0. The second and fourth leds will be lighted.
+5. PYNQZ2::Status* getStatus()
+- Return the current Status of the car. It contains the current throttle and steer value of the car. You can use it like `PYNQZ2::Status* s = controller.getStatus(); float nowThrottle = s->throttleRate; float nowSteer = s->steerRate;`
+6. string to_record()
+- This function can generate a piece of info describing the current status of the car in .csv format. Example return: `0.1,0.5`, 0.1 is the steer value and 0.5 is the throttle value. It seems that the car is moving right forward now.
