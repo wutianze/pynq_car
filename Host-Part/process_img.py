@@ -23,7 +23,7 @@ OUTPUT_NUM = 1
 def image_handle(img):
     image = np.asarray(img)
     image.reshape((image.shape[0],image.shape[1],image.shape[2]))
-    return (image)/255.0 - 0.5
+    return (image)/255.0
 
 CONV_INPUT = "conv2d_1_input"
 calib_batch_size = 50
@@ -70,7 +70,7 @@ if __name__ == '__main__':
         print("OUTPUT_NUM is:%d"%OUTPUT_NUM)    
         for row in files:
             if args.method == 0:
-                if row[1] == 1: # this should be set according to your training data
+                if row[1] == 0: # this should be set according to your training data
                     randNum = random.randint(0,10)
                     # delete some data randomly, bigger of the threshold number means more data in this category will be ignored
                     if randNum < 8:

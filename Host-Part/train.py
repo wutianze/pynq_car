@@ -25,9 +25,9 @@ import argparse
 
 np.random.seed(0)
 IMAGE_SHAPE = [120,160,3]
-OUTPUT_NUM = 1
+OUTPUT_NUM = 3
 CHUNK_SIZE = 256
-
+ORIGINAL_LABEL_NUM = 3
 # step1,load data
 def load_data(read_path):
     training_data = glob.glob(read_path + '/*.npz')
@@ -45,8 +45,12 @@ def load_data(read_path):
         IMAGE_SHAPE[0] = single_image.shape[0]
         IMAGE_SHAPE[1] = single_image.shape[1]
         IMAGE_SHAPE[2] = single_image.shape[2]
-        global OUTPUT_NUM
-        OUTPUT_NUM = data['train_labels'][0].shape[0]
+        global ORIGINAL_LABEL_NUM
+        ORIGINAL_LABEL_NUM = data['train_labels'][0].shape[0]
+    print("IMAGE_SHAPE:")
+    print(IMAGE_SHAPE)
+    print("ORIGINAL_LABEL_NUM:")
+    print(ORIGINAL_LABEL_NUM)
     cut = int(len(training_data)*0.8)
     return training_data[0:cut], training_data[cut:]
 
@@ -116,7 +120,7 @@ def batch_generator(name_list, batch_size):
     while True:
         # load
         image_array = np.zeros((1, IMAGE_SHAPE[0], IMAGE_SHAPE[1], IMAGE_SHAPE[2]))
-        label_array = np.zeros((1, OUTPUT_NUM), 'float')
+        label_array = np.zeros((1, ORIGINAL_LABEL_NUM), 'float')
         # every time read <=10 pack and shuffle
         for read_num in range(10):
             single_npz = name_list[random.randint(0,len(name_list)-1)]
@@ -131,15 +135,21 @@ def batch_generator(name_list, batch_size):
         y = label_array[1:, :]
 
         images = np.empty([batch_size, IMAGE_SHAPE[0], IMAGE_SHAPE[1], IMAGE_SHAPE[2]])
-        steers = np.empty([batch_size, OUTPUT_NUM])
+        labels = np.empty([batch_size, OUTPUT_NUM])
         #for index in np.random.permutation(X.shape[0]):
         for index in range(X.shape[0]):
             images[i] = X[index]
-            steers[i] = y[index]
+            if y[index][0] < 0:
+                labels[i] = [1.,0.,1.]
+            elif y[index][0] > 0:
+                labels[i] = [0.,0.,1.]
+            else:
+                labels[i] = [0.,1.,0.]
+            #labels[i] = y[index]
             i += 1
             if i == batch_size:
                 i = 0
-                yield (images, steers)
+                yield (images, labels)
 
 def main(model_path, read_path):
 
