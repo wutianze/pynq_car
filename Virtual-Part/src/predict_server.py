@@ -29,7 +29,7 @@ import tensorflow as tf
 import numpy as np
 from keras.models import load_model
 from PIL import Image
-
+import cv2
 from tcp_server import IMesgHandler, SimServer
 
 class PynqSimMsgHandler(IMesgHandler):
@@ -80,8 +80,10 @@ class PynqSimMsgHandler(IMesgHandler):
 
     def on_telemetry(self, data):
         imgString = data["image"]
-        image = Image.open(BytesIO(base64.b64decode(imgString)))
-        image_array = np.asarray(image)
+        #image = Image.open(BytesIO(base64.b64decode(imgString)))
+        #image_array = cv2.cvtColor(np.array(image),cv2.COLOR_RGB2BGR)
+        image_array = cv2.imdecode(np.fromstring(base64.b64decode(imgString),dtype=np.uint8),1)
+        #image_array = np.asarray(image)
         if self.process_method == 0:
             image_array = image_array/255.0
         elif self.process_method == 1:
@@ -148,7 +150,7 @@ class PynqSimMsgHandler(IMesgHandler):
             comSend = ''
             toSend = 0
             nowMax = 0.0
-            outputs[1] = outputs[1] - 0.3
+            outputs[1] = outputs[1] - 0.35
             for i in range(len(outputs)):
                 if outputs[i] > nowMax:
                     nowMax = outputs[i] 
@@ -236,8 +238,8 @@ if __name__ == "__main__":
     parser.add_argument('--num_cars', type=int, default=1, help='how many cars to spawn')
     parser.add_argument('--constant_throttle', type=float, default=0.0, help='apply constant throttle')
     parser.add_argument('--rand_seed', type=int, default=0, help='set road generation random seed')
-    parser.add_argument('--process_method', type=int, default=0, help='process method like in process_img')
-    parser.add_argument('--control_method', type=int, default=0, help='0 for command, 1 for steer')
+    parser.add_argument('--process_method', type=int, default=1, help='process method like in process_img')
+    parser.add_argument('--control_method', type=int, default=2, help='0 for command, 1 for steer')
     args = parser.parse_args()
 
     address = (args.host, args.port)
