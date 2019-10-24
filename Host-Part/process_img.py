@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-10-15 15:01:39
+@LastEditTime: 2019-10-24 13:27:41
 @Description: 
 '''
 import os
@@ -46,7 +46,7 @@ def process_img(img_path, key):
 
     image_array = image_handle(image_array)
     image_array = np.expand_dims(image_array, axis=0)
-    print(image_array.shape)  
+    #print(image_array.shape)  
     return (image_array, label_array)
 
 

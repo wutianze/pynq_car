@@ -125,7 +125,7 @@ Although the current model is not the perfect one and it cannot be accelerated b
 
 \subsection{Simulator}
 
-Now we have built a simulator based on sdsandbox\cite{b13} to collect data for training, and we can also test our model using the simulator. With this tool, we can further separate software part from hardware part, even you don't have a real car, you can build and test your model in the virtual environment. The interface of our simulator is shown in Fig.~\ref{si}.  
+Now we have built a simulator based on sdsandbox\cite{b9} to collect data for training, and we can also test our model using the simulator. With this tool, we can further separate software part from hardware part, even you don't have a real car, you can build and test your model in the virtual environment. The interface of our simulator is shown in Fig.~\ref{si}.  
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.5\textwidth]{simulator.png}}
@@ -150,15 +150,15 @@ Although our solution is end-to-end, the training data needs to be processed. No
 For obstacle avoidance, traditional methods will first recognize the objects from the image and then use the state machine functions to make decisions. Our solution is quite different from it, we will add the obstacle avoidance scenes to the step of collecting training data. As a result, when the training step is finished, the AI model can avoid the obstacle automatically.
 \item Road lane detection. 
 
-To detect road lane, we first use 5*5 Gaussian filter to remove the noise of the image. Then Canny edge detection\cite{b14} is applied to detect the edges of the image. Hough transform\cite{b15} is employed to detect the lines of the image. Based on the orientation and relative position of detected lines, side line and stop line of the road can be identified. 
+To detect road lane, we first use 5*5 Gaussian filter to remove the noise of the image. Then Canny edge detection\cite{b13} is applied to detect the edges of the image. Hough transform\cite{b14} is employed to detect the lines of the image. Based on the orientation and relative position of detected lines, side line and stop line of the road can be identified. 
 
-To improve the robustness and accuracy of the algorithm, more techniques will be added to the algorithm, such as K-Means clustering\cite{b16} for Hough lines, Kalman/Gabor filtering for sampled data, alternative IPM (inverse perspective mapping) lane detection method\cite{b17}.
+To improve the robustness and accuracy of the algorithm, more techniques will be added to the algorithm, such as K-Means clustering\cite{b15} for Hough lines, Kalman/Gabor filtering for sampled data, alternative IPM (inverse perspective mapping) lane detection method\cite{b16}.
 
-Road lane detection algorithm is implemented in C++ with OpenCV. And it can be very time consuming running in ARM Cortex-A9 in Xilinx PYNQ-Z2. Some measures are taken to alleviate the heavy computational task of the algorithm. Firstly, the images captured by camera are cropped and down-sampled to reduce the computation complexity. Some time consuming tasks such as Gaussian filter, Canny edge detection, Hough transform are moved to FPGA using Xilinx xfopencv library\cite{b18}.
+Road lane detection algorithm is implemented in C++ with OpenCV. And it can be very time consuming running in ARM Cortex-A9 in Xilinx PYNQ-Z2. Some measures are taken to alleviate the heavy computational task of the algorithm. Firstly, the images captured by camera are cropped and down-sampled to reduce the computation complexity. Some time consuming tasks such as Gaussian filter, Canny edge detection, Hough transform are moved to FPGA using Xilinx xfopencv library\cite{b17}.
 
 \item Traffic light recognition.
 
-To recognize the traffic light in the contest, we first use IHLS color space\cite{b19} to remove the disturbance of the color in complicated background. After obtaining the color information, Hough circle transform\cite{b20} is applied to get the shape information of the traffic light. Combing the shape and color information, traffic light or similar objects can be detected. Finally, a simple BP neural network is employed to accurately recognize the traffic light in the contest.
+To recognize the traffic light in the contest, we first use IHLS color space\cite{b18} to remove the disturbance of the color in complicated background. After obtaining the color information, Hough circle transform\cite{b19} is applied to get the shape information of the traffic light. Combing the shape and color information, traffic light or similar objects can be detected. Finally, a simple BP neural network is employed to accurately recognize the traffic light in the contest.
 
 Traffic light recognition algorithm is implemented in C++ with OpenCV. Similarly, it can be very time consuming running in ARM Cortex-A9 in Xilinx PYNQ-Z2. To reduce computation complexity, images captured by camera can be cropped as well since the traffic light only appear in the upper half of the image. Hough circle transform can be implemented in FPGA using Xilinx xfopencv library and BP neural network can be implemented in FPGA using Xilinx Vivado HLS.
 
@@ -205,18 +205,17 @@ The project is supported by Xilinx and Institute of Computing Technology Chinese
 \bibitem{b6} An FPGA design competition for developing autonomous driving robot cars is held in FPT2019 [ONLINE] Available at: http://fpt19.tju.edu.cn/Contest/FPT2019\_FPGA\_Design \_Competition/Contents\_and\_Conditions.htm
 \bibitem{b7} Kojima, A., \& Nose, Y. (2018, December). Development of an Autonomous Driving Robot Car Using FPGA. In 2018 International Conference on Field-Programmable Technology (FPT) (pp. 411-414). IEEE.
 \bibitem{b8} Aoto, M., Wada, Y., \& Numata, Y. (2018, December). Development of an FPGA Controlled" Mini-Car" Toward Autonomous Driving. In 2018 International Conference on Field-Programmable Technology (FPT) (pp. 400-402). IEEE.
-\bibitem{b9} Tawn Kramer. (2019, September) [ONLINE] Available at: https://github.com/tawnkramer/sdsandbox
+\bibitem{b9} Tawn Kramer. (2019, September) sdsandbox [ONLINE] Available at: https://github.com/tawnkramer/sdsandbox
 \bibitem{b10} TUL Unity3d Available at: https://unity.com/learn
 \bibitem{b11} TUL PetaLinux [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/xilinx2019 \_1/ug1144-petalinux-tools-reference-guide.pdf
 \bibitem{b12} TUL DNNDK [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/ai\_inference /v1\_5
-\bibitem{b13} Tawn Kramer, sdsandbox [ONLINE] Available at: https://github.com/tawnkramer/sdsandbox
-\bibitem{b14} John Canny, "A Computational Approach to Edge Detection, "IEEE Transactions on Pattern Analysis and Machine Intelligence, pp.679-698, 1986.
-\bibitem{b15} J. B. Burns, A. R. Hanson and E. M. Riseman, "Extracting Straight Lines," in IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. PAMI-8, no. 4, pp. 425-455, July 1986.
-\bibitem{b16} S. Selim, M. Ismail, "K-Means-Type Algorithms: A Generalized Convergence Theorem and Characterization of Local Optimality," Pattern Analysis and Machine Intelligence, IEEE Transactions on, vol. 6, no. 1, pp. 81-87, 1984. 
-\bibitem{b17} Jun Wang, Tao Mei, Bin Kong and Hu Wei, "An approach of lane detection based on Inverse Perspective Mapping," 17th International IEEE Conference on Intelligent Transportation Systems (ITSC), Qingdao, 2014, pp. 35-38.
-\bibitem{b18} Xilinx. (2019, Sep) Xilinx/xfopencv. [Online]. Available:  https://github.com/Xilinx/xfopencv
-\bibitem{b19} Allan Hanbury and Jean Serra, "A 3d-polar coordinate colour representation well adapted to image analysis," in Proceedings of the Scandinavian Conference on Image Analysis (SCIA), 2003, pp. 804–811.
-\bibitem{b20} M. Rizon et al., 2005, "Object Detection using Circular Hough Transform", American Journal of Applied Sciences 2, vol 12, pp. 1606-1609.
+\bibitem{b13} John Canny, "A Computational Approach to Edge Detection, "IEEE Transactions on Pattern Analysis and Machine Intelligence, pp.679-698, 1986.
+\bibitem{b14} J. B. Burns, A. R. Hanson and E. M. Riseman, "Extracting Straight Lines," in IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. PAMI-8, no. 4, pp. 425-455, July 1986.
+\bibitem{b15} S. Selim, M. Ismail, "K-Means-Type Algorithms: A Generalized Convergence Theorem and Characterization of Local Optimality," Pattern Analysis and Machine Intelligence, IEEE Transactions on, vol. 6, no. 1, pp. 81-87, 1984. 
+\bibitem{b16} Jun Wang, Tao Mei, Bin Kong and Hu Wei, "An approach of lane detection based on Inverse Perspective Mapping," 17th International IEEE Conference on Intelligent Transportation Systems (ITSC), Qingdao, 2014, pp. 35-38.
+\bibitem{b17} Xilinx. (2019, Sep) Xilinx/xfopencv. [Online]. Available:  https://github.com/Xilinx/xfopencv
+\bibitem{b18} Allan Hanbury and Jean Serra, "A 3d-polar coordinate colour representation well adapted to image analysis," in Proceedings of the Scandinavian Conference on Image Analysis (SCIA), 2003, pp. 804–811.
+\bibitem{b19} M. Rizon et al., 2005, "Object Detection using Circular Hough Transform", American Journal of Applied Sciences 2, vol 12, pp. 1606-1609.
 \end{thebibliography}
 \vspace{12pt}
 

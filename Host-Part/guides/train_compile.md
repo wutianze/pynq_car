@@ -4,12 +4,15 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-15 15:51:43
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-15 16:45:57
+ * @LastEditTime: 2019-10-24 13:52:27
  * @Description: 
  -->
 # What you will learn
 - How to do some pre-process in your images.
 - How to train the AI model.
+
+# Preparation
+Please run `pip install keras==2.2.0` to install keras if you want to use the code we provided.
 
 # Handle images
 1. First copy the images your generated(using the images from the car's collect function or from the simulator or from anywhere) to the Host-Part/images directory. If you want to use our simulator to generate images, please go to sdsandbox and read its guide.
@@ -19,7 +22,8 @@
    
 # Train the model
 1. Run `python train.py --model=./model_stored --read=./training_data_npz`, it will use the processed images from process_img's result and store the trained model in model_stored directory.
-2. You can define your own network structure in `build_model()` and your own compiling features in `train_model()`. Also all the variables in it can be set as you wish but I recommend you read the code carefully and think twice before you edit.
+2. You should set the `OUTPUT_NUM` which means the number of labels. The IMAGE_SHAPE will be set automatically.
+3. You can define your own network structure in `build_model()` and your own compiling features in `train_model()`. Also all the variables in it can be set as you wish but I recommend you read the code carefully and think twice before you edit. If you want to do some changes to labels, you should edit `batch_generator()`, you can read the original data stored in train.csv and build your own labels. 
 
 # Steps
 - Just one single step: Run `./process_train.sh`, you can edit the script to change read/store directories. 
