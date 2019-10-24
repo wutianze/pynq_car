@@ -47,7 +47,7 @@ public class PIDController : MonoBehaviour {
 	public float maxSpeed = 5.0f;
 
 	public Text pid_steering;
-	public float straightV = 8.0f;
+	public float straightV = 7.0f;
 	public float turnV = 0.5f;
 
 	void Awake()
