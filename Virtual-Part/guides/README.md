@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-23 10:12:28
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-16 15:17:41
+ * @LastEditTime: 2019-10-24 10:50:21
  * @Description: 
  -->
 # Introduction
@@ -19,7 +19,7 @@ The simulator we provided is based on the sdsandbox project. For more informatio
 
 You need to have [Unity](https://unity3d.com/get-unity/download) installed, and python3+, tensorflow, keras is also needed.
 
-Linux Unity install [here](https://forum.unity3d.com/threads/unity-on-linux-release-notes-and-known-issues.350256/). Check last post in this thread.
+You can both use linux version or windows version of Unity3d. 
 
 ## Using Unity3d to test your .h5 model
 

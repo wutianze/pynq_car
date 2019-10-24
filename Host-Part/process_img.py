@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Sauron Wu
-@LastEditTime: 2019-10-15 15:01:39
+@LastEditTime: 2019-10-24 13:23:57
 @Description: 
 '''
 import os
@@ -13,18 +13,17 @@ from time import time
 import math
 import csv
 import argparse
-import config
 import random
 import cv2
 
 CHUNK_SIZE = 256
 IMAGE_SHAPE = [120,160,3]
+global OUTPUT_NUM
 OUTPUT_NUM = 1
-HASSET = False
 def image_handle(img):
     image = np.asarray(img)
     image.reshape((image.shape[0],image.shape[1],image.shape[2]))
-    return (img[40:,:])/255.0 - 0.5
+    return (image)/255.0 - 0.5
 
 CONV_INPUT = "conv2d_1_input"
 calib_batch_size = 50
@@ -41,21 +40,13 @@ def calib_input(iter):
 
 def process_img(img_path, key):
     image_array = cv2.imread(img_path)
-    image_array = np.expand_dims(image_array, axis=0)  
     label_array = []
     for k in key:
         label_array.append(float(k)) 
-    global HASSET
-    if HASSET == False:
-        IMAGE_SHAPE[0] = image_array.shape[0]
-        IMAGE_SHAPE[1] = image_array.shape[1]
-        IMAGE_SHAPE[2] = image_array.shape[2]
-        global OUTPUT_NUM
-        OUTPUT_NUM = len(label_array)
-        HASSET = True
 
-    image_array = image_handle(cv2.imread(img_path))
-    
+    image_array = image_handle(image_array)
+    image_array = np.expand_dims(image_array, axis=0)
+    print(image_array.shape)  
     return (image_array, label_array)
 
 
@@ -69,7 +60,14 @@ if __name__ == '__main__':
     names = []
     keys = {}
     with open(path+"/train.csv") as f:
-        files = csv.reader(f)
+        files = list(csv.reader(f))
+        
+        image_for_shape = cv2.imread(path+'/'+files[0][0])
+        IMAGE_SHAPE[0] = image_for_shape.shape[0]
+        IMAGE_SHAPE[1] = image_for_shape.shape[1]
+        IMAGE_SHAPE[2] = image_for_shape.shape[2]
+        OUTPUT_NUM = len(files[0]) - 1
+        print("OUTPUT_NUM is:%d"%OUTPUT_NUM)    
         for row in files:
             if args.method == 0:
                 if row[1] == 1: # this should be set according to your training data
@@ -95,14 +93,10 @@ if __name__ == '__main__':
         print("Turn Now:%d"%turn)
         for file in CHUNK_files:
             if not os.path.isdir(file) and file[len(file) - 3:len(file)] == 'jpg':
-                try:
-                    key = keys[file]
-
-                    image_array, label_array = process_img(path + "/" + file,key)
-                    train_imgs = np.vstack((train_imgs, image_array))
-                    train_labels = np.vstack((train_labels, label_array))
-                except:
-                    print('prcess error')
+                key = keys[file]
+                image_array, label_array = process_img(path + "/" + file,key)
+                train_imgs = np.vstack((train_imgs, image_array))
+                train_labels = np.vstack((train_labels, label_array))
 
         # delete the initial all-0 array
         train_imgs = train_imgs[1:, :]
