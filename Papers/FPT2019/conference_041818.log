@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/W32TeX) (preloaded format=pdflatex 2019.9.12)  15 OCT 2019 15:36
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/W32TeX) (preloaded format=pdflatex 2019.9.12)  24 OCT 2019 14:40
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**c:/Users/tianzew/Desktop/pynq_car/Paper-commited/conference_041818.tex
-(c:/Users/tianzew/Desktop/pynq_car/Paper-commited/conference_041818.tex
+**c:/Users/tianzew/Desktop/pynq_car/Papers/FPT2019/conference_041818.tex
+(c:/Users/tianzew/Desktop/pynq_car/Papers/FPT2019/conference_041818.tex
 LaTeX2e <2018-12-01>
 (c:/texlive/2019/texmf-dist/tex/latex/IEEEtran/IEEEtran.cls
 Document Class: IEEEtran 2015/08/26 V1.8b by Michael Shell
@@ -367,7 +367,7 @@ Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
 Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
-) (c:/Users/tianzew/Desktop/pynq_car/Paper-commited/conference_041818.aux)
+) (c:/Users/tianzew/Desktop/pynq_car/Papers/FPT2019/conference_041818.aux)
 \openout1 = `conference_041818.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 12.
@@ -472,13 +472,13 @@ File: net-structure.png Graphic file (type png)
 <use net-structure.png>
 Package pdftex.def Info: net-structure.png  used on input line 117.
 (pdftex.def)             Requested size: 258.00214pt x 335.99837pt.
- [2 <c:/Users/tianzew/Desktop/pynq_car/Paper-commited/car.jpg> <c:/Users/tianzew/Desktop/pynq_car/Paper-commited/software-architecture.jpg> <c:/Users/tianzew/Desktop/pynq_car/Paper-commited/workFlow.jpg>]
+ [2 <c:/Users/tianzew/Desktop/pynq_car/Papers/FPT2019/car.jpg> <c:/Users/tianzew/Desktop/pynq_car/Papers/FPT2019/software-architecture.jpg> <c:/Users/tianzew/Desktop/pynq_car/Papers/FPT2019/workFlow.jpg>]
 <simulator.png, id=21, 1154.3125pt x 578.16pt>
 File: simulator.png Graphic file (type png)
 <use simulator.png>
 Package pdftex.def Info: simulator.png  used on input line 131.
 (pdftex.def)             Requested size: 258.0pt x 129.22464pt.
- [3 <c:/Users/tianzew/Desktop/pynq_car/Paper-commited/net-structure.png> <c:/Users/tianzew/Desktop/pynq_car/Paper-commited/simulator.png>]
+ [3 <c:/Users/tianzew/Desktop/pynq_car/Papers/FPT2019/net-structure.png> <c:/Users/tianzew/Desktop/pynq_car/Papers/FPT2019/simulator.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 203--204
 []\OT1/ptm/m/n/8 TUL PYNQ-Z2 [ON-LINE] Avail-able at:
  []
@@ -509,11 +509,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 205--206
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 208--209
-[]\OT1/ptm/m/n/8 Tawn Kramer. (2019, Septem-ber) [ON-LINE] Avail-able at:
- []
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 210--211
 []\OT1/ptm/m/n/8 TUL PetaL-inux [ON-LINE] Avail-able at:
  []
@@ -534,12 +529,7 @@ Overfull \hbox (1.34932pt too wide) in paragraph at lines 211--212
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 212--213
-[]\OT1/ptm/m/n/8 Tawn Kramer, sd-sand-box [ON-LINE] Avail-able at:
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 217--218
+Underfull \hbox (badness 10000) in paragraph at lines 216--217
 []\OT1/ptm/m/n/8 Xilinx. (2019, Sep) Xil-inx/xfopencv. [On-line]. Avail-able:
  []
 
@@ -554,17 +544,17 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[4] (c:/Users/tianzew/Desktop/pynq_car/Paper-commited/conference_041818.aux) ) 
+[4] (c:/Users/tianzew/Desktop/pynq_car/Papers/FPT2019/conference_041818.aux) ) 
 Here is how much of TeX's memory you used:
- 4445 strings out of 492623
- 64298 string characters out of 6133290
- 139030 words of memory out of 5000000
- 8289 multiletter control sequences out of 15000+600000
+ 4444 strings out of 492623
+ 64293 string characters out of 6133290
+ 139026 words of memory out of 5000000
+ 8288 multiletter control sequences out of 15000+600000
  40038 words of font info for 87 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  41i,11n,35p,871b,302s stack positions out of 5000i,500n,10000p,200000b,80000s
 {c:/texlive/2019/texmf-dist/fonts/enc/dvips/base/8r.enc}<c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb><c:/texlive/2019/texmf-dist/fonts/type1/urw/times/utmb8a.pfb><c:/texlive/2019/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb><c:/texlive/2019/texmf-dist/fonts/type1/urw/times/utmr8a.pfb><c:/texlive/2019/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on c:/Users/tianzew/Desktop/pynq_car/Paper-commited/conference_041818.pdf (4 pages, 6792972 bytes).
+Output written on c:/Users/tianzew/Desktop/pynq_car/Papers/FPT2019/conference_041818.pdf (4 pages, 6792939 bytes).
 PDF statistics:
  46 PDF objects out of 1000 (max. 8388607)
  27 compressed objects within 1 object stream
