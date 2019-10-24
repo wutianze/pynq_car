@@ -27,7 +27,7 @@ You can both use linux version or windows version of Unity3d.
 
 ```bash
 cd Virtual-Part
-python src/predict_server.py path-to-your-model/model.h5
+python src/predict_server.py --model=path-to-your-model/model.h5
 ```
  If you get a crash loading this model, you will not be able to run the demo. But you can still generate your own model. This is a problem between tensorflow/keras versions. 
  
