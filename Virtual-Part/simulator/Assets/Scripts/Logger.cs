@@ -31,7 +31,7 @@ public class Logger : MonoBehaviour {
     float timeSinceLastCapture = 0.0f;
 
     //The style for xilinx pynq_car using command
-    public bool PynqStyle = false;
+    public bool PynqStyle = true;
 
     public Text logDisplay;
 
