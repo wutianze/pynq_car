@@ -175,12 +175,12 @@ public class PIDController : MonoBehaviour {
 
 		steeringReq = (-Kp * err) - (Kd * diffErr) - (Ki * totalError);
 
-		if(steeringReq < -straightV){
+		/*if(steeringReq < -straightV){
 			steeringReq = -turnV;
 		}else if(steeringReq > straightV){
 			steeringReq = turnV;
 		}else{steeringReq = 0.0f;}
-		steeringReq = steeringReq*car.GetMaxSteering();
+		steeringReq = steeringReq*car.GetMaxSteering();*/
 		if(doDrive)
 			car.RequestSteering(steeringReq);
 
