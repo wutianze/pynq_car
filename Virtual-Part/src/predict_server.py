@@ -3,8 +3,8 @@
 @GitHub: wutianze
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-23 10:12:28
-@LastEditors: Sauron Wu
-@LastEditTime: 2019-09-28 17:35:25
+@LastEditors: Please set LastEditors
+@LastEditTime: 2019-10-25 17:02:17
 @Description: 
 '''
 #!/usr/bin/env python
@@ -238,7 +238,7 @@ if __name__ == "__main__":
     parser.add_argument('--num_cars', type=int, default=1, help='how many cars to spawn')
     parser.add_argument('--constant_throttle', type=float, default=0.0, help='apply constant throttle')
     parser.add_argument('--rand_seed', type=int, default=0, help='set road generation random seed')
-    parser.add_argument('--process_method', type=int, default=1, help='process method like in process_img')
+    parser.add_argument('--process_method', type=int, default=0, help='process method like in process_img')
     parser.add_argument('--control_method', type=int, default=2, help='0 for command, 1 for steer')
     args = parser.parse_args()
 
