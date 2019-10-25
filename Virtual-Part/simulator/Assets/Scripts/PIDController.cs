@@ -47,7 +47,7 @@ public class PIDController : MonoBehaviour {
 	public float maxSpeed = 5.0f;
 
 	public Text pid_steering;
-	public float straightV = 8.0f;
+	public float straightV = 7.0f;
 	public float turnV = 0.5f;
 
 	void Awake()
@@ -175,12 +175,12 @@ public class PIDController : MonoBehaviour {
 
 		steeringReq = (-Kp * err) - (Kd * diffErr) - (Ki * totalError);
 
-		if(steeringReq < -straightV){
+		/*if(steeringReq < -straightV){
 			steeringReq = -turnV;
 		}else if(steeringReq > straightV){
 			steeringReq = turnV;
 		}else{steeringReq = 0.0f;}
-		steeringReq = steeringReq*car.GetMaxSteering();
+		steeringReq = steeringReq*car.GetMaxSteering();*/
 		if(doDrive)
 			car.RequestSteering(steeringReq);
 

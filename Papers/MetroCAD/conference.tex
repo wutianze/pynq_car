@@ -126,12 +126,51 @@ To improve the robustness and accuracy of the algorithm, more techniques will be
 
 \end{itemize}
 
-\subsection{Key Characteristics}
+\textbf{DPU Acceleration. }The DPU\cite{b17} is one accelerator in FPGA, it can accelerate the process of AI reference. We provide some scripts to do a complete set of optimized tool chains provided by DNNDK, including compression, compilation and runtime. You can refer to Fig.~\ref{df} to see the framework of DNNDK. 
+
+After using DPU, the fps can be which means it's easy for the board to perform AI reference. The model we use here is described above. 
+
+What's more, the DPU can not only provide computation power for AI reference but users can also program the FPGA to add their own accelerators for different algorithms. So, if you are a researcher who cares mostly about hardware acceleration, you can do experiments based on our platform.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth,height=0.5\textheight]{DNNDK.PNG}}
+\caption{DNNDK Framework\cite{b17}.}
+\label{df}
+\end{figure}
+
+\section{Key Characteristics}
 The xxx platform has three key characteristics: high flexibility and extensibility, full stack, and easy-to-use. These three characteristics can help users understand AD technology stack and the platform.
 
 \textbf{High Flexibility and Extensibility. }The idea of our system design is inspired by ROS. In ROS, you can easily add new functions by adding ROS nodes. Nodes can easily get and send messages through the publish-subscribe mechanism. What we do is making the ROS system more lightweight and forthright. The thread is similar to node while the producer–consumer model is similar to the publish-subscribe mechanism. So it's easy to add more hardware devices as sensors or threads as handlers. What's more, due to the base of our system is Ubuntu18.04, it's easy to redefine the whole software framework as you like, actually we have an example of using ROS in following case studies.
 
-\textbf{Full Stack. }The full stack here means our product provide almost everything 
+\textbf{Full Stack. }The full stack here means our product provide almost everything you need to learn about AD technologies from algorithms to hardware. It's important for researchers or students to understand how the car runs and why sophisticated algorithms can be run in resource limited edge platform. Users can use different physical construction, different operating system, different software framework, different algorithm and different hardware acceleration etc. That means researchers can do whatever research they want based on our platform and they can easily use existing modules and understand the operation mode of the whole system. Considering the difficulty users may have in collecting training data and testing AI models in real world, we provide a simulator in Unity3d which is a game engine. Users can easily use the simulator to do some tests or more. The simulator usage will be introduced in case studies.
+
+\textbf{Easy-to-Use. }The most important thing we believe is to make our platform easy to use. To achieve this, most libraries of the platform are familiar to users like OpenCv and TensorFlow\cite{b33}, they are open-sourced and widely used. Most importantly, the basic knowledge users should know includes only Linux, C++,Python, AI and a little about DPU usage. The software framework is simple and tidy, we only keep necessary functions and make it extendable. The hardware is simple too, if you don't want to add more devices, one camera and two motors are all you have to deal with. Users even don't have to prepare a real car to do experiments, then you can care nothing about hardware. Besides, we provide many documents for users, so it's easy for them to modify any part of the platform.
+
+\section{Case Studies}
+In this section, we use three case studies deployed on xxxx to show the capabilities of our research platform.
+
+\subsection{Autonomous Driving with DPU power}
+This case shows how you can use our platform to train an AI model and use it for autonomous driving. 
+
+First, you can control the car using your keyboard or whatever you like and save data from the car's sensors as training data. Or you can just get the data from Internet or somewhere else. 
+
+Second, after some pre-process, you can put the images you get as input to the AI model and the labels such as keyboard signals as the output. Train the model using TensorFlow until you get a satisfy model.
+
+Third, you will use DNNDK\cite{b17} provided by Xilinx to do the compression and compilation and then copy the generated files to the car.
+
+Finally, the car can move by itself. It will be controlled by AI models or other algorithms added. 
+
+\subsection{Simulator Use}
+
+
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth,height=0.5\textheight]{simulator.png}}
+\caption{Simulator Interface.}
+\label{si}
+\end{figure}
+
 
 \begin{thebibliography}{00}
 
@@ -198,11 +237,13 @@ IEEE Intelligent Vehicles Symposium (IV), pages 763–
 
 \bibitem{b29} Jun Wang, Tao Mei, Bin Kong and Hu Wei, "An approach of lane detection based on Inverse Perspective Mapping," 17th International IEEE Conference on Intelligent Transportation Systems (ITSC), Qingdao, 2014, pp. 35-38.
 
-\bibitem{b30} Xilinx. (2019, Sep) Xilinx/xfopencv. [Online]. Available:  https://github.com/Xilinx/xfopencv
+\bibitem{b30} Xilinx. (2019, Sep) Xilinx/xfopencv. [ONLINE]. Available:  https://github.com/Xilinx/xfopencv
 
 \bibitem{b31} Allan Hanbury and Jean Serra, "A 3d-polar coordinate colour representation well adapted to image analysis," in Proceedings of the Scandinavian Conference on Image Analysis (SCIA), 2003, pp. 804–811.
 
 \bibitem{b32} M. Rizon et al., 2005, "Object Detection using Circular Hough Transform", American Journal of Applied Sciences 2, vol 12, pp. 1606-1609.
+
+\bibitem{33} TensorFlow [ONLINE] Available at: https://www.tensorflow.org
 \end{thebibliography}
 \vspace{12pt}
 

@@ -31,9 +31,7 @@ public class Logger : MonoBehaviour {
     float timeSinceLastCapture = 0.0f;
 
     //The style for xilinx pynq_car using command
-    public bool PynqStyle = false;
-
-    public bool PynqStyle2 = true;
+    public bool PynqStyle = true;
 
     public Text logDisplay;
 
@@ -63,7 +61,7 @@ public class Logger : MonoBehaviour {
 
 		if(bDoLog && car != null)
 		{
-			if(PynqStyle || PynqStyle2){
+			if(PynqStyle){
                 outputFilename = "train.csv";
             }
 
@@ -105,39 +103,9 @@ public class Logger : MonoBehaviour {
 		{
 			if(PynqStyle){
                 string image_filename = GetPynqStyleImageFilename();
-                char comNow = car.GetComNow();
-                int commandGet = 0;
-                switch(comNow){
-                    case 'w':
-                        commandGet = 1;
-                        break;
-                    case 's':
-                        commandGet = 3;
-                        break;
-                    case 'a':
-                        commandGet = 0;
-                        break;
-                    case 'd':
-                        commandGet = 2;
-                        break;
-                    default:
-                        return;
-                }
-				writer.WriteLine(string.Format("{0},{1}", image_filename,commandGet.ToString()));
-            }else if(PynqStyle2){
-                string image_filename = GetPynqStyleImageFilename();
-                float st = car.GetSteering();
-                float left = 0.0f;
-                float straight = 0.0f;
-                float right = 0.0f;
-                
-                if(st < 0){
-                    left = 1.0f;
-                }
-                else if(st > 0){
-                    right = 1.0f;
-                }else{straight = 1.0f;}
-                writer.WriteLine(string.Format("{0},{1},{2},{3}",image_filename,left.ToString(),straight.ToString(),right.ToString()));
+                float steering = car.GetSteering() / car.GetMaxSteering();
+                float throttle = car.GetThrottle();
+				writer.WriteLine(string.Format("{0},{1},{2}", image_filename,steering.ToString(),throttle.ToString()));
             }
 		}
 
@@ -190,7 +158,7 @@ public class Logger : MonoBehaviour {
             Texture2D image = cs.GetImage();
 
             ImageSaveJob ij = new ImageSaveJob();
-            if(PynqStyle || PynqStyle2){
+            if(PynqStyle){
                 ij.filename = GetLogPath()+GetPynqStyleImageFilename();
                 ij.bytes = image.EncodeToJPG();
             }
