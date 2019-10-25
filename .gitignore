@@ -29,3 +29,4 @@ Virtual-Part/simulator/Logs
 Virtual-Part/simulator/.vs
 Virtual-Part/*.csproj
 Virtual-Part/env
+Pynq-Z2_AD_Car/_book/*

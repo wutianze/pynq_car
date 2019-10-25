@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Please set LastEditors
-@LastEditTime: 2019-10-25 13:59:18
+@LastEditTime: 2019-10-25 17:19:47
 @Description: 
 '''
 import os
@@ -62,9 +62,9 @@ def process_img(img_path, key):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='prediction server')
-    parser.add_argument('--path', type=str, help='images dir', default="/home/xilinx/images")
-    parser.add_argument('--store', type=str, help='npz store dir', default="/home/xilinx/pynq_car/Host-Part/process_images")
-    parser.add_argument('--method', type=int, help='whether to reduce some categories\' number, 0 for true', default=1)
+    parser.add_argument('--path', type=str, help='images dir', default="/home/xilinx/virtual-images")
+    parser.add_argument('--store', type=str, help='npz store dir', default="/home/xilinx/pynq_car/Host-Part/process_command255")
+    parser.add_argument('--method', type=int, help='whether to reduce some categories\' number, 0 for true', default=0)
     args = parser.parse_args()
     path = args.path
     names = []
@@ -82,7 +82,7 @@ if __name__ == '__main__':
                 if float(row[1]) == 0: # this should be set according to your training data
                     randNum = random.randint(0,10)
                     # delete some data randomly, bigger of the threshold number means more data in this category will be ignored
-                    if randNum < 3:
+                    if randNum < 5:
                         continue
             names.append(row[0])
             tmp = []
