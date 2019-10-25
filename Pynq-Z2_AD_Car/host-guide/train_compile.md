@@ -3,8 +3,8 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-15 15:51:43
- * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-24 13:52:27
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2019-10-25 17:48:49
  * @Description: 
  -->
 # What you will learn
@@ -27,4 +27,4 @@ Please run `pip install keras==2.2.0` to install keras if you want to use the co
 
 # Steps
 - Just one single step: Run `./process_train.sh`, you can edit the script to change read/store directories. 
-- Now, here comes two methods for you to choose, one is to use the real car to run and test, the other is to use our simulator to test. For more information of the simulator, please refer to `sdsandbox/guides/`.
+- Now, here comes two methods for you to choose, one is to use the real car to run and test, the other is to use our simulator to test. For more information of the simulator, please refer to `Virtual-Part` guides.
