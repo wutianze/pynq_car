@@ -4,17 +4,17 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-14 09:10:53
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-22 11:35:14
+ * @LastEditTime: 2019-10-28 17:18:06
  * @Description: 
  */
 #include"control.h"
 #include<cmath>
 #define THROTTLEINIT 200000
-#define THROTTLEMAX 169500
+#define THROTTLEVAL 14500
 #define THROTTLEZERO 155000
 #define STEERINIT 2000000
-#define STEERMAX 110000
-#define STEERZERO 100000
+#define STEERVAL 30000
+#define STEERZERO 110000
 PYNQZ2::PYNQZ2(){
     int fd = open("/dev/mem",O_RDWR);
     nowS = new PYNQZ2::Status();
@@ -41,7 +41,7 @@ void PYNQZ2::throttleSet(float rate){
     //leds[0] = leds[0] & 0x04;
     if(abs(rate - nowS->throttleRate) < 0.001)return;
     rate = (rate > 1.0?1.0:rate) < (-1.0)?(-1.0):rate;
-    throttle[5] = THROTTLEZERO + rate * (THROTTLEMAX - THROTTLEZERO);
+    throttle[5] = THROTTLEZERO + rate * THROTTLEVAL;
     nowS->throttleRate = rate;
 }
 
@@ -49,7 +49,7 @@ void PYNQZ2::steerSet(float rate){
     //leds[0] = leds[0] & 0x08;
     if(abs(rate - nowS->steerRate) < 0.001)return;
     rate = (rate > 1.0?1.0:rate) < (-1.0)?(-1.0):rate;
-    steer[5] = STEERZERO + rate * (STEERMAX - STEERZERO);
+    steer[5] = STEERZERO + rate * STEERVAL;
     nowS->steerRate = rate;
 }
 

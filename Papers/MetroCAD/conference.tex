@@ -161,12 +161,17 @@ Third, you will use DNNDK\cite{b17} provided by Xilinx to do the compression and
 
 Finally, the car can move by itself. It will be controlled by AI models or other algorithms added. 
 
-\subsection{Simulator Use}
+\subsection{Simulator}
+The simulator is a tool which can help users test their designs more efficiently. You can see the interface of the simulator in Fig.~\ref{si}. The simulator is based on sdsandbox\cite{b5} which is a simulator project for Donkey Car\cite{b34}. As you can see in the picture, the users can use this simulator to collect training data and test their models. 
+When testing, you should build a server, the server will receive sensor data from the client of the simulator and generate control messages according to these data. We have already built one example, the server will get images taken by simulator and handles them using the AI model trained before, then the model output control commands and these commands will be sent to the simulator.
+It's also convenient for users to modify the source code of the simulator to define their own data format or control methods. However, users should be familiar with C\# and Unity3d if they would like to do so, and we provide some coding tutorial manual to help.
 
-
+\subsection{ROS Usage}
+Due to the high impact of ROS, we make our platform able to support ROS projects. The version we use is ROS Melodic\cite{b35} which is mainly used in Ubuntu18.04. 
+This time we show how to read LiDAR data and control the car using ROS. With LiDAR data, the car can handle obstacle avoidance tasks and LiDAR data processing is the basic of SLAM map-building
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=0.5\textwidth,height=0.5\textheight]{simulator.png}}
+\centerline{\includegraphics[width=0.5\textwidth]{simulator.png}}
 \caption{Simulator Interface.}
 \label{si}
 \end{figure}
@@ -193,11 +198,7 @@ of the ACM, 51(1):107–113, 2008.
 
 \bibitem{b9} Wang, Yifan, Liangkai Liu, Xingzhou Zhang, and Weisong Shi. "HydraOne: An indoor experimental research and education platform for CAVs." In 2nd {USENIX} Workshop on Hot Topics in Edge Computing (HotEdge 19). 2019.
 
-\bibitem{b10} Junqing Wei, Jarrod M Snider, Junsung Kim, John M
-Dolan, Raj Rajkumar, and Bakhtiar Litkouhi. Towards
-a viable autonomous driving research platform. In 2013
-IEEE Intelligent Vehicles Symposium (IV), pages 763–
-770. IEEE, 2013.
+\bibitem{b10} Junqing Wei, Jarrod M Snider, Junsung Kim, John M Dolan, Raj Rajkumar, and Bakhtiar Litkouhi. Towards a viable autonomous driving research platform. In 2013 IEEE Intelligent Vehicles Symposium (IV), pages 763–770. IEEE, 2013.
 
 \bibitem{b11} O'Kelly, Matthew, Varundev Sukhil, Houssam Abbas, Jack Harkins, Chris Kao, Yash Vardhan Pant, Rahul Mangharam et al. "F1/10: An Open-Source Autonomous Cyber-Physical Platform." arXiv preprint arXiv:1901.08567 (2019).
 
@@ -243,8 +244,12 @@ IEEE Intelligent Vehicles Symposium (IV), pages 763–
 
 \bibitem{b32} M. Rizon et al., 2005, "Object Detection using Circular Hough Transform", American Journal of Applied Sciences 2, vol 12, pp. 1606-1609.
 
-\bibitem{33} TensorFlow [ONLINE] Available at: https://www.tensorflow.org
+\bibitem{b33} TensorFlow [ONLINE] Available at: https://www.tensorflow.org
+
+\bibitem{b34} Donkey Car [ONLINE] Available at: https://www.donkeycar.com
 \end{thebibliography}
+
+\bibitem{b35} ROS Melodic [ONLINE] Available at: http://wiki.ros.org/melodic/
 \vspace{12pt}
 
 \end{document}
