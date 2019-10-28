@@ -166,15 +166,28 @@ The simulator is a tool which can help users test their designs more efficiently
 When testing, you should build a server, the server will receive sensor data from the client of the simulator and generate control messages according to these data. We have already built one example, the server will get images taken by simulator and handles them using the AI model trained before, then the model output control commands and these commands will be sent to the simulator.
 It's also convenient for users to modify the source code of the simulator to define their own data format or control methods. However, users should be familiar with C\# and Unity3d if they would like to do so, and we provide some coding tutorial manual to help.
 
-\subsection{ROS Usage}
-Due to the high impact of ROS, we make our platform able to support ROS projects. The version we use is ROS Melodic\cite{b35} which is mainly used in Ubuntu18.04. 
-This time we show how to read LiDAR data and control the car using ROS. With LiDAR data, the car can handle obstacle avoidance tasks and LiDAR data processing is the basic of SLAM map-building
-
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.5\textwidth]{simulator.png}}
 \caption{Simulator Interface.}
 \label{si}
 \end{figure}
+
+\subsection{ROS Usage}
+Due to the high impact of ROS, we make our platform able to support ROS projects. The version we use is ROS Melodic\cite{b35} which is mainly used in Ubuntu18.04. 
+
+This time we show how to read LiDAR data and control the car using ROS. With Lidar data, the car can handle obstacle avoidance tasks and SLAM\cite{b36} tasks whose basical technology is Lidar data processing.
+The Lidar we use is LeiShen LS01D\cite{b37}, LeiShen has already provided one ROS node for users to gain and publish Lidar data. We can read the  laser point cloud data by subscribing the published topic. Also, it will be more visualized to use RViz\cite{b38}, Fig.~\ref{ld} is one example.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{ladirData.png}}
+\caption{Lidar Data.}
+\label{ld}
+\end{figure}
+
+The control node of the car is a transplantation of code from existing controller. It's easy to send control commands by publishing commands to corresponding topic. 
+
+\section{Conclusion}
+In this paper, we present the design, implementation, characteristics and case studies of xxx, the 
 
 
 \begin{thebibliography}{00}
@@ -247,9 +260,15 @@ of the ACM, 51(1):107–113, 2008.
 \bibitem{b33} TensorFlow [ONLINE] Available at: https://www.tensorflow.org
 
 \bibitem{b34} Donkey Car [ONLINE] Available at: https://www.donkeycar.com
-\end{thebibliography}
 
 \bibitem{b35} ROS Melodic [ONLINE] Available at: http://wiki.ros.org/melodic/
-\vspace{12pt}
 
+\bibitem{b36} SLAM [ONLINE] Available at: https://en.wikipedia.org/wiki/Simultaneous\_localization\_and\_mapping
+
+\bibitem{b37} LeiShen Lidar LS01D [ONLINE] Available at: https://github.com/leishen-lidar/LS01D
+
+\bibitem{b38} TUL RViz [ONLINE] Available at: http://wiki.ros.org/rviz
+\end{thebibliography}
+
+\vspace{12pt}
 \end{document}
