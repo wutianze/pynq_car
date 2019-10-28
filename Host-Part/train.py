@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Please set LastEditors
-@LastEditTime: 2019-10-25 16:53:48
+@LastEditTime: 2019-10-28 13:12:33
 @Description: 
 '''
 import keras
@@ -25,7 +25,7 @@ import argparse
 
 np.random.seed(0)
 IMAGE_SHAPE = [120,160,3]
-OUTPUT_NUM = 3
+OUTPUT_NUM = 1
 CHUNK_SIZE = 256
 ORIGINAL_LABEL_NUM = 3
 # step1,load data
@@ -63,21 +63,22 @@ def build_model(keep_prob,model_path):
     model = Sequential()
     model.add(Conv2D(24, (5, 5), strides=(2, 2), activation="relu",input_shape=(IMAGE_SHAPE[0],IMAGE_SHAPE[1],IMAGE_SHAPE[2])))
     #model.add(BatchNormalization())
-    #model.add(Dropout(keep_prob))
-    model.add(Conv2D(36, (5, 5), strides=(2, 2), activation="relu"))
-    #model.add(Dropout(keep_prob))
-    model.add(Conv2D(48, (5, 5), strides=(2, 2), activation="relu"))
-    #model.add(Dropout(keep_prob))
-    model.add(Conv2D(64, (3, 3), activation="relu"))
-    #model.add(Dropout(keep_prob))
-    model.add(Conv2D(64, (3, 3), activation="relu"))    
+    model.add(Dropout(keep_prob))
+    model.add(Conv2D(32, (5, 5), strides=(2, 2), activation="relu"))
+    model.add(Dropout(keep_prob))
+    model.add(Conv2D(64, (5, 5), strides=(2, 2), activation="relu"))
+    model.add(Dropout(keep_prob))
+    model.add(Conv2D(64, (3, 3), strides=(2,2), activation="relu"))
+    model.add(Dropout(keep_prob))
+    model.add(Conv2D(64, (3, 3), strides=(1,1), activation="relu"))    
     model.add(Dropout(keep_prob))
     model.add(Flatten())
-    model.add(Dense(250, activation="relu"))
-    #model.add(Dropout(keep_prob))
-    #model.add(Dense(50, activation="relu"))
-    #model.add(Dropout(keep_prob))
-    model.add(Dense(OUTPUT_NUM,activation='softmax'))
+    model.add(Dense(100, activation="relu"))
+    model.add(Dropout(keep_prob))
+    model.add(Dense(50, activation="relu"))
+    model.add(Dropout(keep_prob))
+    model.add(Dense(OUTPUT_NUM,activation="relu"))
+    #model.add(Dense(OUTPUT_NUM,activation='softmax'))
     model.summary()
     return model
 
@@ -98,12 +99,11 @@ def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
     tensorboard = TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=20, write_graph=True,write_grads=True,
                               write_images=True, embeddings_freq=0, embeddings_layer_names=None,
                               embeddings_metadata=None)
-    reduce_lr = ReduceLROnPlateau(monitor='acc', factor=0.1, patience=10, 
-                                  verbose=0, mode='max', min_delta=1e-5,cooldown=3, min_lr=0)
+    reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=10, verbose=0, mode='min', min_delta=1e-5,cooldown=3, min_lr=0)
 
     
-    model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(lr=learning_rate), metrics=['accuracy'])
-    #model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),loss='mean_squared_error', metrics=['accuracy'])
+    #model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(lr=learning_rate), metrics=['accuracy'])
+    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),loss='mean_squared_error') # for congression model
     
     model.fit_generator(batch_generator(train_list, batch_size),
                         steps_per_epoch=samples_per_epoch/batch_size,
@@ -137,19 +137,16 @@ def batch_generator(name_list, batch_size):
         images = np.zeros([batch_size, IMAGE_SHAPE[0], IMAGE_SHAPE[1], IMAGE_SHAPE[2]])
         labels = np.zeros([batch_size, OUTPUT_NUM])
         #for index in np.random.permutation(X.shape[0]):
-        for index in range(X.shape[0]):
+        for index in np.random.permutation(X.shape[0]):
             images[i] = X[index]
-            #print(images[i])
-            #print(y[index][0])
-            if y[index][0] < -0.1:
-                labels[i] = [1.,0.,0.]
-            elif y[index][0] > 0.1:
-                labels[i] = [0.,0.,1.]
-            else:
-                labels[i] = [0.,1.,0.]
-            #labels[i] = [0,1,0]
+            #if y[index][0] < 0:
+            #    labels[i] = [1.,0.,0.]
+            #elif y[index][0] > 0:
+            #    labels[i] = [0.,0.,1.]
+            #else:
+            #    labels[i] = [0.,1.,0.]
+            labels[i] = [(y[index][0]+1.)/2.]
             #print(labels[i])
-            #labels[i] = y[index]
             i += 1
             if i == batch_size:
                 i = 0
@@ -162,7 +159,7 @@ def main(model_path, read_path):
     print('-'*30)
 
 
-    keep_prob = 0.5
+    keep_prob = 0.2
     # learning_rate must be smaller than 0.0001
     learning_rate = 0.0001
     nb_epoch = 100
