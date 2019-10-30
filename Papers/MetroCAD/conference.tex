@@ -7,10 +7,13 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
+\usepackage[textwidth=18.5cm]{geometry}
+\usepackage{blindtext}
+\parindent=0pt
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
-
+\begin{sloppypar}
 \title{Hydra Mini}
 
 \author{\IEEEauthorblockN{1\textsuperscript{st} Tianze Wu}
@@ -19,6 +22,17 @@
 {University of Chinese Academy of Sciences}\\
 Beijing, China \\
 wutianze@ict.ac.cn}
+\IEEEauthorblockN{2\textsuperscript{st} Weisong Shi}
+\IEEEauthorblockA{
+\textit{Wayne State University}\\
+{Insititute Of Computing Technology Chinese Academy Of Sciences}\\
+Detroit, US \\
+weisong@wayne.edu}
+\IEEEauthorblockN{3\textsuperscript{st} Joshual Lu}
+\IEEEauthorblockA{
+\textit{Xilinx}\\
+Shanghai, China\\
+joshual@xilinx.com}
 }
 \maketitle
 
@@ -179,15 +193,15 @@ This time we show how to read LiDAR data and control the car using ROS. With Lid
 The Lidar we use is LeiShen LS01D\cite{b37}, LeiShen has already provided one ROS node for users to gain and publish Lidar data. We can read the  laser point cloud data by subscribing the published topic. Also, it will be more visualized to use RViz\cite{b38}, Fig.~\ref{ld} is one example.
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=0.5\textwidth]{ladirData.png}}
+\centerline{\includegraphics[width=0.5\textwidth]{car.jpg}}
 \caption{Lidar Data.}
 \label{ld}
 \end{figure}
 
-The control node of the car is a transplantation of code from existing controller. It's easy to send control commands by publishing commands to corresponding topic. 
+The control node of the car is a transplantation of code from existing controller. It's easy to send control commands by publishing commands to corresponding topic. As we can see, it's easy for users to build their projects based on ROS in our platform. Since ROS is widely used, it's important that our platform can help users who want to try ROS.
 
 \section{Conclusion}
-In this paper, we present the design, implementation, characteristics and case studies of xxx, the 
+In this paper, we present the design, implementation, characteristics and case studies of xxx, an experimental research and education platform for autonomous driving. The platform is highly flexible and extensible, full stack, and easy-to-use. These three characteristics can help users understand AD technology well and take full advantage of xxx. Students and researchers can use our platform for full-stack researches on algorithms, applications, system, mechanical control and hardware acceleration. We hope this platform can help users enjoy their research and learning process.
 
 
 \begin{thebibliography}{00}
@@ -207,7 +221,7 @@ of the ACM, 51(1):107–113, 2008.
 
 \bibitem{b7} ReleaseNotes Ubuntu 18.04 [ONLINE] Available at: https://wiki.ubuntu.com/
 
-\bibitem{b8} TUL ARM Cortex-A9 [ONLINE] Available at: https://developer.arm.com/http://www.armdesigner.com/MINI3188/?gclid=Cj0KCQjwi7DtBRCLARIsAGCJWBpdSiwajASBuoCjuPR9pprkW7iJOfAQnCIpNK\_eJhz35TM5WoY2fYIaAhYYEALw\_wcB
+\bibitem{b8} TUL ARM Cortex-A9 [ONLINE] Available at: https://developer.arm.com/http://www.armdesigner.com/
 
 \bibitem{b9} Wang, Yifan, Liangkai Liu, Xingzhou Zhang, and Weisong Shi. "HydraOne: An indoor experimental research and education platform for CAVs." In 2nd {USENIX} Workshop on Hot Topics in Edge Computing (HotEdge 19). 2019.
 
@@ -225,7 +239,7 @@ of the ACM, 51(1):107–113, 2008.
 
 \bibitem{b16} Tensor\_processing\_unit, Wikipedia [ONLINE] Available at: https://en.wikipedia.org/wiki/Tensor\_processing\_unit
 
-\bibitem{b17} TUL DNNDK [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/ai\_inference /v1\_5
+\bibitem{b17} TUL DNNDK [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/
 
 \bibitem{b18} Producer–consumer problem, Wikipedia [ONLINE] Available at: https://en.wikipedia.org/wiki/Producer\_consumer\_problem
 
@@ -263,7 +277,7 @@ of the ACM, 51(1):107–113, 2008.
 
 \bibitem{b35} ROS Melodic [ONLINE] Available at: http://wiki.ros.org/melodic/
 
-\bibitem{b36} SLAM [ONLINE] Available at: https://en.wikipedia.org/wiki/Simultaneous\_localization\_and\_mapping
+\bibitem{b36} SLAM [ONLINE] Available at: https://en.wikipedia.org/wiki/ Simultaneous\_localization\_and\_mapping
 
 \bibitem{b37} LeiShen Lidar LS01D [ONLINE] Available at: https://github.com/leishen-lidar/LS01D
 
@@ -271,4 +285,5 @@ of the ACM, 51(1):107–113, 2008.
 \end{thebibliography}
 
 \vspace{12pt}
+\end{sloppypar}
 \end{document}
