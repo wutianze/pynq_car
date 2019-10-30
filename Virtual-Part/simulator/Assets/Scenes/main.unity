@@ -1827,7 +1827,7 @@ MonoBehaviour:
   startOnWake: 1
   brakeOnEnd: 0
   doDrive: 1
-  maxSpeed: 3
+  maxSpeed: 5
   pid_steering: {fileID: 296341086}
   straightV: 7
   turnV: 0.5
