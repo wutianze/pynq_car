@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Please set LastEditors
-@LastEditTime: 2019-10-28 10:11:34
+@LastEditTime: 2019-10-30 10:32:52
 @Description: 
 '''
 import os
@@ -27,19 +27,6 @@ def image_handle(img):
     #image = np.asarray(img)
     #img.reshape((img.shape[0],img.shape[1],img.shape[2]))
     return (img[40:,:])/255.0-0.5
-
-CONV_INPUT = "conv2d_1_input"
-calib_batch_size = 50
-def calib_input(iter):
-  images = []
-  path = "/home/sauron/pynq_car/sdsandbox/sdsim/lsr-pid2/"
-  files = os.listdir(path)
-  for index in range(0, calib_batch_size):
-    if files[iter*calib_batch_size+index] == "train.csv":
-        continue
-    image = image_handle(cv2.imread(path + files[iter*calib_batch_size + index]))
-    images.append(image)
-  return {CONV_INPUT: images}
 
 def process_img(img_path, key):
     image_array = cv2.imread(img_path)

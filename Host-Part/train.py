@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Please set LastEditors
-@LastEditTime: 2019-10-28 13:12:33
+@LastEditTime: 2019-10-29 15:04:04
 @Description: 
 '''
 import keras
@@ -25,7 +25,7 @@ import argparse
 
 np.random.seed(0)
 IMAGE_SHAPE = [120,160,3]
-OUTPUT_NUM = 1
+OUTPUT_NUM = 3
 CHUNK_SIZE = 256
 ORIGINAL_LABEL_NUM = 3
 # step1,load data
@@ -77,8 +77,8 @@ def build_model(keep_prob,model_path):
     model.add(Dropout(keep_prob))
     model.add(Dense(50, activation="relu"))
     model.add(Dropout(keep_prob))
-    model.add(Dense(OUTPUT_NUM,activation="relu"))
-    #model.add(Dense(OUTPUT_NUM,activation='softmax'))
+    #model.add(Dense(OUTPUT_NUM,activation="relu"))
+    model.add(Dense(OUTPUT_NUM,activation='softmax'))
     model.summary()
     return model
 
@@ -94,16 +94,16 @@ def train_model(model, learning_rate, nb_epoch, samples_per_epoch,
                                  verbose=0,
                                  save_best_only=True,
                                  mode='min')
-    early_stop = EarlyStopping(monitor='loss', min_delta=.0005, patience=20,
-                               verbose=1, mode='min')
+    early_stop = EarlyStopping(monitor='acc', min_delta=.0005, patience=20,
+                               verbose=1, mode='max')
     tensorboard = TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=20, write_graph=True,write_grads=True,
                               write_images=True, embeddings_freq=0, embeddings_layer_names=None,
                               embeddings_metadata=None)
-    reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=10, verbose=0, mode='min', min_delta=1e-5,cooldown=3, min_lr=0)
+    reduce_lr = ReduceLROnPlateau(monitor='acc', factor=0.1, patience=10, verbose=0, mode='max', min_delta=1e-5,cooldown=3, min_lr=0)
 
     
-    #model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(lr=learning_rate), metrics=['accuracy'])
-    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),loss='mean_squared_error') # for congression model
+    model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(lr=learning_rate), metrics=['accuracy'])
+    #model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),loss='mean_squared_error') # for congression model
     
     model.fit_generator(batch_generator(train_list, batch_size),
                         steps_per_epoch=samples_per_epoch/batch_size,
@@ -139,13 +139,13 @@ def batch_generator(name_list, batch_size):
         #for index in np.random.permutation(X.shape[0]):
         for index in np.random.permutation(X.shape[0]):
             images[i] = X[index]
-            #if y[index][0] < 0:
-            #    labels[i] = [1.,0.,0.]
-            #elif y[index][0] > 0:
-            #    labels[i] = [0.,0.,1.]
-            #else:
-            #    labels[i] = [0.,1.,0.]
-            labels[i] = [(y[index][0]+1.)/2.]
+            if y[index][0] < 0:
+                labels[i] = [1.,0.,0.]
+            elif y[index][0] > 0:
+                labels[i] = [0.,0.,1.]
+            else:
+                labels[i] = [0.,1.,0.]
+            #labels[i] = [(y[index][0]+1.)/2.]
             #print(labels[i])
             i += 1
             if i == batch_size:
