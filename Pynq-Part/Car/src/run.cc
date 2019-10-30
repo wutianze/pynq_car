@@ -44,18 +44,17 @@ mutex exitLock;
 mutex timeLock;
 bool EXIT = false;
 int commander = NNCONTROL;
-time_t timeSet;
+clock_t timeSet;
 safe_queue<Mat> takenImages;
 safe_queue<int> generatedCommands;
 vector<string> kinds = {"left", "forward", "right"};
 //vector<string> kinds = {"steer"};
-
+float runSpeed;
 #define KERNEL_CONV "testModel_0"
 #define CONV_INPUT_NODE "conv2d_1_convolution"
 #define CONV_OUTPUT_NODE "dense_3_MatMul"
 
-#define TASKNUM 3
-
+#define TASKNUM 1
 //#define SHOWTIME
 #ifdef SHOWTIME
 #define _T(func)                                                              \
@@ -118,11 +117,12 @@ int topKind(const float *d, int size)
 #define COMMANDMAXLEN 3
 void addCommand(int com){
     timeLock.lock();
-    time_t now = time(0);
+    clock_t now = clock();
     if(now < timeSet){
         timeLock.unlock();
         return;
     }else{
+    	//cout<<"FPS:"<<CLOCKS_PER_SEC/float(now-timeSet)<<endl;
         timeSet = now;
     }
     timeLock.unlock();
@@ -198,7 +198,7 @@ void run_cv(){
     cout<<"Run CV Exit\n";
 }
 
-#define IMAGEMAXLEN 5
+#define IMAGEMAXLEN 10 
 void run_camera(){
     cout<<"Run Camera\n";
     VideoCapture cap(0);
@@ -227,9 +227,10 @@ void run_camera(){
 void run_command(){
     cout<<"Run Command\n";
     PYNQZ2 controller = PYNQZ2();
-    controller.throttleSet(0.5);
+    controller.throttleSet(0.0);
+    controller.throttleSet(1.0);
     sleep(0.1);
-    controller.throttleSet(0.29);
+    controller.throttleSet(runSpeed);
     while(true){
 	exitLock.lock();
 	if(EXIT){
@@ -243,7 +244,7 @@ void run_command(){
         int tmpC;
         if(!generatedCommands.try_pop(tmpC))continue;
 	//generatedCommands.wait_and_pop(tmpC);
-        cout<<"the command is:"<<tmpC<<endl;
+    //    cout<<"the command is:"<<tmpC<<endl;
         switch(tmpC){
             case 0:
             controller.steerSet(-1.0);
@@ -262,14 +263,15 @@ void run_command(){
 
 int main(int argc, char **argv)
 {
-     if (argc != 2) {
-        cout << "Usage of this exe: ./car c/n"<< endl;
+     if (argc != 3) {
+        cout << "Usage of this exe: ./car c/n 0.5(run speed)"<< endl;
         return -1;
       }
 
     signal(SIGTSTP,sig_handler);
     // n means just use ml, c means use ml & cv.
     mode = argv[1];
+    runSpeed = atof(argv[2]);
     /* The main procress of using DPU kernel begin. */
     DPUKernel *kernelConv;
 
@@ -278,9 +280,9 @@ int main(int argc, char **argv)
     vector<DPUTask*> tasks(TASKNUM);
     generate(tasks.begin(),tasks.end(),std::bind(dpuCreateTask,kernelConv,0));    
     vector<thread> threads;
-    threads.push_back(thread(run_model,tasks[0]));
-    threads.push_back(thread(run_model,tasks[1]));
-    threads.push_back(thread(run_model,tasks[2]));
+    for(int i=0;i<TASKNUM;i++){
+    	threads.push_back(thread(run_model,tasks[i]));
+    }
     threads.push_back(thread(run_command));
     threads.push_back(thread(run_camera));
     if(mode[0]=='c'){

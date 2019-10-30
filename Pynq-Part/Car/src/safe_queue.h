@@ -52,6 +52,7 @@ public:
         if(m_queue.empty())
             return false;
         res = move(m_queue.front());
+	m_queue.pop();
         return true;
     }
 

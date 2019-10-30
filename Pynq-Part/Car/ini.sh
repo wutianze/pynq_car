@@ -3,8 +3,8 @@
  # @GitHub: wutianze
  # @Email: 1369130123qq@gmail.com
  # @Date: 2019-10-14 14:51:04
- # @LastEditors: Please set LastEditors
- # @LastEditTime: 2019-10-30 10:37:43
+ # @LastEditors: Sauron Wu
+ # @LastEditTime: 2019-10-28 17:19:06
  # @Description: must run in su mode
  ###
 insmod /home/xilinx/dpu.ko
