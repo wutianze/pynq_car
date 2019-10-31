@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-15 09:17:19
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-31 15:39:10
+ * @LastEditTime: 2019-10-31 15:45:14
  * @Description: 
  -->
 # What you will learn:
@@ -25,13 +25,13 @@ networks.
 encapsulates the system calls to invoke the DPU driver for DPU Task scheduling, monitoring, profiling,
 and resources management. 
 - Simple guide of libn2cube
-   1. The information you need to know after the generation of .elf using the host part of DNNDK-v3.0(If you don't know what it is, please refer to the Host part guide of this project) is:
-      -  kernel name: KERNEL_CONV
-      -  input node(s): CONV_INPUT_NODE
-      -  output node(s): CONV_OUTPUT_NODE  
-   2. Each DPU kernel supported by the DPU has a corresponding ELF object file with a name that is the same as the kernel name prefixed by dpu_ with extension .elf. So before compiling your code, you should put the .elf files into model directory and add their names to MODEL variable in Makefile.  
-   3. The sample flow of using DPU kernel:  
-         ```  
+  1. The information you need to know after the generation of .elf using the host part of DNNDK-v3.0(If you don't know what it is, please refer to the Host part guide of this project) is:
+     -  kernel name: KERNEL_CONV
+     -  input node(s): CONV_INPUT_NODE
+     -  output node(s): CONV_OUTPUT_NODE  
+  2. Each DPU kernel supported by the DPU has a corresponding ELF object file with a name that is the same as the kernel name prefixed by dpu_ with extension .elf. So before compiling your code, you should put the .elf files into model directory and add their names to MODEL variable in Makefile.  
+  3. The sample flow of using DPU kernel:  
+     ```c++
          int main(void) {
          /* DPU Kernels/Tasks for running ResNet-50 */
          DPUKernel* kernelConv;
@@ -68,21 +68,21 @@ and resources management.
          dpuClose();
          return 0;
 
-         ```
-   4. The `main()` operations include:
-        - Call `dpuOpen()` to open the DPU device.
-        - Call `dpuLoadKernel()` to load the DPU kernel reset50_0.
-        - Call `dpuCreateTask()` to create task for each DPU kernel.
-        - Call `dpuDestroyKernel()` and `dpuDestroyTask()` to destroy DPU kernel and task.
-        - Call `dpuClose()` to close the DPU device.
-   5. Run CONV Kernel include:
-        - Get the image for processing and set it as input
-        - Run the task using `dpuRunTask()`
-        - Get the output of the kernel and Run Softmax in it if needed
-        - If your model is regression model, you can just use the result without running softmax like 
-            ```c++
-            float* res = float*(smRes.data()); float final_res = res[0] + res[1]
-            ``` 
+     ```
+  4. The `main()` operations include:
+     - Call `dpuOpen()` to open the DPU device.
+     - Call `dpuLoadKernel()` to load the DPU kernel reset50_0.
+     - Call `dpuCreateTask()` to create task for each DPU kernel.
+     - Call `dpuDestroyKernel()` and `dpuDestroyTask()` to destroy DPU kernel and task.
+     - Call `dpuClose()` to close the DPU device.
+  5. Run CONV Kernel include:
+     - Get the image for processing and set it as input
+     - Run the task using `dpuRunTask()`
+     - Get the output of the kernel and Run Softmax in it if needed
+     - If your model is regression model, you can just use the result without running softmax like  
+    ```c++
+    float* res = float*(smRes.data()); float final_res = res[0] + res[1]
+    ``` 
 - What you need to modify according to your own model:
     1. Variables:
         - KERNEL_CONV, CONV_INPUT_NODE, CONV_OUTPUT_NODE
