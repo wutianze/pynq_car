@@ -3,8 +3,8 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-25 18:08:27
- * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-28 15:11:32
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2019-10-31 14:34:48
  * @Description: 
  -->
 # Summary
@@ -20,5 +20,5 @@
     * [Preparation](Pynq-Z2_AD_Car/virtual-guide/README.md)
     * [Custom Simulator](Pynq-Z2_AD_Car/virtual-guide/custom_simulator.md)
 * [More Study Cases]
-    * [ROS](ros.md)
+    * [ROS](Pynq-Z2_AD_Car/more-study/ros.md)
 
