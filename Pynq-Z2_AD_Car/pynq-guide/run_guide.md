@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-15 09:17:19
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-31 15:34:41
+ * @LastEditTime: 2019-10-31 15:39:10
  * @Description: 
  -->
 # What you will learn:
@@ -28,10 +28,10 @@ and resources management.
    1. The information you need to know after the generation of .elf using the host part of DNNDK-v3.0(If you don't know what it is, please refer to the Host part guide of this project) is:
       -  kernel name: KERNEL_CONV
       -  input node(s): CONV_INPUT_NODE
-      -  output node(s): CONV_OUTPUT_NODE
-   2. Each DPU kernel supported by the DPU has a corresponding ELF object file with a name that is the same as the kernel name prefixed by dpu_ with extension .elf. So before compiling your code, you should put the .elf files into model directory and add their names to MODEL variable in Makefile. 
-   3. The sample flow of using DPU kernel:
-         ```
+      -  output node(s): CONV_OUTPUT_NODE  
+   2. Each DPU kernel supported by the DPU has a corresponding ELF object file with a name that is the same as the kernel name prefixed by dpu_ with extension .elf. So before compiling your code, you should put the .elf files into model directory and add their names to MODEL variable in Makefile.  
+   3. The sample flow of using DPU kernel:  
+         ```  
          int main(void) {
          /* DPU Kernels/Tasks for running ResNet-50 */
          DPUKernel* kernelConv;
