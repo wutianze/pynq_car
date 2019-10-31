@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-15 09:17:19
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-31 15:52:59
+ * @LastEditTime: 2019-10-31 15:54:46
  * @Description: 
  -->
 # What you will learn:
@@ -72,12 +72,12 @@ networks.
     ``` 
 ## What you need to modify according to your own model:
 1. Variables:
-   - KERNEL_CONV, CONV_INPUT_NODE, CONV_OUTPUT_NODE
-   - vector<string> kinds: if you use classification model, you need to define your own categories
+   - `KERNEL_CONV, CONV_INPUT_NODE, CONV_OUTPUT_NODE`
+   - `vector<string> kinds`: if you use classification model, you need to define your own categories
 2. Functions:
-   - setInputImage(): Replace it with your own image pre-process way
-   - topKind(): It will use the results of softmax function and output the final kind
-   - runCV(): This function is independent of DPU usage, you can add your cv control here
+   - `setInputImage()`: Replace it with your own image pre-process way
+   - `topKind()`: It will use the results of softmax function and output the final kind
+   - `runCV()`: This function is independent of DPU usage, you can add your cv control here
    - If you use regression model, you don't need to use `topKind()` and softmax function, you should get the model output directly and add it in `addCommand()` and use it in `runCommand()`
 
 ## Run the car
