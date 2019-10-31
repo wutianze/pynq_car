@@ -47,8 +47,8 @@ void storeImage()
     outFile.open(path + "train.csv", ios::out | ios::app);
     int count = 0;
     while(count <= imgMax){
-        sleep(0.2);
-	    mtxQueueStore.lock();
+	sleep(0.1);
+	mtxQueueStore.lock();
         if(startRecord == EXIT){
             mtxQueueStore.unlock();
             break;
@@ -59,9 +59,9 @@ void storeImage()
         mtxQueueStore.unlock();
         pair<string,Mat>tmpQ;
         queueStore.wait_and_pop(tmpQ);
-        time_t now = time(0);
-        string fileName = to_string(now) + to_string(count) + ".jpg";
-   	    imwrite(path + fileName, tmpQ.second);
+        clock_t now = clock();
+        string fileName = to_string(now) + ".jpg";
+   	imwrite(path + fileName, tmpQ.second);
         outFile << fileName << ','<< tmpQ.first <<endl;
         count++;
             }
@@ -70,13 +70,15 @@ void storeImage()
 
 int main(int argc, char **argv)
 {
-    if (argc != 2) {
-          cout << "Usage of this exe: ./collect 50000"
+    if (argc != 4) {
+          cout << "Usage of this exe: ./collect 50000(img number to collect) 0.23(run speed) 0/1(1 means see the image)"
              << endl;
         return -1;
       }
     // nn means just use ml, cv means use ml & cv.
     imgMax = atoi(argv[1]);
+    float runSpeed = atof(argv[2]);
+    int seeImg = atoi(argv[3]);
     PYNQZ2 controller = PYNQZ2();
 
     VideoCapture cap(0);
@@ -87,33 +89,42 @@ int main(int argc, char **argv)
     {
         mkdir(path.c_str(), 0777);
     }
+    bool firstStart = true;
+    if(seeImg == 0)namedWindow("just get key");
     thread storeThread = thread(storeImage);
     while (startRecord != EXIT)
     {
         cap >> image;
-        imshow("car see", image);
+	if(seeImg==1)imshow("car see", image);
         char c = (char)waitKey(1);
-        cout << c << endl;
+        //cout << c << endl;
         switch (c)
         {
         case 'w':
             controller.steerSet(0);
-            controller.throttleSet(0.5);
+	    controller.throttleSet(runSpeed);
             controller.setLeds(1);
+	    if(firstStart){
+	    	controller.steerSet(0);
+		controller.throttleSet(0.37);
+		controller.setLeds(15);
+		firstStart=false;
+	    }
             break;
         case 'a':
-            controller.steerSet(-0.5);
-            controller.throttleSet(0.5);
+            controller.steerSet(-1.0);
+            controller.throttleSet(runSpeed);
             controller.setLeds(2);
             break;
         case 's':
             controller.steerSet(0);
             controller.throttleSet(0);
             controller.setLeds(4);
+	    firstStart = true;
             break;
         case 'd':
-            controller.steerSet(0.5);
-            controller.throttleSet(0.5);
+            controller.steerSet(1.0); 
+            controller.throttleSet(runSpeed);
             controller.setLeds(8);
             break;
 	    case 't':
@@ -132,6 +143,6 @@ int main(int argc, char **argv)
     }
     storeThread.join();
     destroyAllWindows();
-
+    cap.release();
     return 0;
 }

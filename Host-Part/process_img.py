@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Please set LastEditors
-@LastEditTime: 2019-10-25 17:19:47
+@LastEditTime: 2019-10-30 10:32:52
 @Description: 
 '''
 import os
@@ -26,20 +26,7 @@ def image_handle(img):
     #print(img)
     #image = np.asarray(img)
     #img.reshape((img.shape[0],img.shape[1],img.shape[2]))
-    return (img)/255.0
-
-CONV_INPUT = "conv2d_1_input"
-calib_batch_size = 50
-def calib_input(iter):
-  images = []
-  path = "/home/sauron/pynq_car/sdsandbox/sdsim/lsr-pid2/"
-  files = os.listdir(path)
-  for index in range(0, calib_batch_size):
-    if files[iter*calib_batch_size+index] == "train.csv":
-        continue
-    image = image_handle(cv2.imread(path + files[iter*calib_batch_size + index]))
-    images.append(image)
-  return {CONV_INPUT: images}
+    return (img[40:,:])/255.0-0.5
 
 def process_img(img_path, key):
     image_array = cv2.imread(img_path)
@@ -72,7 +59,7 @@ if __name__ == '__main__':
     with open(path+"/train.csv") as f:
         files = list(csv.reader(f))
         image_for_shape = cv2.imread(path+'/'+files[0][0])
-        IMAGE_SHAPE[0] = image_for_shape.shape[0]
+        IMAGE_SHAPE[0] = image_for_shape.shape[0]-40
         IMAGE_SHAPE[1] = image_for_shape.shape[1]
         IMAGE_SHAPE[2] = image_for_shape.shape[2]
         OUTPUT_NUM = len(files[0]) - 1

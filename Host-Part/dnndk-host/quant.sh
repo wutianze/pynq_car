@@ -3,8 +3,8 @@
  # @GitHub: wutianze
  # @Email: 1369130123qq@gmail.com
  # @Date: 2019-09-19 12:44:02
- # @LastEditors: Sauron Wu
- # @LastEditTime: 2019-10-15 15:25:14
+ # @LastEditors: Please set LastEditors
+ # @LastEditTime: 2019-10-29 15:35:03
  # @Description: 
  ###
 #!/bin/bash
@@ -25,14 +25,14 @@ echo "#####################################"
 echo "QUANTIZE"
 echo "#####################################"
 decent_q quantize \
-  --input_frozen_graph ../model.pb \
+  --input_frozen_graph ./model.pb \
   --input_nodes conv2d_1_input \
   --input_shapes ?,80,160,3 \
   --output_nodes dense_3/Softmax \
   --method 1 \
-  --input_fn ../process_img.calib_input \
+  --input_fn graph_input_fn.calib_input \
   --gpu 0 \
-  --calib_iter 10
+  --calib_iter 200
 
 echo "#####################################"
 echo "QUANTIZATION COMPLETED"

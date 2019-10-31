@@ -3,8 +3,8 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-14 14:57:47
- * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-17 14:48:18
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2019-10-30 10:34:52
  * @Description: 
  -->
 # What you will learn:
@@ -25,7 +25,7 @@ chmod +x ./ini.sh
 Compile the code and try.
 ```shell
 make collect
-./build/collect 50000 # 50000 means how many pictures you need to collect
+./build/collect 50000 0.5 # 50000 means how many pictures you need to collect, 0.5 means the speed of your car
 ```
 Now you will see a small window in your PC and you can use your keyboard to control your car:
 - w: move forward

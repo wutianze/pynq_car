@@ -28,6 +28,7 @@
 #include <vector>
 #include <thread>
 #include "control.h"
+#include<csignal>
 using namespace cv;
 using namespace std;
 using namespace std::chrono;
@@ -39,21 +40,21 @@ string mode;
 #define CVCONTROL 1
 // commander indicates the car is controlled by AI or opencv currently
 mutex commanderLock;
+mutex exitLock;
 mutex timeLock;
+bool EXIT = false;
 int commander = NNCONTROL;
-time_t timeSet;
+clock_t timeSet;
 safe_queue<Mat> takenImages;
 safe_queue<int> generatedCommands;
-//vector<string> kinds = {"left", "forward", "right", "stop"};
-vector<string> kinds = {"steer"};
-
-#define KERNEL_CONV "testModel"
+vector<string> kinds = {"left", "forward", "right"};
+//vector<string> kinds = {"steer"};
+float runSpeed;
+#define KERNEL_CONV "testModel_0"
 #define CONV_INPUT_NODE "conv2d_1_convolution"
-#define CONV_OUTPUT_NODE "dense_2_MatMul"
+#define CONV_OUTPUT_NODE "dense_3_MatMul"
 
-#define TASKNUM 3
-#define THREADNUM 6 //THREADNUM should be TASKNUM + 3
-
+#define TASKNUM 1
 //#define SHOWTIME
 #ifdef SHOWTIME
 #define _T(func)                                                              \
@@ -70,6 +71,15 @@ vector<string> kinds = {"steer"};
 #else
 #define _T(func) func;
 #endif
+
+void sig_handler(int sig){
+cout<<"SIGTSTP resceived\n";
+if(sig == SIGTSTP){
+	exitLock.lock();
+	EXIT = true;
+	exitLock.unlock();
+}
+}
 
 // the input image is in BGR format(opencv default), and the '/255 - 0.5' must be the same when you 
 // train the model, don't forget to multiply the scale finally
@@ -91,6 +101,7 @@ int topKind(const float *d, int size)
     assert(d && size > 0);
     int result = 0;
     float maxx = d[0];
+    //d[1]=d[1] -0.1;
     for (auto i = 0; i < size; ++i)
     {
         if (d[i] > maxx)
@@ -99,17 +110,19 @@ int topKind(const float *d, int size)
             result = i;
         }
     }
+    cout<<"result:"<<d[0]<<", "<<d[1]<<", "<<d[2]<<", \n";
     return result;
 }
 
 #define COMMANDMAXLEN 3
 void addCommand(int com){
     timeLock.lock();
-    time_t now = time(0);
+    clock_t now = clock();
     if(now < timeSet){
         timeLock.unlock();
         return;
     }else{
+    	//cout<<"FPS:"<<CLOCKS_PER_SEC/float(now-timeSet)<<endl;
         timeSet = now;
     }
     timeLock.unlock();
@@ -123,28 +136,37 @@ void addCommand(int com){
 }
 
 void run_model(DPUTask* task){
+    cout<<"Run Model\n";
     int channel = kinds.size();
     vector<float> smRes(channel);
-    int8_t *fcRes;
+
     Mat tmpImage;
     while (1)
     {
+	exitLock.lock();
+	if(EXIT)break;
+	else{
+	exitLock.unlock();
+	}
         commanderLock.lock();
         if(commander == CVCONTROL){
             commanderLock.unlock();
             continue;
         }
         commanderLock.unlock();
-        takenImages.wait_and_pop(tmpImage);
+        if(!takenImages.try_pop(tmpImage))continue;
+	//takenImages.wait_and_pop(tmpImage);
         _T(setInputImage(task, CONV_INPUT_NODE, tmpImage));
         //dpuSetInputImage2(task,CONV_INPUT_NODE, tmpImage);
         _T(dpuRunTask(task));
         float scale = dpuGetOutputTensorScale(task, CONV_OUTPUT_NODE);
-        modelRes = dpuGetTensorAddress(dpuGetOutputTensor(task, CONV_OUTPUT_NODE));
+        int8_t* modelRes = dpuGetTensorAddress(dpuGetOutputTensor(task, CONV_OUTPUT_NODE));
         _T(dpuRunSoftmax(modelRes, smRes.data(), channel, 1, scale));
 
         addCommand(topKind(smRes.data(), channel));        
     }
+    exitLock.unlock();
+    cout<<"Run Model Exit\n";
 }
 
 int cv_al1(Mat image){
@@ -152,10 +174,17 @@ int cv_al1(Mat image){
 }
 
 void run_cv(){
+    cout<<"Run CV\n";
     if(mode[0] == 'n')return;
     Mat tmpImage;
     while(true){
-        takenImages.wait_and_pop(tmpImage);
+	exitLock.lock();
+	if(EXIT)break;
+	else{
+	exitLock.unlock();
+	}
+        if(!takenImages.try_pop(tmpImage))continue;
+	//takenImages.wait_and_pop(tmpImage);
         int tmpCommand = cv_al1(tmpImage);
         if(tmpCommand == 0)continue;
         commanderLock.lock();
@@ -165,55 +194,84 @@ void run_cv(){
         }
         commanderLock.unlock();
     }
+    exitLock.unlock();
+    cout<<"Run CV Exit\n";
 }
 
-#define IMAGEMAXLEN 5
+#define IMAGEMAXLEN 10 
 void run_camera(){
+    cout<<"Run Camera\n";
     VideoCapture cap(0);
     cap.set(CV_CAP_PROP_FRAME_WIDTH, 160);
-    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 80);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 120);
     Mat image;
     while(true){
+	exitLock.lock();
+	if(EXIT)break;
+	else{
+	exitLock.unlock();
+	}
         cap >> image;
         int nowSize = takenImages.size();
         if(nowSize >= IMAGEMAXLEN){
-            if(takenImages.try_pop())takenImages.push(image);
+            if(takenImages.try_pop())takenImages.push(image.rowRange(40,image.rows).clone());
         }else{
-            takenImages.push(image);
+            takenImages.push(image.rowRange(40,image.rows).clone());
         }
     }
+    exitLock.unlock();
+    cout<<"Run Camera Exit\n";
     cap.release();
 }
 
 void run_command(){
+    cout<<"Run Command\n";
     PYNQZ2 controller = PYNQZ2();
-    controller.throttleSet(0.5);
+    controller.throttleSet(0.0);
+    controller.throttleSet(1.0);
+    sleep(0.1);
+    controller.throttleSet(runSpeed);
     while(true){
+	exitLock.lock();
+	if(EXIT){
+		break;
+		controller.steerSet(0.0);
+		controller.throttleSet(0.0);
+	}
+	else{
+	exitLock.unlock();
+	}
         int tmpC;
-        generatedCommands.wait_and_pop(tmpC);
-        cout<<"the command is:"<<tmpC<<endl;
+        if(!generatedCommands.try_pop(tmpC))continue;
+	//generatedCommands.wait_and_pop(tmpC);
+    //    cout<<"the command is:"<<tmpC<<endl;
         switch(tmpC){
             case 0:
-            controller.steerSet(-0.5);
+            controller.steerSet(-1.0);
             break;
             case 1:
             controller.steerSet(0);
             break;
             case 2:
-            controller.steerSet(0.5);
+            controller.steerSet(1.0);
             break;
         }
     }
+    exitLock.unlock();
+    cout<<"Run Command Exit\n";
     }
 
 int main(int argc, char **argv)
 {
-     if (argc != 2) {
-        cout << "Usage of this exe: ./car c/n"<< endl;
+     if (argc != 3) {
+        cout << "Usage of this exe: ./car c/n 0.5(run speed)"<< endl;
         return -1;
       }
+
+    signal(SIGTSTP,sig_handler);
     // n means just use ml, c means use ml & cv.
     mode = argv[1];
+    runSpeed = atof(argv[2]);
     /* The main procress of using DPU kernel begin. */
     DPUKernel *kernelConv;
 
@@ -221,19 +279,20 @@ int main(int argc, char **argv)
     kernelConv = dpuLoadKernel(KERNEL_CONV);
     vector<DPUTask*> tasks(TASKNUM);
     generate(tasks.begin(),tasks.end(),std::bind(dpuCreateTask,kernelConv,0));    
-    array<thread,THREADNUM> threads = {
-        thread(run_model, tasks[0]),
-        thread(run_model, tasks[1]),
-        thread(run_model, tasks[2]),
-        thread(run_command),
-        thread(run_camera),
-        thread(run_cv)
-    };
-
-    for(int i = 0; i < THREADNUM; i++){
-        threads[i].join();
-        cout<<"one exit"<<endl;
+    vector<thread> threads;
+    for(int i=0;i<TASKNUM;i++){
+    	threads.push_back(thread(run_model,tasks[i]));
     }
+    threads.push_back(thread(run_command));
+    threads.push_back(thread(run_camera));
+    if(mode[0]=='c'){
+    threads.push_back(thread(run_cv));
+    }
+    for(int i = 0; i < threads.size(); i++){
+        threads[i].join();
+        cout<<"one exit:"<<i<<endl;
+    }
+
     for_each(tasks.begin(),tasks.end(),dpuDestroyTask);
 
     dpuDestroyKernel(kernelConv);

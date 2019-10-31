@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-23 10:12:28
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-24 10:50:21
+ * @LastEditTime: 2019-10-31 15:19:15
  * @Description: 
  -->
 # Introduction
@@ -38,14 +38,20 @@ python src/predict_server.py --model=path-to-your-model/model.h5
 ## Generate training data
 
 1) Load the Unity project Virtual-Part/simulator in Unity.  
+![Step 1](./1.PNG)  
 
-2) Create a dir for example Virtual-Part/simulator/log.  
+2) Hit the start arrow in Unity to launch project.  
+![Step 2](./2.PNG)
 
-3) Hit the start arrow in Unity to launch project.  
+3) Select `Set Log Dir` to choose the directory where you want to store the generated data.
+![Step 3](./3.PNG)
 
-4) Hit button "Generate Training Data" to generate image and steering training data. See simulator/log for output files.  
+4) Hit button "Generate Training Data" to generate image and steering training data. See the directory for output files. 
+![Step 4](./4.PNG) 
 
 5) When the road comes to an end, just stop the generating process and generate another road, then start the process again.
+![Step 5.1](./5.PNG)
+![Step 5.2](./6.PNG)
 
 6) The default pictures to collect is 50000, the guide will teach you how to change it later.
 

@@ -14,7 +14,7 @@ CUR_DIR =   $(shell pwd)
 SRC     =   $(CUR_DIR)/src
 BUILD   =   $(CUR_DIR)/build
 VPATH   =   $(SRC)
-MODEL   =   $(CUR_DIR)/model/dpu_test.elf
+MODEL   =   $(CUR_DIR)/model/dpu_testModel_0.elf
 ARCH    =     $(shell uname -m | sed -e s/arm.*/armv71/ \
 	-e s/aarch64.*/aarch64/ )
 

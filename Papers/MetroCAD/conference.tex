@@ -7,10 +7,13 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
+\usepackage[textwidth=18.5cm]{geometry}
+\usepackage{blindtext}
+\parindent=0pt
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
-
+\begin{sloppypar}
 \title{Hydra Mini}
 
 \author{\IEEEauthorblockN{1\textsuperscript{st} Tianze Wu}
@@ -19,6 +22,17 @@
 {University of Chinese Academy of Sciences}\\
 Beijing, China \\
 wutianze@ict.ac.cn}
+\IEEEauthorblockN{2\textsuperscript{st} Weisong Shi}
+\IEEEauthorblockA{
+\textit{Wayne State University}\\
+{Insititute Of Computing Technology Chinese Academy Of Sciences}\\
+Detroit, US \\
+weisong@wayne.edu}
+\IEEEauthorblockN{3\textsuperscript{st} Joshual Lu}
+\IEEEauthorblockA{
+\textit{Xilinx}\\
+Shanghai, China\\
+joshual@xilinx.com}
 }
 \maketitle
 
@@ -161,15 +175,33 @@ Third, you will use DNNDK\cite{b17} provided by Xilinx to do the compression and
 
 Finally, the car can move by itself. It will be controlled by AI models or other algorithms added. 
 
-\subsection{Simulator Use}
-
-
+\subsection{Simulator}
+The simulator is a tool which can help users test their designs more efficiently. You can see the interface of the simulator in Fig.~\ref{si}. The simulator is based on sdsandbox\cite{b5} which is a simulator project for Donkey Car\cite{b34}. As you can see in the picture, the users can use this simulator to collect training data and test their models. 
+When testing, you should build a server, the server will receive sensor data from the client of the simulator and generate control messages according to these data. We have already built one example, the server will get images taken by simulator and handles them using the AI model trained before, then the model output control commands and these commands will be sent to the simulator.
+It's also convenient for users to modify the source code of the simulator to define their own data format or control methods. However, users should be familiar with C\# and Unity3d if they would like to do so, and we provide some coding tutorial manual to help.
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=0.5\textwidth,height=0.5\textheight]{simulator.png}}
+\centerline{\includegraphics[width=0.5\textwidth]{simulator.png}}
 \caption{Simulator Interface.}
 \label{si}
 \end{figure}
+
+\subsection{ROS Usage}
+Due to the high impact of ROS, we make our platform able to support ROS projects. The version we use is ROS Melodic\cite{b35} which is mainly used in Ubuntu18.04. 
+
+This time we show how to read LiDAR data and control the car using ROS. With Lidar data, the car can handle obstacle avoidance tasks and SLAM\cite{b36} tasks whose basical technology is Lidar data processing.
+The Lidar we use is LeiShen LS01D\cite{b37}, LeiShen has already provided one ROS node for users to gain and publish Lidar data. We can read the  laser point cloud data by subscribing the published topic. Also, it will be more visualized to use RViz\cite{b38}, Fig.~\ref{ld} is one example.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{laser.png}}
+\caption{Lidar Data.}
+\label{ld}
+\end{figure}
+
+The control node of the car is a transplantation of code from existing controller. It's easy to send control commands by publishing commands to corresponding topic. As we can see, it's easy for users to build their projects based on ROS in our platform. Since ROS is widely used, it's important that our platform can help users who want to try ROS.
+
+\section{Conclusion}
+In this paper, we present the design, implementation, characteristics and case studies of xxx, an experimental research and education platform for autonomous driving. The platform is highly flexible and extensible, full stack, and easy-to-use. These three characteristics can help users understand AD technology well and take full advantage of xxx. Students and researchers can use our platform for full-stack researches on algorithms, applications, system, mechanical control and hardware acceleration. We hope this platform can help users enjoy their research and learning process.
 
 
 \begin{thebibliography}{00}
@@ -189,15 +221,11 @@ of the ACM, 51(1):107–113, 2008.
 
 \bibitem{b7} ReleaseNotes Ubuntu 18.04 [ONLINE] Available at: https://wiki.ubuntu.com/
 
-\bibitem{b8} TUL ARM Cortex-A9 [ONLINE] Available at: https://developer.arm.com/http://www.armdesigner.com/MINI3188/?gclid=Cj0KCQjwi7DtBRCLARIsAGCJWBpdSiwajASBuoCjuPR9pprkW7iJOfAQnCIpNK\_eJhz35TM5WoY2fYIaAhYYEALw\_wcB
+\bibitem{b8} TUL ARM Cortex-A9 [ONLINE] Available at: https://developer.arm.com/http://www.armdesigner.com/
 
 \bibitem{b9} Wang, Yifan, Liangkai Liu, Xingzhou Zhang, and Weisong Shi. "HydraOne: An indoor experimental research and education platform for CAVs." In 2nd {USENIX} Workshop on Hot Topics in Edge Computing (HotEdge 19). 2019.
 
-\bibitem{b10} Junqing Wei, Jarrod M Snider, Junsung Kim, John M
-Dolan, Raj Rajkumar, and Bakhtiar Litkouhi. Towards
-a viable autonomous driving research platform. In 2013
-IEEE Intelligent Vehicles Symposium (IV), pages 763–
-770. IEEE, 2013.
+\bibitem{b10} Junqing Wei, Jarrod M Snider, Junsung Kim, John M Dolan, Raj Rajkumar, and Bakhtiar Litkouhi. Towards a viable autonomous driving research platform. In 2013 IEEE Intelligent Vehicles Symposium (IV), pages 763–770. IEEE, 2013.
 
 \bibitem{b11} O'Kelly, Matthew, Varundev Sukhil, Houssam Abbas, Jack Harkins, Chris Kao, Yash Vardhan Pant, Rahul Mangharam et al. "F1/10: An Open-Source Autonomous Cyber-Physical Platform." arXiv preprint arXiv:1901.08567 (2019).
 
@@ -211,7 +239,7 @@ IEEE Intelligent Vehicles Symposium (IV), pages 763–
 
 \bibitem{b16} Tensor\_processing\_unit, Wikipedia [ONLINE] Available at: https://en.wikipedia.org/wiki/Tensor\_processing\_unit
 
-\bibitem{b17} TUL DNNDK [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/ai\_inference /v1\_5
+\bibitem{b17} TUL DNNDK [ONLINE] Available at: https://www.xilinx.com/support/documentation/sw\_manuals/
 
 \bibitem{b18} Producer–consumer problem, Wikipedia [ONLINE] Available at: https://en.wikipedia.org/wiki/Producer\_consumer\_problem
 
@@ -243,8 +271,19 @@ IEEE Intelligent Vehicles Symposium (IV), pages 763–
 
 \bibitem{b32} M. Rizon et al., 2005, "Object Detection using Circular Hough Transform", American Journal of Applied Sciences 2, vol 12, pp. 1606-1609.
 
-\bibitem{33} TensorFlow [ONLINE] Available at: https://www.tensorflow.org
-\end{thebibliography}
-\vspace{12pt}
+\bibitem{b33} TensorFlow [ONLINE] Available at: https://www.tensorflow.org
 
+\bibitem{b34} Donkey Car [ONLINE] Available at: https://www.donkeycar.com
+
+\bibitem{b35} ROS Melodic [ONLINE] Available at: http://wiki.ros.org/melodic/
+
+\bibitem{b36} SLAM [ONLINE] Available at: https://en.wikipedia.org/wiki/ Simultaneous\_localization\_and\_mapping
+
+\bibitem{b37} LeiShen Lidar LS01D [ONLINE] Available at: https://github.com/leishen-lidar/LS01D
+
+\bibitem{b38} TUL RViz [ONLINE] Available at: http://wiki.ros.org/rviz
+\end{thebibliography}
+
+\vspace{12pt}
+\end{sloppypar}
 \end{document}
