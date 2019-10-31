@@ -37,7 +37,7 @@ joshual@xilinx.com}
 \maketitle
 
 \begin{abstract}
-Autonomous driving is a hot topic currently, many companies and research institutions have put a lot of effort into the topic. In this paper, we present xx car, an experimental research and education platform for autonomous driving. xx is based on Xilinx Pynq-Z2 and also uses the power of Deep learning Processing Unit(DPU) to accelerate the inference process and provides a simulator for training and testing in virtual environment. Our platform can help researchers and students who want to try autonomous driving or hardware accelerating build their own solutions and test it efficiently. We hope the xxx car meets three requirements: affordable, easy to understand and easy to use. 
+Autonomous driving is a hot topic currently, many companies and research institutions have put a lot of effort into the topic. In this paper, we present xx car, an affordable experimental research and education platform for autonomous driving. xx is based on Xilinx Pynq-Z2 and also uses the power of Deep learning Processing Unit(DPU) in FPGA to accelerate the inference process and provides a simulator for training and testing in virtual environment. Our platform can help researchers and students who want to try autonomous driving or hardware accelerating build their own solutions and test it efficiently. We hope the xxx car meets three requirements: affordable, easy to understand and easy to use. 
 \end{abstract}
 
 %\begin{IEEEkeywords}
@@ -45,7 +45,7 @@ Autonomous driving is a hot topic currently, many companies and research institu
 %\end{IEEEkeywords}
 
 \section{Introduction}
-With the development of AI technology, many work can be done by robot instead of human. Driving is one of these tasks and autonomous driving(AD) has become more and more popular these years. We can see from Google Trends of the keyword 'autonomous driving' from 2010 to 2019 in Fig.~\ref{st}, it's obvious that AD technology will be one of the hot topics of AI. The reason why this topic is so hot is that AD is not one single technology, but rather a highly complex system that consists of many sub-systems\cite{b1}, it's the area where any researcher can make contributions.
+With the development of AI technology, many work can be done by robot instead of human. Driving is one of these tasks and autonomous driving(AD) has become more and more popular these years. We can see from Google Trends of the keyword 'autonomous driving' from 2012 to 2019 in Fig.~\ref{st}, it's obvious that AD technology will be one of the hot topics of AI. The reason why this topic is so hot is that AD is not one single technology, but rather a highly complex system that consists of many sub-systems\cite{b1}, it's the area where any researcher can make contributions.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.5\textwidth]{search_result.PNG}}
@@ -57,9 +57,9 @@ As a result, there will be more people trying to learn about AD technology. So a
 
 In the cloud computing domain, researchers usually want to own machines that have good computation performance. The data center based on virtualization technology\cite{b2} and distributed computing\cite{b3} nowadays usually has many powerful servers for data processing. Also, for AD tasks, accelerating the inference process through hardware is becoming more and more common and indispensable, it's the cornerstone of the development of AD and all the researchers and students should pay enough attention to it. However, when comes to systems in the car, we should care about not only the computing power but also the power consumption and cost. It's a pity that we can hardly find one product that can provide both enough computing power and hardware acceleration but remains affordable for most of the people.
 
-To make everyone have the opportunity to participate in the research of AD, we propose xxx, an indoor experimental research and education platform for AD. The platform was first designed for the design competition of FPT 2019\cite{}, then we find the potential of this design and decide to make the project a common platform for researchers and students. As shown in Fig.~\ref{ov}, xxx is a powerful and flexible platform from hardware to software. It depends on three main components: mechanical component, control system and FPGA accelerator. We also provide a simulator using Unity3d\cite{b4} based on sdsandbox\cite{b5} that can make the users test their design more conveniently. All the resources on xxx are managed by Pynq-Z2\cite{b6} system which is based on Ubuntu 18.04\cite{b7}. 
+To make everyone have the opportunity to participate in the research of AD, we propose xxx, an indoor experimental research and education platform for AD. The platform was first designed for the design competition of FPT 2019\cite{b39}, then we find the potential of this design and decide to make the project a common platform for researchers and students. As shown in Fig.~\ref{ov}, xxx is a powerful and flexible platform from hardware to software. It depends on three main components: mechanical component, control system and FPGA accelerator. We also provide a simulator using Unity3d\cite{b4} based on sdsandbox\cite{b5} that can make the users test their design more conveniently. All the resources on xxx are managed by Pynq-Z2\cite{b6} system which is based on Ubuntu 18.04\cite{b7}. 
 
-Users can use the computing power in Pynq-Z2 includes both FPGA which can be used as a specialized hardware accelerator and an Arm 32-bit core ARM Cortex-A9\cite{b8} which is familiar to normal people. We believe that in the future the hardware acceleration will become an imperative for the modern cars to provide edge computing power, so it's necessary to embed FPGA which is flexible for researching in our platform. Users will find it easy to do research on multi-area of AD and develop their own algorithms and systems based on xxx.
+Users can use the computing power in Pynq-Z2 includes both Zynq7020 FPGA\cite{b40} which can be used as a specialized hardware accelerator and an Arm 32-bit core ARM Cortex-A9\cite{b8} which is familiar to normal people. We believe that in the future the hardware acceleration will become an imperative for the modern cars to provide edge computing power, so it's necessary to embed FPGA which is flexible for researching in our platform. Users will find it easy to do research on multi-area of AD and develop their own algorithms and systems based on xxx.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.5\textwidth]{car.jpg}}
@@ -282,6 +282,10 @@ of the ACM, 51(1):107–113, 2008.
 \bibitem{b37} LeiShen Lidar LS01D [ONLINE] Available at: https://github.com/leishen-lidar/LS01D
 
 \bibitem{b38} TUL RViz [ONLINE] Available at: http://wiki.ros.org/rviz
+
+\bibitem{b39} Wu, Tianze, Weiyi Liu, and Yongwei Jin. An End-to-End solution to Autonomous Driving based on Xilinx FPGA. No. 1680. EasyChair, 2019.
+
+\bibitem{b40} Zynq Xilinx [ONLINE] Available at: https://www.xilinx.com/products/silicon-devices/soc/zynq-7000.html
 \end{thebibliography}
 
 \vspace{12pt}
