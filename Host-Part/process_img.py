@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors: Please set LastEditors
-@LastEditTime: 2019-10-30 10:32:52
+@LastEditTime: 2019-11-01 17:10:00
 @Description: 
 '''
 import os
@@ -52,19 +52,17 @@ if __name__ == '__main__':
     parser.add_argument('--path', type=str, help='images dir', default="/home/xilinx/virtual-images")
     parser.add_argument('--store', type=str, help='npz store dir', default="/home/xilinx/pynq_car/Host-Part/process_command255")
     parser.add_argument('--method', type=int, help='whether to reduce some categories\' number, 0 for true', default=0)
+    parser.add_argument('--filter_size', type=int, help='size of smallest file', default=9000)
     args = parser.parse_args()
     path = args.path
     names = []
     keys = {}
     with open(path+"/train.csv") as f:
         files = list(csv.reader(f))
-        image_for_shape = cv2.imread(path+'/'+files[0][0])
-        IMAGE_SHAPE[0] = image_for_shape.shape[0]-40
-        IMAGE_SHAPE[1] = image_for_shape.shape[1]
-        IMAGE_SHAPE[2] = image_for_shape.shape[2]
-        OUTPUT_NUM = len(files[0]) - 1
-        print("OUTPUT_NUM is:%d"%OUTPUT_NUM)    
         for row in files:
+            if (not(os.path.exists(path+'/'+row[0]))) or os.path.getsize(path+'/'+row[0]) < args.filter_size:
+                continue
+            
             if args.method == 0:
                 if float(row[1]) == 0: # this should be set according to your training data
                     randNum = random.randint(0,10)
@@ -76,6 +74,12 @@ if __name__ == '__main__':
             for i in range(1,len(row)):
                 tmp.append(float(row[i]))
             keys[row[0]] = tmp
+    image_for_shape = cv2.imread(path+'/'+names[0])
+    IMAGE_SHAPE[0] = image_for_shape.shape[0]-40
+    IMAGE_SHAPE[1] = image_for_shape.shape[1]
+    IMAGE_SHAPE[2] = image_for_shape.shape[2]
+    OUTPUT_NUM = len(files[0]) - 1
+    print("OUTPUT_NUM is:%d"%OUTPUT_NUM)    
     turns = int(math.ceil(len(names) / CHUNK_SIZE))      
     print("number of files: {}".format(len(names)))
     print("turns: {}".format(turns))

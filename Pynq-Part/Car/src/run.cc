@@ -46,7 +46,7 @@ bool EXIT = false;
 int commander = NNCONTROL;
 clock_t timeSet;
 safe_queue<Mat> takenImages;
-safe_queue<int> generatedCommands;
+safe_queue<float> generatedCommands;
 vector<string> kinds = {"left", "forward", "right"};
 //vector<string> kinds = {"steer"};
 float runSpeed;
@@ -128,6 +128,27 @@ void addCommand(int com){
     timeLock.unlock();
     int nowSize = generatedCommands.size();
     if( nowSize >= COMMANDMAXLEN){
+        if(generatedCommands.try_pop())generatedCommands.push(float(com));
+        return;
+    }else{
+        generatedCommands.push(float(com));
+    }
+}
+
+#define COMMANDMAXLEN 3
+void addSteer(float com){
+    timeLock.lock();
+    clock_t now = clock();
+    if(now < timeSet){
+        timeLock.unlock();
+        return;
+    }else{
+    	//cout<<"FPS:"<<CLOCKS_PER_SEC/float(now-timeSet)<<endl;
+        timeSet = now;
+    }
+    timeLock.unlock();
+    int nowSize = generatedCommands.size();
+    if( nowSize >= COMMANDMAXLEN){
         if(generatedCommands.try_pop())generatedCommands.push(com);
         return;
     }else{
@@ -161,9 +182,9 @@ void run_model(DPUTask* task){
         _T(dpuRunTask(task));
         float scale = dpuGetOutputTensorScale(task, CONV_OUTPUT_NODE);
         int8_t* modelRes = dpuGetTensorAddress(dpuGetOutputTensor(task, CONV_OUTPUT_NODE));
-        _T(dpuRunSoftmax(modelRes, smRes.data(), channel, 1, scale));
-
-        addCommand(topKind(smRes.data(), channel));        
+	//_T(dpuRunSoftmax(modelRes, smRes.data(), channel, 1, scale));
+	addCommand(((float*)smRes.data())[0]);
+        //addCommand(topKind(smRes.data(), channel));        
     }
     exitLock.unlock();
     cout<<"Run Model Exit\n";
@@ -261,6 +282,29 @@ void run_command(){
     cout<<"Run Command Exit\n";
     }
 
+void run_steer(){
+    cout<<"Run Command\n";
+    PYNQZ2 controller = PYNQZ2();
+    controller.throttleSet(runSpeed);
+    while(true){
+	exitLock.lock();
+	if(EXIT){
+		break;
+		controller.steerSet(0.0);
+		controller.throttleSet(0.0);
+	}
+	else{
+	exitLock.unlock();
+	}
+        float tmpS;
+        if(!generatedCommands.try_pop(tmpS))continue;
+    		controller.steerSet(tmpS);
+    }
+    exitLock.unlock();
+    cout<<"Run Steer Exit\n";
+    }
+
+
 int main(int argc, char **argv)
 {
      if (argc != 3) {
@@ -283,7 +327,8 @@ int main(int argc, char **argv)
     for(int i=0;i<TASKNUM;i++){
     	threads.push_back(thread(run_model,tasks[i]));
     }
-    threads.push_back(thread(run_command));
+    //threads.push_back(thread(run_command));
+    threads.push_back(thread(run_steer));
     threads.push_back(thread(run_camera));
     if(mode[0]=='c'){
     threads.push_back(thread(run_cv));

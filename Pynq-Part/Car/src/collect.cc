@@ -7,6 +7,7 @@
  * @LastEditTime: 2019-10-22 11:34:28
  * @Description: 
  */
+#include <cmath>
 #include <assert.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -61,11 +62,13 @@ void storeImage()
         queueStore.wait_and_pop(tmpQ);
         clock_t now = clock();
         string fileName = to_string(now) + ".jpg";
-   	imwrite(path + fileName, tmpQ.second);
+        imwrite(path + fileName, tmpQ.second);
         outFile << fileName << ','<< tmpQ.first <<endl;
         count++;
+	if(count%1000 ==0)cout<<"now count:"<<count<<endl;
             }
     outFile.close();
+    cout<<"get enough imgs:"<<count<<"\n";
 }
 
 int main(int argc, char **argv)
@@ -89,7 +92,6 @@ int main(int argc, char **argv)
     {
         mkdir(path.c_str(), 0777);
     }
-    bool firstStart = true;
     if(seeImg == 0)namedWindow("just get key");
     thread storeThread = thread(storeImage);
     while (startRecord != EXIT)
@@ -98,38 +100,32 @@ int main(int argc, char **argv)
 	if(seeImg==1)imshow("car see", image);
         char c = (char)waitKey(1);
         //cout << c << endl;
-        switch (c)
+        //cout<<controller.nowS->steerRate<<endl;
+	switch (c)
         {
         case 'w':
-            controller.steerSet(0);
-	    controller.throttleSet(runSpeed);
+            //controller.steerSet(0);
+            controller.throttleSet(-runSpeed);
             controller.setLeds(1);
-	    if(firstStart){
-	    	controller.steerSet(0);
-		controller.throttleSet(0.37);
-		controller.setLeds(15);
-		firstStart=false;
-	    }
             break;
         case 'a':
-            controller.steerSet(-1.0);
-            controller.throttleSet(runSpeed);
+            controller.steerChange(-0.8);
+            //controller.throttleSet(runSpeed);
             controller.setLeds(2);
             break;
         case 's':
-            controller.steerSet(0);
+            //controller.steerSet(0.2);
             controller.throttleSet(0);
             controller.setLeds(4);
-	    firstStart = true;
             break;
         case 'd':
-            controller.steerSet(1.0); 
-            controller.throttleSet(runSpeed);
+            controller.steerChange(0.8); 
+            //controller.throttleSet(runSpeed);
             controller.setLeds(8);
             break;
-	    case 't':
+	case 't':
             mtxQueueStore.lock();
-	        startRecord = STARTRECORD;
+	    startRecord = STARTRECORD;
             mtxQueueStore.unlock();
 	        cout<<"Start Record\n";
 	        break;
@@ -137,7 +133,25 @@ int main(int argc, char **argv)
             mtxQueueStore.lock();
             startRecord = EXIT;
             mtxQueueStore.unlock();
-        }
+            break;
+        default:
+            {
+                float nowF = controller.nowS->steerRate;
+            if(nowF >0){
+		    if(nowF-0.4>=0){
+                controller.steerChange(-0.4);}
+		    else{
+		    controller.steerSet(0.0);
+		    }
+            }else if(nowF<0){
+		    if(nowF+0.4<=0){
+            controller.steerChange(0.4);}
+		    else{
+		    controller.steerSet(0.0);
+		    }
+            }
+            }
+            }
         string oneRecord = controller.to_record();
         queueStore.push(make_pair(oneRecord,image));
     }
