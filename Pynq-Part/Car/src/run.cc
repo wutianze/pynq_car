@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-21 17:51:30
+ * @LastEditTime: 2019-11-12 14:52:58
  * @Description: 
  */
 #include <assert.h>
@@ -164,11 +164,11 @@ void run_model(DPUTask* task){
     Mat tmpImage;
     while (1)
     {
-	exitLock.lock();
-	if(EXIT)break;
-	else{
-	exitLock.unlock();
-	}
+	    exitLock.lock();
+	    if(EXIT)break;
+	    else{
+	        exitLock.unlock();
+	    }
         commanderLock.lock();
         if(commander == CVCONTROL){
             commanderLock.unlock();
@@ -199,13 +199,12 @@ void run_cv(){
     if(mode[0] == 'n')return;
     Mat tmpImage;
     while(true){
-	exitLock.lock();
-	if(EXIT)break;
-	else{
-	exitLock.unlock();
-	}
+    	exitLock.lock();
+    	if(EXIT)break;
+    	else{
+    	exitLock.unlock();
+    	}
         if(!takenImages.try_pop(tmpImage))continue;
-	//takenImages.wait_and_pop(tmpImage);
         int tmpCommand = cv_al1(tmpImage);
         if(tmpCommand == 0)continue;
         commanderLock.lock();

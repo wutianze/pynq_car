@@ -1,10 +1,12 @@
 COLLECT = collect
 RUN = run
+FPT = fpt
 
 CXX       :=   g++
 CC        :=   gcc 
 COLLECTOBJ :=   collect.o control.o
 RUNOBJ    :=   run.o control.o
+FPTOBJ    := run_fpt.o control.o cv_lane.o
 
 # linking libraries of OpenCV
 COLLECTLDFLAGS   =   $(shell pkg-config --libs opencv) -lpthread
@@ -15,6 +17,7 @@ SRC     =   $(CUR_DIR)/src
 BUILD   =   $(CUR_DIR)/build
 VPATH   =   $(SRC)
 MODEL   =   $(CUR_DIR)/model/dpu_testModel_0.elf
+YOLO    =   $(CUR_DIR)/model/yolo_model.elf
 ARCH    =     $(shell uname -m | sed -e s/arm.*/armv71/ \
 	-e s/aarch64.*/aarch64/ )
 
@@ -35,6 +38,9 @@ $(COLLECT) : $(COLLECTOBJ)
 
 $(RUN) : $(RUNOBJ)
 	$(CXX) $(CFLAGS) $(addprefix $(BUILD)/, $^) $(MODEL) -o $(BUILD)/$@ $(RUNLDFLAGS)
+
+$(FPT) : $(FPTOBJ)
+	$(CXX) $(CFLAGS) $(addprefix $(BUILD)/, $^) -o $(BUILD)/$@ $(RUNLDFLAGS)
 
 %.o : %.cc
 	$(CXX) -c $(CFLAGS) $< -o $(BUILD)/$@
