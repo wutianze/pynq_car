@@ -21,6 +21,7 @@ from keras.layers import Lambda, Conv2D, MaxPooling2D, Dropout, Dense, Flatten, 
 from keras.models import load_model, Model, Input
 from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard, ReduceLROnPlateau
 from keras.optimizers import Adam, SGD
+from keras.utils import plot_model
 import argparse
 
 np.random.seed(0)
@@ -80,6 +81,7 @@ def build_model(keep_prob,model_path):
     model.add(Dense(OUTPUT_NUM,activation="relu"))
     #model.add(Dense(OUTPUT_NUM,activation='softmax'))
     model.summary()
+    plot_model(model, to_file="model.png",show_shapes=True)
     return model
 
 # step3 Train Model
@@ -158,7 +160,6 @@ def main(model_path, read_path):
     print('parameters')
     print('-'*30)
 
-
     keep_prob = 0.2
     # learning_rate must be smaller than 0.0001
     learning_rate = 0.0001
@@ -179,6 +180,8 @@ def main(model_path, read_path):
 
     # compile the model
     model = build_model(keep_prob,model_path)
+    print("build finished")
+
     # train model
     train_model(model, learning_rate, nb_epoch, samples_per_epoch, batch_size, train_list, valid_list,model_path)
     print("Model Train Finished")
