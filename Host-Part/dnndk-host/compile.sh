@@ -19,7 +19,7 @@ dnnc \
        --output_dir=compile \
        --save_kernel \
        --mode normal \
-       --net_name=testModel
+       --net_name=yolo6600Model
 
 echo "#####################################"
 echo "COMPILATION COMPLETED"

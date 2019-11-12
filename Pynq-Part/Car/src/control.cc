@@ -10,11 +10,12 @@
 #include"control.h"
 #include<cmath>
 #define THROTTLEINIT 200000
-#define THROTTLEVAL 54500
+#define THROTTLEVAL 40000
 #define THROTTLEZERO 150000
 #define STEERINIT 2000000
 #define STEERVAL 40000
 #define STEERZERO 151000
+// every time you start, make sure the steer is straight
 PYNQZ2::PYNQZ2(){
     int fd = open("/dev/mem",O_RDWR);
     nowS = new PYNQZ2::Status();
@@ -34,8 +35,6 @@ PYNQZ2::PYNQZ2(){
     steer[0] = 0b011010010110;
     steer[1] = STEERINIT;
     steerSet(0);
-
-    
 }
 void PYNQZ2::throttleSet(float rate){
     //leds[0] = leds[0] & 0x04;
@@ -78,6 +77,8 @@ string PYNQZ2::to_record(){
 }
 
 PYNQZ2::~PYNQZ2(){
+    steerSet(0);
+    throttleSet(0);
     throttle[0] = 0b000000010110;
     steer[0] = 0b000000010110;
     leds[0] = 0x00;

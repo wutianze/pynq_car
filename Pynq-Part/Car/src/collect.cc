@@ -3,8 +3,8 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-20 14:23:08
- * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-22 11:34:28
+ * @LastEditors  : Sauron Wu
+ * @LastEditTime : 2019-12-18 12:33:47
  * @Description: 
  */
 #include <cmath>
@@ -37,6 +37,9 @@ safe_queue<pair<string,Mat>> queueStore;
 #define STARTRECORD 1
 #define EXIT 2
 
+#define STORESIZE_WIDTH 160
+#define STORESIZE_HEIGHT 120
+
 int imgMax = 50000;
 int startRecord = NOTSTART;
 //mutex mutexshow;
@@ -48,7 +51,7 @@ void storeImage()
     outFile.open(path + "train.csv", ios::out | ios::app);
     int count = 0;
     while(count <= imgMax){
-	sleep(0.1);
+	sleep(0.05);
 	mtxQueueStore.lock();
         if(startRecord == EXIT){
             mtxQueueStore.unlock();
@@ -78,7 +81,6 @@ int main(int argc, char **argv)
              << endl;
         return -1;
       }
-    // nn means just use ml, cv means use ml & cv.
     imgMax = atoi(argv[1]);
     float runSpeed = atof(argv[2]);
     int seeImg = atoi(argv[3]);
@@ -88,6 +90,7 @@ int main(int argc, char **argv)
     cap.set(CV_CAP_PROP_FRAME_WIDTH, 160);
     cap.set(CV_CAP_PROP_FRAME_HEIGHT, 120);
     Mat image;
+    Mat resizeImage;
     if (access(path.c_str(), 0) == -1)
     {
         mkdir(path.c_str(), 0777);
@@ -97,7 +100,8 @@ int main(int argc, char **argv)
     while (startRecord != EXIT)
     {
         cap >> image;
-	if(seeImg==1)imshow("car see", image);
+        resize(image,resizeImage,Size(STORESIZE_WIDTH,STORESIZE_HEIGHT));
+	if(seeImg==1)imshow("car see", resizeImage);
         char c = (char)waitKey(1);
         //cout << c << endl;
         //cout<<controller.nowS->steerRate<<endl;
@@ -125,11 +129,14 @@ int main(int argc, char **argv)
             break;
 	case 't':
             mtxQueueStore.lock();
-	    startRecord = STARTRECORD;
+            if(startRecord == NOTSTART)startRecord = STARTRECORD;
+            else{
+                startRecord = NOTSTART;
+            }
             mtxQueueStore.unlock();
-	        cout<<"Start Record\n";
+	        cout<<"Start or Stop Record\n";
 	        break;
-        case 27:
+        case 27://Esc
             mtxQueueStore.lock();
             startRecord = EXIT;
             mtxQueueStore.unlock();
@@ -138,14 +145,14 @@ int main(int argc, char **argv)
             {
                 float nowF = controller.nowS->steerRate;
             if(nowF >0){
-		    if(nowF-0.4>=0){
-                controller.steerChange(-0.4);}
+		    if(nowF-0.2>=0){
+                controller.steerChange(-0.2);}
 		    else{
 		    controller.steerSet(0.0);
 		    }
             }else if(nowF<0){
-		    if(nowF+0.4<=0){
-            controller.steerChange(0.4);}
+		    if(nowF+0.2<=0){
+            controller.steerChange(0.2);}
 		    else{
 		    controller.steerSet(0.0);
 		    }
@@ -153,7 +160,7 @@ int main(int argc, char **argv)
             }
             }
         string oneRecord = controller.to_record();
-        queueStore.push(make_pair(oneRecord,image));
+        queueStore.push(make_pair(oneRecord,resizeImage));
     }
     storeThread.join();
     destroyAllWindows();
