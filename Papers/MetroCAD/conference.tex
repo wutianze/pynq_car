@@ -71,18 +71,20 @@ Users can use the computing power in Pynq-Z2 includes both Zynq7020 FPGA\cite{b4
 
 In this section, we summarize the related work and some other similar platforms.
 
-\textbf{Research Platform for Autonomous Devices.} Yifan Wang et al. presented HydraOne\cite{b9}, HydraOne is an indoor robot-based platform, it has sufficient resources and components to conduct related experiments. It has three key characteristics: design modularization, resource extensibility and openness, as well as function isolation, which allows users to conduct various research and education experiments. Wei et al. presented the CMU autonomous driving research platform which is based on a Cadillac SRX\cite{b10}. This work focuses on vehicle engineering problems, including the actuation, power, and sensor systems on the vehicle. Matthew O’Kelly et al present F1/10\cite{b11}: an open-source, affordable, and high-performance 1/10 scale autonomous vehicle testbed. The F1/10 testbed carries a full suite of sensors, perception, planning, control, and networking software stacks that are similar to full scale solutions. 
+\textbf{Research Platform for Autonomous Devices.} Yifan Wang et al. presented HydraOne\cite{b9}, HydraOne is an indoor robot-based platform, it has sufficient resources and components to conduct related experiments. It has three key characteristics: design modularization, resource extensibility and openness, as well as function isolation, which allows users to conduct various research and education experiments. Wei et al. presented the CMU autonomous driving research platform which is based on a Cadillac SRX\cite{b10}. This work focuses on vehicle engineering problems, including the actuation, power, and sensor systems on the vehicle. Matthew O’Kelly et al present F1/10\cite{b11}: an open-source, affordable, and high-performance 1/10 scale autonomous vehicle testbed. The F1/10 testbed carries a full suite of sensors, perception, planning, control, and networking software stacks that are similar to full scale solutions. Compared to above products, our platform costs less and provides FPGA support, also it's easy for users to custom their own components based on it. The basic of our tool kit is simple and affordable, but it has great potential.
 
-\textbf{Hardware Acceleration Technology.} GPU\cite{b12} is now widely used by researchers to accelerate the training and inference process of AI. The training library is cuDNN\cite{b13} while the inference library is TensorRT\cite{b14}. cuDNN is a GPU-accelerated library of primitives for deep neural networks. It provides highly tuned implementations of routines arising frequently in DNN applications. TensorRT focuses specifically on running an already trained network quickly and efficiently on a GPU for the purpose of generating a result; also known as inferencing. The tensor processing unit was announced in May 2016 at Google I/O, when the company said that the TPU had already been used inside their data centers for over a year\cite{b15}. The chip has been specifically designed for Google's TensorFlow framework, a symbolic math library which is used for machine learning applications such as neural networks.\cite{b16} The Xilinx Deep Learning Processor Unit (DPU)\cite{b17} is a programmable engine optimized for convolutional neural networks. The unit includes a high performance scheduler module, a hybrid computing array module, an instruction fetch unit module, and a global memory pool module. The DPU uses a specialized instruction set, which allows for the efficient implementation of many convolutional neural network.
+\textbf{Hardware Acceleration Technology.} GPU\cite{b12} is now widely used by researchers to accelerate the training and inference process of AI. The training library is cuDNN\cite{b13} while the inference library is TensorRT\cite{b14}. cuDNN is a GPU-accelerated library of primitives for deep neural networks. It provides highly tuned implementations of routines arising frequently in DNN applications. TensorRT focuses specifically on running an already trained network quickly and efficiently on a GPU for the purpose of generating a result; also known as inferencing. The tensor processing unit was announced in May 2016 at Google I/O, when the company said that the TPU had already been used inside their data centers for over a year\cite{b15}. The chip has been specifically designed for Google's TensorFlow framework, a symbolic math library which is used for machine learning applications such as neural networks.\cite{b16} The Xilinx Deep Learning Processor Unit (DPU)\cite{b17} is a programmable engine optimized for convolutional neural networks. The unit includes a high performance scheduler module, a hybrid computing array module, an instruction fetch unit module, and a global memory pool module. The DPU uses a specialized instruction set, which allows for the efficient implementation of many convolutional neural network. With our platform, you can easily try DPU or FPGA to help your algorithms run better.
 
 \section{Design and Implementation}
 In this section, we introduce the design and implementation details of xxx and present main characteristics of the platform.
 
 \subsection{Hardware Design}
+As shown in Fig.~\ref{hd}, xxx is equipped with a Xilinx Pynq-Z2 board which acts as the main controller, it collects the data from multiple sensors and feeds the data to several computing tasks in real-time. An DFROBOT IO expansion board V7.1 receives the control message output from the computing tasks and then sends the control signals to the motor drivers to control the movement of xxx. The whole xxx platform is powered by two DFROBOT FIT0137 Batteries. And to provide steady voltage for PK370PH-4743 motor and DF15MG electric steering engine, a QuicRun WP 1060 Brushed electronic speed controller is used.
 
+The basic sensor is one VIMICRO camera, also we provide a study case using LeiShen LS01D LIDAR. It's easy for you to add more sensors to the platform.
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=0.5\textwidth]{sf.jpg}}
+\centerline{\includegraphics[width=0.5\textwidth]{hd.PNG}}
 \caption{Hardware Design.}
 \label{hd}
 \end{figure}
@@ -164,6 +166,12 @@ The xxx platform has three key characteristics: high flexibility and extensibili
 \section{Case Studies}
 In this section, we use three case studies deployed on xxxx to show the capabilities of our research platform.
 
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{fpt.jpg}}
+\caption{Autonomous Driving with DPU.}
+\label{fpt}
+\end{figure}
+
 \subsection{Autonomous Driving with DPU power}
 This case shows how you can use our platform to train an AI model and use it for autonomous driving. 
 
@@ -173,7 +181,7 @@ Second, after some pre-process, you can put the images you get as input to the A
 
 Third, you will use DNNDK\cite{b17} provided by Xilinx to do the compression and compilation and then copy the generated files to the car.
 
-Finally, the car can move by itself. It will be controlled by AI models or other algorithms added. 
+Finally, the car can move by itself. It will be controlled by AI models or other algorithms added. See Fig.~\ref{fpt} as an example.
 
 \subsection{Simulator}
 The simulator is a tool which can help users test their designs more efficiently. You can see the interface of the simulator in Fig.~\ref{si}. The simulator is based on sdsandbox\cite{b5} which is a simulator project for Donkey Car\cite{b34}. As you can see in the picture, the users can use this simulator to collect training data and test their models. 
@@ -201,7 +209,7 @@ The Lidar we use is LeiShen LS01D\cite{b37}, LeiShen has already provided one RO
 The control node of the car is a transplantation of code from existing controller. It's easy to send control commands by publishing commands to corresponding topic. As we can see, it's easy for users to build their projects based on ROS in our platform. Since ROS is widely used, it's important that our platform can help users who want to try ROS.
 
 \section{Conclusion}
-In this paper, we present the design, implementation, characteristics and case studies of xxx, an experimental research and education platform for autonomous driving. The platform is highly flexible and extensible, full stack, and easy-to-use. These three characteristics can help users understand AD technology well and take full advantage of xxx. Students and researchers can use our platform for full-stack researches on algorithms, applications, system, mechanical control and hardware acceleration. We hope this platform can help users enjoy their research and learning process.
+In this paper, we present the design, implementation, characteristics and case studies of xxx, an experimental research and education platform for autonomous driving. The platform is highly flexible and extensible, full stack, and easy-to-use. These three characteristics can help users understand AD technology well and take full advantage of xxx. Students and researchers can use our platform for full-stack researches on algorithms, applications, system, mechanical control and hardware acceleration. We hope this platform can help users enjoy their research and learning process without paying much.
 
 
 \begin{thebibliography}{00}
