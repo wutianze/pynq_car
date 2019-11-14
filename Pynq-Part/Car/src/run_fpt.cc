@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-11-12 16:56:45
+ * @LastEditTime: 2019-11-14 14:09:24
  * @Description: 
  */
 #include <assert.h>
@@ -153,9 +153,9 @@ void run_model(DPUTask* task){
     cout<<"Run Model Exit\n";
 }
 
-#define TOO_LEFT 50
-#define TOO_RIGHT 150
-
+#define STRAIGHT_LEFT_K -7.5
+#define STRAIGHT_RIGHT_K 7.5
+#define K_RANGE 0.1
 void run_cv(){
     cout<<"Run CV\n";
     Mat tmpImage;
@@ -173,16 +173,34 @@ void run_cv(){
     	}
         if(!takenImages.try_pop(tmpImage))continue;
         IplImage frame_get = IplImage(tmpImage);
-        find_lane(&frame_get,temp_frame,grey,edges,houghStorage);
+        int canFind = find_lane(&frame_get,temp_frame,grey,edges,houghStorage);
+        
         steer_throttle_command tmpC;
-        if(laneL.b.get() < TOO_LEFT){
-            tmpC.steer = 0.3;
-        }else if(laneL.b.get() > TOO_RIGHT){
-            tmpC.steer = -0.3;
-        }else{
-            tmpC.steer = laneL.k.get() - 0.3;
+        if(canFind == 1){//cannot find left but can find right
+            float tmpK = laneR.k.get();
+	    float tmpB = laneR.b.get();
+	    if(tmpK > STRAIGHT_RIGHT_K + K_RANGE|| tmpK < 0)tmpC.steer = 0.5;
+	    else if(tmpK < STRAIGHT_RIGHT_K - K_RANGE && tmpK > 0)tmpC.steer = float(STRAIGHT_RIGHT_K - K_RANGE - tmpK)/float(STRAIGHT_RIGHT_K - K_RANGE);
+    	    if((72- tmpB)/tmpK < 140)tmpC.steer = -0.4;
+	    cout<<"laneR k:"<<tmpK<<endl;
+	    //cout<<"laneR b:"<<laneR.b.get()<<",k:"<<laneR.k.get()<<";steer:"<<tmpC.steer<<"\r\033[k";
+        }else if(canFind == 3){
+	    tmpC.steer = 0;
+    	    //cout<<"cannot find any so steer:"<<tmpC.steer<<"\r\033[k";
+	}else{
+            float tmpB = laneL.b.get();
+    	    float tmpK = laneL.k.get();
+            if(tmpK > STRAIGHT_LEFT_K + K_RANGE && tmpK < 0)tmpC.steer = float(STRAIGHT_LEFT_K + K_RANGE - tmpK)/float(STRAIGHT_LEFT_K + K_RANGE);
+            else if(tmpK < STRAIGHT_LEFT_K - K_RANGE || tmpK > 0)tmpC.steer = -0.5;
+	    if((72- tmpB)/tmpK > 70)tmpC.steer = 0.4;
+	    cout<<"laneL k:"<<tmpK<<endl;
+    	    //if(tmpK > 10 && -tmpB/tmpK > TOO_LEFT)tmpC.steer = 
+    	    //cout<<"laneL b:"<<laneL.b.get()<<",k:"<<laneL.k.get()<<"; laneR b:"<<laneR.b.get()<<",k:"<<laneR.k.get()<<";steer:"<<tmpC.steer<<"\r\033[k";
         }
-        tmpC.throttle = 0.5;
+	
+	cout<<"steer:"<<setprecision(4)<<tmpC.steer<<endl;
+
+        tmpC.throttle = -1.0;
         commanderLock.lock();
         if(commander == CVCONTROL){
             addCommand(tmpC);
@@ -243,7 +261,6 @@ void run_command(){
         steer_throttle_command tmpS;
         if(!generatedCommands.try_pop(tmpS))continue;
     	controller.steerSet(tmpS.steer);
-        if(tmpS.throttle + 1 < 0.001)tmpS.throttle = 0.5;
         controller.throttleSet(tmpS.throttle);
     }
     exitLock.unlock();

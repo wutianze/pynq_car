@@ -91,7 +91,8 @@ void FindResponses(IplImage *img, int startX, int endX, int y, std::vector<int>&
     }
 }
 
-void processSide(std::vector<Lane> lanes, IplImage *edges, bool right) {
+//return if can find a line
+bool processSide(std::vector<Lane> lanes, IplImage *edges, bool right) {
 
 	Status* side = right ? &laneR : &laneL;
 
@@ -165,8 +166,9 @@ void processSide(std::vector<Lane> lanes, IplImage *edges, bool right) {
 
 		bool update_ok = (k_diff <= K_VARY_FACTOR && b_diff <= B_VARY_FACTOR) || side->reset;
 
-		printf("side: %s, k vary: %.4f, b vary: %.4f, lost: %s\n", 
-			(right?"RIGHT":"LEFT"), k_diff, b_diff, (update_ok?"no":"yes"));
+		//printf("side: %s, k vary: %.4f, b vary: %.4f, need update: %s\n", 
+		//	(right?"RIGHT":"LEFT"), k_diff, b_diff, (update_ok?"no":"yes"));
+		//printf("\r\033[k");
 		
 		if (update_ok) {
 			// update is in valid bounds
@@ -183,7 +185,7 @@ void processSide(std::vector<Lane> lanes, IplImage *edges, bool right) {
 		}
 
 	} else {
-		printf("no lanes detected - lane tracking lost! counter increased\n");
+		//printf("no lanes detected - lane tracking lost! counter increased\n");
 		side->lost++;
 		if (side->lost >= MAX_LOST_FRAMES && !side->reset) {
 			// do full reset when lost for more than N frames
@@ -191,12 +193,15 @@ void processSide(std::vector<Lane> lanes, IplImage *edges, bool right) {
 			side->k.clear();
 			side->b.clear();
 		}
+		return false;
 	}
 
 	delete[] votes;
+	return true;
 }
 
-void processLanes(CvSeq* lines, IplImage* edges, IplImage* temp_frame) {
+//return 0 if can find both, 1 for cannot find left, 2 for cannot find right, 3 for cannot find both
+int processLanes(CvSeq* lines, IplImage* edges, IplImage* temp_frame) {
 
 	// classify lines to left/right side
 	std::vector<Lane> left, right;
@@ -237,8 +242,9 @@ void processLanes(CvSeq* lines, IplImage* edges, IplImage* temp_frame) {
     	cvLine(temp_frame, left[i].p0, left[i].p1, CV_RGB(255, 0, 0), 2);
     }
     #endif
-	processSide(left, edges, false);
-	processSide(right, edges, true);
+	int canFind = 0;
+	if(!processSide(left, edges, false))canFind++;
+	if(!processSide(right, edges, true))canFind = canFind + 2;
     
     #ifdef SHOW_TMP_FRAME
 	// show computed lanes
@@ -252,9 +258,10 @@ void processLanes(CvSeq* lines, IplImage* edges, IplImage* temp_frame) {
 	cvLine(temp_frame, cvPoint(x, laneL.k.get()*x + laneL.b.get()), 
 		cvPoint(x2, laneL.k.get() * x2 + laneL.b.get()), CV_RGB(255, 0, 255), 2);
     #endif
+	return canFind;
 }
 
-void find_lane(IplImage* frame_get, IplImage* temp_frame, IplImage* grey, IplImage* edges, CvMemStorage* houghStorage){
+int find_lane(IplImage* frame_get, IplImage* temp_frame, IplImage* grey, IplImage* edges, CvMemStorage* houghStorage){
     if (frame_get == NULL) {
 		fprintf(stderr, "Error: null frame received\n");
 		assert(0);
@@ -278,7 +285,7 @@ void find_lane(IplImage* frame_get, IplImage* temp_frame, IplImage* grey, IplIma
 	CvSeq* lines = cvHoughLines2(edges, houghStorage, CV_HOUGH_PROBABILISTIC, 
 		rho, theta, HOUGH_TRESHOLD, HOUGH_MIN_LINE_LENGTH, HOUGH_MAX_LINE_GAP);
 
-	processLanes(lines, edges, temp_frame);
+	int canF = processLanes(lines, edges, temp_frame);
 	 
     #ifdef SHOW_TMP_FRAME
 	// show middle line
@@ -292,5 +299,7 @@ void find_lane(IplImage* frame_get, IplImage* temp_frame, IplImage* grey, IplIma
 	//cvMoveWindow("Grey", 0, 0); 
 	//cvMoveWindow("Edges", 0, frame_size.height+25);
 	cvMoveWindow("Color", 0, 2*(LANE_DET_HEIGHT/2+25)); 
+	cvWaitKey(5);
     #endif
+	return canF;
 }

@@ -85,8 +85,8 @@ enum{
 
 };
 
-#define K_VARY_FACTOR 0.1f
-#define B_VARY_FACTOR 5
-#define MAX_LOST_FRAMES 1
+#define K_VARY_FACTOR 0.3f
+#define B_VARY_FACTOR 10
+#define MAX_LOST_FRAMES 5
 
-void find_lane(IplImage*, IplImage*, IplImage*, IplImage*, CvMemStorage*);
+int find_lane(IplImage*, IplImage*, IplImage*, IplImage*, CvMemStorage*);
