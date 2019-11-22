@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-11-14 14:09:24
+ * @LastEditTime: 2019-11-22 10:52:55
  * @Description: 
  */
 #include <assert.h>
@@ -30,6 +30,7 @@
 #include "control.h"
 #include<csignal>
 #include "cv_lane.h"
+#include "runYolo.h"
 using namespace cv;
 using namespace std;
 using namespace std::chrono;
@@ -51,10 +52,6 @@ struct steer_throttle_command{
     float throttle;
 };
 safe_queue<steer_throttle_command> generatedCommands;
-
-#define KERNEL_CONV "testModel_0"
-#define CONV_INPUT_NODE "conv2d_1_convolution"
-#define CONV_OUTPUT_NODE "dense_3_MatMul"
 
 #define TASKNUM 1
 //#define SHOWTIME
@@ -118,12 +115,76 @@ void addCommand(steer_throttle_command tmpC){
         generatedCommands.push(tmpC);
     }
 }
+void avoid(){
+    cout<<"run avoid\n";
+    steer_throttle_command tmpC;
+    
+    //1. turn right
+    tmpC.steer = 1;
+    tmpC.throttle = -1.0;
+    addCommand(tmpC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(4200));
 
+    //2. turn left
+    tmpC.steer = -1;
+    tmpC.throttle = -1.0;
+    addCommand(tmpC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(6000));
+
+    //2. straight to cross the obstacle
+    tmpC.steer = 0;
+    tmpC.throttle = -1.0;
+    addCommand(tmpC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(700));
+
+    //2. turn left
+    tmpC.steer = -1;
+    tmpC.throttle = -1.0;
+    addCommand(tmpC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(4900));
+
+    //2. turn right
+    tmpC.steer = 1;
+    tmpC.throttle = -1.0;
+    addCommand(tmpC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(3400));
+
+    //2. straight again
+    tmpC.steer = 0;
+    tmpC.throttle = -1.0;
+    addCommand(tmpC);
+    //std::this_thread::sleep_for(std::chrono::milliseconds(300));
+}
+
+void small_left(){
+cout<<"turn left in crossroad(small)\n";
+steer_throttle_command tmpC;
+tmpC.steer = 0;
+addCommand(tmpC);
+std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+tmpC.steer = -1;
+addCommand(tmpC);
+std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+tmpC.steer = 0;
+addCommand(tmpC);
+}
+void big_right(){
+cout<<"turn right in crossroad(big)\n";
+steer_throttle_command tmpC;
+tmpC.steer = 0;
+tmpC.throttle = -1;
+addCommand(tmpC);
+std::this_thread::sleep_for(std::chrono::milliseconds(6000));
+tmpC.steer = 1;
+addCommand(tmpC);
+std::this_thread::sleep_for(std::chrono::milliseconds(8000));
+tmpC.steer = 0;
+addCommand(tmpC);
+}
 void run_model(DPUTask* task){
     cout<<"Run Model\n";
-    //int channel = kinds.size();
-    int channel = 2;
-    vector<float> smRes(channel);
+    int sh = dpuGetInputTensorHeight(task, INPUTNODE);
+    int sw = dpuGetInputTensorWidth(task, INPUTNODE);
 
     Mat tmpImage;
     while (1)
@@ -133,21 +194,22 @@ void run_model(DPUTask* task){
 	    else{
 	        exitLock.unlock();
 	    }
-        commanderLock.lock();
-        if(commander == CVCONTROL){
-            commanderLock.unlock();
-            continue;
-        }
-        commanderLock.unlock();
+        
         if(!takenImages.try_pop(tmpImage))continue;
-	    //takenImages.wait_and_pop(tmpImage);
-        _T(setInputImage(task, CONV_INPUT_NODE, tmpImage));
-        //dpuSetInputImage2(task,CONV_INPUT_NODE, tmpImage);
-        _T(dpuRunTask(task));
-        float scale = dpuGetOutputTensorScale(task, CONV_OUTPUT_NODE);
-        int8_t* modelRes = dpuGetTensorAddress(dpuGetOutputTensor(task, CONV_OUTPUT_NODE));
-        steer_throttle_command tmpC = steer_throttle_command(((float*)smRes.data())[0],-1);
-	    addCommand(tmpC);
+	    set_input_image(task, tmpImage,INPUTNODE);
+        dpuRunTask(task);
+	    vector<vector<float>> res = deal(task, tmpImage, sw, sh);
+        //imshow("yolo-v3", img);
+        //waitKey(0);	    //takenImages.wait_and_pop(tmpImage);
+        if(res.size() != 0){
+            commanderLock.lock();
+            commander = NNCONTROL;
+            commanderLock.unlock();
+            avoid();
+            commanderLock.lock();
+            commander = CVCONTROL;
+            commanderLock.unlock();
+        }
     }
     exitLock.unlock();
     cout<<"Run Model Exit\n";
@@ -171,6 +233,12 @@ void run_cv(){
     	else{
     	exitLock.unlock();
     	}
+        commanderLock.lock();
+        if(commander == NNCONTROL){
+            commanderLock.unlock();
+            continue;
+        }
+        commanderLock.unlock();
         if(!takenImages.try_pop(tmpImage))continue;
         IplImage frame_get = IplImage(tmpImage);
         int canFind = find_lane(&frame_get,temp_frame,grey,edges,houghStorage);
@@ -200,14 +268,9 @@ void run_cv(){
 	
 	cout<<"steer:"<<setprecision(4)<<tmpC.steer<<endl;
 
-        tmpC.throttle = -1.0;
-        commanderLock.lock();
-        if(commander == CVCONTROL){
-            addCommand(tmpC);
-            commanderLock.unlock();
-            continue;
-        }
-        commanderLock.unlock();
+    tmpC.throttle = -1.0;
+    addCommand(tmpC);
+
     }
     exitLock.unlock();
     cvReleaseMemStorage(&houghStorage);
@@ -244,6 +307,7 @@ void run_camera(){
     cap.release();
 }
 
+
 void run_command(){
     cout<<"Run Command\n";
     PYNQZ2 controller = PYNQZ2();
@@ -260,10 +324,13 @@ void run_command(){
 	}
         steer_throttle_command tmpS;
         if(!generatedCommands.try_pop(tmpS))continue;
-    	controller.steerSet(tmpS.steer);
+    	//cout<<tmpS.steer<<endl;
+	controller.steerSet(tmpS.steer);
         controller.throttleSet(tmpS.throttle);
     }
     exitLock.unlock();
+    controller.steerSet(0);
+    controller.throttleSet(0);
     cout<<"Run Steer Exit\n";
     }
 
@@ -276,30 +343,33 @@ int main(int argc, char **argv)
       }
 
     signal(SIGTSTP,sig_handler);
-//
-//    /* The main procress of using DPU kernel begin. */
-//    DPUKernel *kernelConv;
-//
-//    dpuOpen();
-//    kernelConv = dpuLoadKernel(KERNEL_CONV);
-//    vector<DPUTask*> tasks(TASKNUM);
-//    generate(tasks.begin(),tasks.end(),std::bind(dpuCreateTask,kernelConv,0));    
-      vector<thread> threads;
-//    for(int i=0;i<TASKNUM;i++){
-//    	threads.push_back(thread(run_model,tasks[i]));
-//    }
-
+/*
+    dpuOpen();
+    DPUKernel *kernelConv = dpuLoadKernel(YOLOKERNEL);
+    vector<DPUTask*> tasks(TASKNUM);
+    generate(tasks.begin(),tasks.end(),std::bind(dpuCreateTask,kernelConv,0));    
+    */
+    vector<thread> threads;
     threads.push_back(thread(run_command));
-    threads.push_back(thread(run_camera));
-    threads.push_back(thread(run_cv));
+    //threads.push_back(thread(run_camera));
+    //threads.push_back(thread(run_cv));
+ 
+    /*
+    for(int i=0;i<TASKNUM;i++){
+    	threads.push_back(thread(run_model,tasks[i]));
+    }
+*/
+    threads.push_back(thread(big_right));
+    
     for(int i = 0; i < threads.size(); i++){
         threads[i].join();
         cout<<"one exit:"<<i<<endl;
     }
+/*
+    for_each(tasks.begin(),tasks.end(),dpuDestroyTask);
 
-    //for_each(tasks.begin(),tasks.end(),dpuDestroyTask);
-
-    //dpuDestroyKernel(kernelConv);
-    //dpuClose();
+    dpuDestroyKernel(kernelConv);
+    dpuClose();
+*/
     return 0;
 }
