@@ -4,9 +4,11 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-11-20 13:47:36
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-11-20 14:09:23
+ * @LastEditTime: 2019-11-25 14:26:59
  * @Description: 
  */
+#ifndef RUNYOLO_H
+#define RUNYOLO_H
 #include <algorithm>
 #include <vector>
 #include <atomic>
@@ -44,5 +46,14 @@ using namespace std::chrono;
 #define YOLOKERNEL "testModel"
 #define INPUTNODE "conv2d_1_convolution"
 
+extern vector<string>outputs_node;
+//yolo parameters
+extern const int classification;
+//categories should be the same as predefined_classes.txt
+extern vector<string>categories;
+extern const int anchor;
+extern vector<float> biases;
+
 vector<vector<float>> deal(DPUTask* task, Mat& img, int sw, int sh);
 void set_input_image(DPUTask* task, const Mat& img, const char* nodename);
+#endif

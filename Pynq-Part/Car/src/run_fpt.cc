@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-11-22 10:52:55
+ * @LastEditTime: 2019-11-25 17:58:56
  * @Description: 
  */
 #include <assert.h>
@@ -35,8 +35,16 @@ using namespace cv;
 using namespace std;
 using namespace std::chrono;
 
+//#define DEBUG_MODE
+
 #define NNCONTROL 0
 #define CVCONTROL 1
+
+//camera parameters: img size
+#define TAKE_SIZE_WIDTH 416
+#define TAKE_SIZE_HEIGHT 416 
+
+
 // commander indicates the car is controlled by AI or opencv currently
 mutex commanderLock;
 mutex exitLock;
@@ -53,6 +61,7 @@ struct steer_throttle_command{
 };
 safe_queue<steer_throttle_command> generatedCommands;
 
+// the tasks created to run yolo, now the number can only be one
 #define TASKNUM 1
 //#define SHOWTIME
 #ifdef SHOWTIME
@@ -156,6 +165,7 @@ void avoid(){
     //std::this_thread::sleep_for(std::chrono::milliseconds(300));
 }
 
+// turn left in cross road
 void small_left(){
 cout<<"turn left in crossroad(small)\n";
 steer_throttle_command tmpC;
@@ -168,6 +178,8 @@ std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 tmpC.steer = 0;
 addCommand(tmpC);
 }
+
+// turn right in cross road
 void big_right(){
 cout<<"turn right in crossroad(big)\n";
 steer_throttle_command tmpC;
@@ -181,6 +193,108 @@ std::this_thread::sleep_for(std::chrono::milliseconds(8000));
 tmpC.steer = 0;
 addCommand(tmpC);
 }
+
+//----------fpt rules
+#define IGNORE_OB_X  350
+#define IGNORE_OB_AREA 100
+#define SEE_OBSTACLE 2
+int detect_valid_ob = 0;
+
+#define PERSON_OUT_X 100
+#define IGNORE_PER_AREA 100
+#define SEE_PER 2
+int detect_valid_per = 0;
+
+#define IGNORE_SIDEWALK_AREA 300
+#define SEE_SIDEWALK 2
+int detect_valid_side = 0;
+//-------------------
+
+void box_handler(vector<vector<float>>&res){
+    //person_place means where is the person, -1:no person;0:in the road;1:out of the road
+    int person_place = -1;
+    bool has_ob = false;
+    bool has_side = false;
+
+    //first find things
+    for(int i=0;i<res.size();i++){
+        switch(int(res[i][4])){
+            //person
+            case 0:{
+                if(res[i][2]*res[i][3] < IGNORE_PER_AREA){
+                    detect_valid_ob = 0;
+                    detect_valid_per = 0;
+                }
+                if(detect_valid_per < SEE_PER){
+                    detect_valid_per++;
+                    continue;
+                }
+                if(res[i][0]-res[i][2]/2 < PERSON_OUT_X){
+                    person_place = 1;
+                }
+                else{
+                    person_place = 0;
+                }
+                detect_valid_per = 0;
+                break;
+            }
+            //obstacles
+            case 1:case 2:case 3:{
+                if(res[i][0]-res[i][2]/2 > IGNORE_OB_X || res[i][2] * res[i][3] < IGNORE_OB_AREA){
+                    detect_valid_ob = 0;
+                    continue;
+                }
+                detect_valid_ob++;
+                if(detect_valid_ob > SEE_OBSTACLE){
+                    has_ob = true;
+                    detect_valid_ob = 0;
+                }
+                break;
+            }
+            //sidewalk
+            case 4:{
+                if(res[i][2]*res[i][3] < IGNORE_PER_AREA){
+                    detect_valid_side = 0;
+                    continue;
+                }
+                detect_valid_side++;
+                if(detect_valid_side > SEE_SIDEWALK){
+                    has_side = true;
+                    detect_valid_side = 0;
+                }
+                break;
+            }
+        }
+    }
+
+    //find both ob and person, ignore person
+    if(has_ob && person_place != -1){
+        person_place = -1;
+    }
+
+    //second control according to findings
+    if(has_ob){
+        commanderLock.lock();
+        commander = NNCONTROL;
+        commanderLock.unlock();
+        avoid();
+        commanderLock.lock();
+        commander = CVCONTROL;
+        commanderLock.unlock();
+        has_ob = false;
+        return;
+    }
+    if(person_place == 0){
+        steer_throttle_command tmpC;
+        tmpC.steer = 0;
+        tmpC.throttle = 0;
+        addCommand(tmpC);
+    }else if(person_place == 1){
+        if(has_side){}
+    }
+
+}
+
 void run_model(DPUTask* task){
     cout<<"Run Model\n";
     int sh = dpuGetInputTensorHeight(task, INPUTNODE);
@@ -201,15 +315,7 @@ void run_model(DPUTask* task){
 	    vector<vector<float>> res = deal(task, tmpImage, sw, sh);
         //imshow("yolo-v3", img);
         //waitKey(0);	    //takenImages.wait_and_pop(tmpImage);
-        if(res.size() != 0){
-            commanderLock.lock();
-            commander = NNCONTROL;
-            commanderLock.unlock();
-            avoid();
-            commanderLock.lock();
-            commander = CVCONTROL;
-            commanderLock.unlock();
-        }
+        box_handler(res);
     }
     exitLock.unlock();
     cout<<"Run Model Exit\n";
@@ -285,8 +391,8 @@ void run_cv(){
 void run_camera(){
     cout<<"Run Camera\n";
     VideoCapture cap(0);
-    cap.set(CV_CAP_PROP_FRAME_WIDTH, 160);
-    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 120);
+    cap.set(CV_CAP_PROP_FRAME_WIDTH, TAKE_SIZE_WIDTH);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, TAKE_SIZE_HEIGHT);
     Mat image;
     while(true){
 	exitLock.lock();

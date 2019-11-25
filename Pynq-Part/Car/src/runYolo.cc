@@ -1,8 +1,9 @@
 #include"runYolo.h"
-
 vector<string>outputs_node= {"conv2d_59_convolution", "conv2d_67_convolution", "conv2d_75_convolution"};
 //yolo parameters
 const int classification = 80;
+//categories should be the same as predefined_classes.txt
+vector<string>categories={"person","arrowOb","coneOb","yellowOb","sidewalk","lights"};
 const int anchor = 3;
 vector<float> biases { 116,90,  156,198,  373,326, 30,61,  62,45,  59,119, 10,13,  16,30,  33,23};
 
@@ -18,7 +19,6 @@ class image {
     };
    void free(){delete[] data;};
 };
-
 void detect(vector<vector<float>> &boxes, vector<float> result, int channel, int height, int weight, int num, int sh, int sw);
 image load_image_cv(const cv::Mat& img);
 image letterbox_image(image im, int w, int h);
@@ -275,8 +275,9 @@ vector<vector<float>> deal(DPUTask* task, Mat& img, int sw, int sh)
     }
     correct_region_boxes(boxes, boxes.size(), img.cols, img.rows, sw, sh);
     vector<vector<float>> res = apply_nms(boxes, classification, NMS_THRE);
-
-    vector<vector<float>> final_res;
+    return res;
+    // transfer from (x_center,y_center,width,height,class) to (xmin,ymin,xmax,ymax,class)
+    /*vector<vector<float>> final_res;
     float h = img.rows;
     float w = img.cols;
     for(size_t i = 0; i < res.size(); ++i)
@@ -290,6 +291,7 @@ vector<vector<float>> deal(DPUTask* task, Mat& img, int sw, int sh)
         final_res.push_back(handle_res);
     }
     return final_res;
+    */
 }
 
 void detect(vector<vector<float>> &boxes, vector<float> result, int channel, int height, int width, int num, int sh, int sw) 
