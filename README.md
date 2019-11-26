@@ -7,6 +7,7 @@
  * @LastEditTime: 2019-10-31 15:25:25
  * @Description: 
  -->
+# You can read the gitbook [here](https://app.gitbook.com/@1369130123/s/pynq-z2-ad-car/)
 # Build your own autonomous Car
 ## Introduction
 Enjoy your own autonomous driving car with the power of DPU and feel free to try your own AI model and new ideas.
