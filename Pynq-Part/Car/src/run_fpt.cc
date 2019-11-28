@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-11-25 17:58:56
+ * @LastEditTime: 2019-11-28 16:54:43
  * @Description: 
  */
 #include <assert.h>
@@ -194,27 +194,37 @@ tmpC.steer = 0;
 addCommand(tmpC);
 }
 
+//0 is red, 1 is yellow, 2 is green
+int get_light(){
+
+}
+
 //----------fpt rules
+// last_command: -1:no command, 0:avoid, 1:stop, 2:back to cv
+int last_command = -1;
+int pre_last_command = -1;
+
 #define IGNORE_OB_X  350
 #define IGNORE_OB_AREA 100
 #define SEE_OBSTACLE 2
-int detect_valid_ob = 0;
 
 #define PERSON_OUT_X 100
 #define IGNORE_PER_AREA 100
 #define SEE_PER 2
-int detect_valid_per = 0;
 
 #define IGNORE_SIDEWALK_AREA 300
 #define SEE_SIDEWALK 2
-int detect_valid_side = 0;
+
+#define IGNORE_LIGHT_AREA 300
 //-------------------
 
-void box_handler(vector<vector<float>>&res){
+void box_handler(vector<vector<float>>&res, Mat&img){
     //person_place means where is the person, -1:no person;0:in the road;1:out of the road
     int person_place = -1;
     bool has_ob = false;
     bool has_side = false;
+    //0 is red, 1 is yellow, 2 is green
+    int light = -1;
 
     //first find things
     for(int i=0;i<res.size();i++){
@@ -222,11 +232,6 @@ void box_handler(vector<vector<float>>&res){
             //person
             case 0:{
                 if(res[i][2]*res[i][3] < IGNORE_PER_AREA){
-                    detect_valid_ob = 0;
-                    detect_valid_per = 0;
-                }
-                if(detect_valid_per < SEE_PER){
-                    detect_valid_per++;
                     continue;
                 }
                 if(res[i][0]-res[i][2]/2 < PERSON_OUT_X){
@@ -235,63 +240,108 @@ void box_handler(vector<vector<float>>&res){
                 else{
                     person_place = 0;
                 }
-                detect_valid_per = 0;
                 break;
             }
             //obstacles
             case 1:case 2:case 3:{
                 if(res[i][0]-res[i][2]/2 > IGNORE_OB_X || res[i][2] * res[i][3] < IGNORE_OB_AREA){
-                    detect_valid_ob = 0;
                     continue;
                 }
-                detect_valid_ob++;
-                if(detect_valid_ob > SEE_OBSTACLE){
-                    has_ob = true;
-                    detect_valid_ob = 0;
-                }
+                has_ob = true;
                 break;
             }
             //sidewalk
             case 4:{
                 if(res[i][2]*res[i][3] < IGNORE_PER_AREA){
-                    detect_valid_side = 0;
                     continue;
                 }
-                detect_valid_side++;
-                if(detect_valid_side > SEE_SIDEWALK){
-                    has_side = true;
-                    detect_valid_side = 0;
+                has_side = true;
+                break;
+            }
+            //lights
+            case 5:{
+                if(res[i][2]*res[i][3] < IGNORE_PER_AREA){
+                    continue;
                 }
+                light = get_light(img(Rect area(res[i][0],res[i][1],res[i][2],res[i][3])));
                 break;
             }
         }
     }
 
-    //find both ob and person, ignore person
-    if(has_ob && person_place != -1){
-        person_place = -1;
-    }
-
-    //second control according to findings
+    int now_command = -1;
+    //second generate last_command
     if(has_ob){
-        commanderLock.lock();
-        commander = NNCONTROL;
-        commanderLock.unlock();
-        avoid();
-        commanderLock.lock();
-        commander = CVCONTROL;
-        commanderLock.unlock();
-        has_ob = false;
-        return;
-    }
-    if(person_place == 0){
-        steer_throttle_command tmpC;
-        tmpC.steer = 0;
-        tmpC.throttle = 0;
-        addCommand(tmpC);
+        now_command = 0;
+    }else if(person_place == 0){
+        now_command = 1;
     }else if(person_place == 1){
-        if(has_side){}
+        if(has_side){
+            switch(light){
+                case -1:case 0:case 1:{
+                    now_command = 1;
+                    break;
+                }
+                case 2:{//if the light is green and the people is not in the road, keep running
+                    now_command = 2;
+                }
+            }
+        }
+    }else if(person_place == -1){
+        switch(light){
+                //no ob no person no light just use cv
+                case -1:case 2:{
+                    now_command = 2;
+                    break;
+                }
+                case 0:case 1:{
+                    now_command = 1;
+                    break;
+                }
+            }
     }
+    bool change = false;
+    if(last_command == now_command && last_command != pre_last_command){
+        change = true;
+    }
+    if(change){
+        switch(now_command){
+            case 0:{
+                commanderLock.lock();
+                commander = NNCONTROL;
+                commanderLock.unlock();
+                avoid();
+                commanderLock.lock();
+                commander = CVCONTROL;
+                commanderLock.unlock();
+                break;
+            }
+            case 1:{
+                commanderLock.lock();
+                commander = NNCONTROL;
+                commanderLock.unlock();
+                steer_throttle_command tmpC;
+                tmpC.steer = 0;
+                tmpC.throttle = 0;
+                addCommand(tmpC);
+                break;
+            }
+            case 2:{
+                commanderLock.lock();
+                commander = CVCONTROL;
+                commanderLock.unlock();
+                break;
+            }
+            default:{
+                commanderLock.lock();
+                commander = CVCONTROL;
+                commanderLock.unlock();
+                break;
+            }
+        }
+    }
+    pre_last_command = last_command;
+    last_command = now_command;
 
 }
 
@@ -315,7 +365,7 @@ void run_model(DPUTask* task){
 	    vector<vector<float>> res = deal(task, tmpImage, sw, sh);
         //imshow("yolo-v3", img);
         //waitKey(0);	    //takenImages.wait_and_pop(tmpImage);
-        box_handler(res);
+        box_handler(res,tmpImage);
     }
     exitLock.unlock();
     cout<<"Run Model Exit\n";
