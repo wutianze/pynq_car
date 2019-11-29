@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-11-28 16:54:43
+ * @LastEditTime: 2019-11-29 14:57:05
  * @Description: 
  */
 #include <assert.h>
@@ -195,8 +195,8 @@ addCommand(tmpC);
 }
 
 //0 is red, 1 is yellow, 2 is green
-int get_light(){
-
+int get_light(Mat img){
+    
 }
 
 //----------fpt rules
@@ -204,18 +204,18 @@ int get_light(){
 int last_command = -1;
 int pre_last_command = -1;
 
-#define IGNORE_OB_X  350
-#define IGNORE_OB_AREA 100
+#define IGNORE_OB_X  0.3
+#define IGNORE_OB_AREA 0.2
 #define SEE_OBSTACLE 2
 
-#define PERSON_OUT_X 100
-#define IGNORE_PER_AREA 100
+#define PERSON_OUT_X 0.1
+#define IGNORE_PER_AREA 0.1
 #define SEE_PER 2
 
-#define IGNORE_SIDEWALK_AREA 300
+#define IGNORE_SIDEWALK_AREA 0.3
 #define SEE_SIDEWALK 2
 
-#define IGNORE_LIGHT_AREA 300
+#define IGNORE_LIGHT_AREA 0.3
 //-------------------
 
 void box_handler(vector<vector<float>>&res, Mat&img){
@@ -263,7 +263,7 @@ void box_handler(vector<vector<float>>&res, Mat&img){
                 if(res[i][2]*res[i][3] < IGNORE_PER_AREA){
                     continue;
                 }
-                light = get_light(img(Rect area(res[i][0],res[i][1],res[i][2],res[i][3])));
+                light = get_light(img(Rect area((res[i][0]-res[i][2]/2)*TAKE_SIZE_WIDTH,(res[i][1]-res[i][3]/2)*TAKE_SIZE_HEIGHT,res[i][2]*TAKE_SIZE_WIDTH,res[i][3]*TAKE_SIZE_HEIGHT)));
                 break;
             }
         }
