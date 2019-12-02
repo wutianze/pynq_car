@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-11-29 14:57:05
+ * @LastEditTime: 2019-12-02 11:53:26
  * @Description: 
  */
 #include <assert.h>
@@ -41,8 +41,8 @@ using namespace std::chrono;
 #define CVCONTROL 1
 
 //camera parameters: img size
-#define TAKE_SIZE_WIDTH 416
-#define TAKE_SIZE_HEIGHT 416 
+#define TAKE_SIZE_WIDTH 640
+#define TAKE_SIZE_HEIGHT 480 
 
 
 // commander indicates the car is controlled by AI or opencv currently
@@ -194,9 +194,42 @@ tmpC.steer = 0;
 addCommand(tmpC);
 }
 
-//0 is red, 1 is yellow, 2 is green
+// if not green, then is red or yellow which means stop
+#define iLowH_green 40
+#define iHighH_green 90
+#define iLowS 90
+#define iHighS 255
+#define iLowV 90
+#define iHighV 255
+//0 is green
 int get_light(Mat img){
-    
+    Mat imgHSV;
+    vector<Mat> hsvSplit;
+    cvtColor(img,imgHSV,COLOR_BGR2HSV);
+  
+    //转化成直方图均衡化
+    split(imgHSV,hsvSplit);
+    equalizeHist(hsvSplit[2],hsvSplit[2]);
+    merge(hsvSplit,imgHSV);
+    Mat imgThresholded;
+    //确定颜色显示的范围
+    inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS,iHighV),imgThresholded);
+    //去除噪点
+    Mat element = getStructuringElement(MORPH_RECT,Size(5,5));
+    morphologyEx(imgThresholded,imgThresholded,MORPH_OPEN,element);
+     //连接连通域
+    morphologyEx(imgThresholded, imgThresholded, MORPH_CLOSE, element);
+    int count_green = 0;
+for(int nrow=0;nrow<imgThresholded.rows;nrow++)
+    { 
+        uchar*data=imgThresholded.ptr<uchar>(nrow);
+        for(int ncol=0;ncol<imgThresholded.cols*imgThresholded.channels();ncol++)
+        {
+            count_green++;
+        }
+    }
+    if(count_green >(imgThresholded.rows*imgThresholded.cols*imgThresholded.channels())/5)return 0;
+    return 1;
 }
 
 //----------fpt rules
@@ -223,7 +256,7 @@ void box_handler(vector<vector<float>>&res, Mat&img){
     int person_place = -1;
     bool has_ob = false;
     bool has_side = false;
-    //0 is red, 1 is yellow, 2 is green
+    //0 is green, 1 is yellow or red
     int light = -1;
 
     //first find things
@@ -278,23 +311,35 @@ void box_handler(vector<vector<float>>&res, Mat&img){
     }else if(person_place == 1){
         if(has_side){
             switch(light){
-                case -1:case 0:case 1:{
+                case -1:case 1:{//if the light is not green or no light,stop
                     now_command = 1;
                     break;
                 }
-                case 2:{//if the light is green and the people is not in the road, keep running
+                case 0:{//if the light is green and the people is not in the road, keep running
                     now_command = 2;
+                    break;
+                }
+            }
+        }else{//no side, people not in road, run(shouldn't have light)
+            switch(light){
+                case 1:{//if the light is not green stop
+                    now_command = 1;
+                    break;
+                }
+                case 0:case -1:{//if the light is green and the people is not in the road, keep running
+                    now_command = 2;
+                    break;
                 }
             }
         }
     }else if(person_place == -1){
         switch(light){
                 //no ob no person no light just use cv
-                case -1:case 2:{
+                case -1:case 0:{
                     now_command = 2;
                     break;
                 }
-                case 0:case 1:{
+                case 1:{
                     now_command = 1;
                     break;
                 }
