@@ -9,8 +9,6 @@ Pynq-Part/system/
 **/rootfs.tar.gz
 **/system.zip
 **/*.o
-Papers/**/conference*
-!Papers/**/*.tex
 **/*.npz
 **/logs
 #**/log*
@@ -30,3 +28,6 @@ Virtual-Part/simulator/.vs
 Virtual-Part/*.csproj
 Virtual-Part/env
 Pynq-Z2_AD_Car/_book/*
+Papers/*
+!Papers/**/*.pdf
+
