@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/W32TeX) (preloaded format=pdflatex 2019.9.12)  24 OCT 2019 14:40
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/W32TeX) (preloaded format=pdflatex 2019.9.12)  1 NOV 2019 10:34
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -554,7 +554,7 @@ Here is how much of TeX's memory you used:
  1141 hyphenation exceptions out of 8191
  41i,11n,35p,871b,302s stack positions out of 5000i,500n,10000p,200000b,80000s
 {c:/texlive/2019/texmf-dist/fonts/enc/dvips/base/8r.enc}<c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb><c:/texlive/2019/texmf-dist/fonts/type1/urw/times/utmb8a.pfb><c:/texlive/2019/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb><c:/texlive/2019/texmf-dist/fonts/type1/urw/times/utmr8a.pfb><c:/texlive/2019/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on c:/Users/tianzew/Desktop/pynq_car/Papers/FPT2019/conference_041818.pdf (4 pages, 6792939 bytes).
+Output written on c:/Users/tianzew/Desktop/pynq_car/Papers/FPT2019/conference_041818.pdf (4 pages, 5963019 bytes).
 PDF statistics:
  46 PDF objects out of 1000 (max. 8388607)
  27 compressed objects within 1 object stream
