@@ -213,7 +213,7 @@ int get_light(Mat img){
     merge(hsvSplit,imgHSV);
     Mat imgThresholded;
     //确定颜色显示的范围
-    inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS,iHighV),imgThresholded);
+    inRange(imgHSV, Scalar(iLowH_green, iLowS, iLowV), Scalar(iHighH_green, iHighS,iHighV),imgThresholded);
     //去除噪点
     Mat element = getStructuringElement(MORPH_RECT,Size(5,5));
     morphologyEx(imgThresholded,imgThresholded,MORPH_OPEN,element);
@@ -221,7 +221,7 @@ int get_light(Mat img){
     morphologyEx(imgThresholded, imgThresholded, MORPH_CLOSE, element);
     int count_green = 0;
 for(int nrow=0;nrow<imgThresholded.rows;nrow++)
-    { 
+    {
         uchar*data=imgThresholded.ptr<uchar>(nrow);
         for(int ncol=0;ncol<imgThresholded.cols*imgThresholded.channels();ncol++)
         {
@@ -296,7 +296,7 @@ void box_handler(vector<vector<float>>&res, Mat&img){
                 if(res[i][2]*res[i][3] < IGNORE_PER_AREA){
                     continue;
                 }
-                light = get_light(img(Rect area((res[i][0]-res[i][2]/2)*TAKE_SIZE_WIDTH,(res[i][1]-res[i][3]/2)*TAKE_SIZE_HEIGHT,res[i][2]*TAKE_SIZE_WIDTH,res[i][3]*TAKE_SIZE_HEIGHT)));
+                light = get_light(img(Rect((res[i][0]-res[i][2]/2)*TAKE_SIZE_WIDTH,(res[i][1]-res[i][3]/2)*TAKE_SIZE_HEIGHT,res[i][2]*TAKE_SIZE_WIDTH,res[i][3]*TAKE_SIZE_HEIGHT)));
                 break;
             }
         }
@@ -416,9 +416,10 @@ void run_model(DPUTask* task){
     cout<<"Run Model Exit\n";
 }
 
-#define STRAIGHT_LEFT_K -7.5
-#define STRAIGHT_RIGHT_K 7.5
-#define K_RANGE 0.1
+#define STRAIGHT_LEFT_K -1.1
+#define STRAIGHT_RIGHT_K 1.1
+#define L_TOO_LEFT 85
+#define K_RANGE 0.2
 void run_cv(){
     cout<<"Run CV\n";
     Mat tmpImage;
@@ -446,23 +447,25 @@ void run_cv(){
         
         steer_throttle_command tmpC;
         if(canFind == 1){//cannot find left but can find right
-            float tmpK = laneR.k.get();
+            tmpC.steer = -0.4;
+		/*float tmpK = laneR.k.get();
 	    float tmpB = laneR.b.get();
 	    if(tmpK > STRAIGHT_RIGHT_K + K_RANGE|| tmpK < 0)tmpC.steer = 0.5;
 	    else if(tmpK < STRAIGHT_RIGHT_K - K_RANGE && tmpK > 0)tmpC.steer = float(STRAIGHT_RIGHT_K - K_RANGE - tmpK)/float(STRAIGHT_RIGHT_K - K_RANGE);
-    	    if((72- tmpB)/tmpK < 140)tmpC.steer = -0.4;
+    	    //if((72- tmpB)/tmpK < 140)tmpC.steer = -0.4;
 	    cout<<"laneR k:"<<tmpK<<endl;
 	    //cout<<"laneR b:"<<laneR.b.get()<<",k:"<<laneR.k.get()<<";steer:"<<tmpC.steer<<"\r\033[k";
+	    */
         }else if(canFind == 3){
-	    tmpC.steer = 0;
+	    tmpC.steer = -0.4;
     	    //cout<<"cannot find any so steer:"<<tmpC.steer<<"\r\033[k";
 	}else{
             float tmpB = laneL.b.get();
     	    float tmpK = laneL.k.get();
-            if(tmpK > STRAIGHT_LEFT_K + K_RANGE && tmpK < 0)tmpC.steer = float(STRAIGHT_LEFT_K + K_RANGE - tmpK)/float(STRAIGHT_LEFT_K + K_RANGE);
+	    if(tmpK > STRAIGHT_LEFT_K + K_RANGE && tmpK < 0)tmpC.steer = float(STRAIGHT_LEFT_K + K_RANGE - tmpK)/float(STRAIGHT_LEFT_K + K_RANGE);
             else if(tmpK < STRAIGHT_LEFT_K - K_RANGE || tmpK > 0)tmpC.steer = -0.5;
-	    if((72- tmpB)/tmpK > 70)tmpC.steer = 0.4;
-	    cout<<"laneL k:"<<tmpK<<endl;
+	    if(tmpB > L_TOO_LEFT)tmpC.steer += 0.3;
+	    cout<<"laneL k:"<<tmpK<<" b:"<<tmpB<<endl;
     	    //if(tmpK > 10 && -tmpB/tmpK > TOO_LEFT)tmpC.steer = 
     	    //cout<<"laneL b:"<<laneL.b.get()<<",k:"<<laneL.k.get()<<"; laneR b:"<<laneR.b.get()<<",k:"<<laneR.k.get()<<";steer:"<<tmpC.steer<<"\r\033[k";
         }
@@ -552,15 +555,15 @@ int main(int argc, char **argv)
     */
     vector<thread> threads;
     threads.push_back(thread(run_command));
-    //threads.push_back(thread(run_camera));
-    //threads.push_back(thread(run_cv));
+    threads.push_back(thread(run_camera));
+    threads.push_back(thread(run_cv));
  
     /*
     for(int i=0;i<TASKNUM;i++){
     	threads.push_back(thread(run_model,tasks[i]));
     }
 */
-    threads.push_back(thread(big_right));
+    //threads.push_back(thread(big_right));
     
     for(int i = 0; i < threads.size(); i++){
         threads[i].join();
