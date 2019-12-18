@@ -3,8 +3,8 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
- * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-11-12 14:52:58
+ * @LastEditors  : Sauron Wu
+ * @LastEditTime : 2019-12-18 13:34:09
  * @Description: 
  */
 #include <assert.h>
@@ -53,6 +53,10 @@ float runSpeed;
 #define KERNEL_CONV "testModel_0"
 #define CONV_INPUT_NODE "conv2d_1_convolution"
 #define CONV_OUTPUT_NODE "dense_3_MatMul"
+
+#define CUT_SIZE 40
+#define STORESIZE_WIDTH 160
+#define STORESIZE_HEIGHT 120
 
 #define TASKNUM 1
 //#define SHOWTIME
@@ -222,9 +226,9 @@ void run_cv(){
 void run_camera(){
     cout<<"Run Camera\n";
     VideoCapture cap(0);
-    cap.set(CV_CAP_PROP_FRAME_WIDTH, 160);
-    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 120);
-    Mat image;
+    cap.set(CV_CAP_PROP_FRAME_WIDTH, STORESIZE_WIDTH);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, STORESIZE_HEIGHT);
+    Mat image,resizeImage;
     while(true){
 	exitLock.lock();
 	if(EXIT)break;
@@ -232,11 +236,12 @@ void run_camera(){
 	exitLock.unlock();
 	}
         cap >> image;
+        resize(image,resizeImage,Size(STORESIZE_WIDTH,STORESIZE_HEIGHT));
         int nowSize = takenImages.size();
         if(nowSize >= IMAGEMAXLEN){
-            if(takenImages.try_pop())takenImages.push(image.rowRange(40,image.rows).clone());
+            if(takenImages.try_pop())takenImages.push(resizeImage.rowRange(CUT_SIZE,resizeImage.rows).clone());
         }else{
-            takenImages.push(image.rowRange(40,image.rows).clone());
+            takenImages.push(resizeImage.rowRange(CUT_SIZE,resizeImage.rows).clone());
         }
     }
     exitLock.unlock();

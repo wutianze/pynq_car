@@ -87,8 +87,8 @@ int main(int argc, char **argv)
     PYNQZ2 controller = PYNQZ2();
 
     VideoCapture cap(0);
-    //cap.set(CV_CAP_PROP_FRAME_WIDTH, 160);
-    //cap.set(CV_CAP_PROP_FRAME_HEIGHT, 120);
+    cap.set(CV_CAP_PROP_FRAME_WIDTH, 160);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 120);
     Mat image;
     Mat resizeImage;
     if (access(path.c_str(), 0) == -1)
@@ -136,7 +136,7 @@ int main(int argc, char **argv)
             mtxQueueStore.unlock();
 	        cout<<"Start or Stop Record\n";
 	        break;
-        case 27:
+        case 27://Esc
             mtxQueueStore.lock();
             startRecord = EXIT;
             mtxQueueStore.unlock();

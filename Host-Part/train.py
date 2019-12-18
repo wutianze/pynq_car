@@ -3,8 +3,8 @@
 @GitHub: wutianze
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
-@LastEditors: Please set LastEditors
-@LastEditTime: 2019-11-01 16:31:44
+@LastEditors  : Sauron Wu
+@LastEditTime : 2019-12-18 13:07:09
 @Description: 
 '''
 import keras
@@ -69,7 +69,7 @@ def build_model(keep_prob,model_path):
     model.add(Dropout(keep_prob))
     model.add(Conv2D(64, (5, 5), strides=(2, 2), activation="relu"))
     model.add(Dropout(keep_prob))
-    model.add(Conv2D(64, (3, 3), strides=(2,2), activation="relu"))
+    model.add(Conv2D(64, (3, 3), strides=(1,1), activation="relu"))
     model.add(Dropout(keep_prob))
     model.add(Conv2D(64, (3, 3), strides=(1,1), activation="relu"))    
     model.add(Dropout(keep_prob))
@@ -160,7 +160,7 @@ def main(model_path, read_path):
     print('-'*30)
 
 
-    keep_prob = 0.2
+    keep_prob = 0.1
     # learning_rate must be smaller than 0.0001
     learning_rate = 0.0001
     nb_epoch = 100
