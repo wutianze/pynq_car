@@ -1,8 +1,8 @@
 '''
 @Author: your name
 @Date: 2019-10-29 15:33:55
-@LastEditTime: 2019-11-01 17:45:22
-@LastEditors: Please set LastEditors
+@LastEditTime: 2019-12-18 11:14:52
+@LastEditors: Sauron Wu
 @Description: In User Settings Edit
 @FilePath: /pynq_car/Host-Part/dnndk-host/graph_input_fn.py
 '''
@@ -17,7 +17,7 @@ CONV_INPUT = "conv2d_1_input"
 calib_batch_size = 50
 def calib_input(iter):
   images = []
-  path = "/home/xilinx/real_steer_images/"
+  path = "/home/xilinx/Host-Part/images/"
   files = os.listdir(path)
   for index in range(0, calib_batch_size):
     if files[iter*calib_batch_size+index] == "train.csv" or (not os.path.exists(path+files[iter*calib_batch_size + index]) or os.path.getsize(path + files[iter*calib_batch_size + index])<9000):

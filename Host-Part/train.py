@@ -25,9 +25,10 @@ import argparse
 
 np.random.seed(0)
 IMAGE_SHAPE = [120,160,3]
+global OUTPUT_NUM
 OUTPUT_NUM = 1
 CHUNK_SIZE = 256
-ORIGINAL_LABEL_NUM = 3
+ORIGINAL_LABEL_NUM = 1
 # step1,load data
 def load_data(read_path):
     training_data = glob.glob(read_path + '/*.npz')
@@ -186,7 +187,10 @@ def main(model_path, read_path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='prediction server')
-    parser.add_argument('--model', type=str, help='model dir', default="/home/xilinx/pynq_car/Host-Part/model_command")
-    parser.add_argument('--read', type=str, help='npz store dir', default="/home/xilinx/pynq_car/Host-Part/process_command255")
+    parser.add_argument('--model', type=str, help='model dir', default="/home/xilinx/pynq_car/Host-Part/model")
+    parser.add_argument('--read', type=str, help='npz store dir', default="/home/xilinx/pynq_car/Host-Part/training_data_npz")
+    parser.add_argument('--output_num', type=int, help='the output num of the model not the original label num', default=1)
     args = parser.parse_args()
+    OUTPUT_NUM = args.output_num
+    print("OUTPUT_NUM:%d"%OUTPUT_NUM)
     main(args.model,args.read)
