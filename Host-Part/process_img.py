@@ -3,8 +3,8 @@
 @GitHub: wutianze
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
-@LastEditors: Please set LastEditors
-@LastEditTime: 2019-11-01 17:10:00
+@LastEditors  : Sauron Wu
+@LastEditTime : 2019-12-19 16:19:46
 @Description: 
 '''
 import os
@@ -46,13 +46,13 @@ if __name__ == '__main__':
     parser.add_argument('--path', type=str, help='images dir', default="/home/xilinx/images")
     parser.add_argument('--store', type=str, help='npz store dir', default="/home/xilinx/pynq_car/Host-Part/training_data_npz")
     parser.add_argument('--method', type=int, help='whether to reduce some categories\' number, 0 for true', default=1)
-    parser.add_argument('--filter_size', type=int, help='size of smallest file', default=9000)
+    parser.add_argument('--filter_size', type=int, help='size of smallest file', default=1000)
     parser.add_argument('--cut_head_size', type=int, help='top head of the image to cut', default=40)
     
     args = parser.parse_args()
     CUT_SIZE = args.cut_head_size
-    print("CUT_SIZE is:%d"%CUT_SIZE)    path
-     = args.path
+    print("CUT_SIZE is:%d"%CUT_SIZE)    
+    path = args.path
     names = []
     keys = {}
     with open(path+"/train.csv") as f:
