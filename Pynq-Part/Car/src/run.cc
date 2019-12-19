@@ -51,8 +51,8 @@ vector<string> kinds = {"left", "forward", "right"};
 //vector<string> kinds = {"steer"};
 float runSpeed;
 #define KERNEL_CONV "testModel_0"
-#define CONV_INPUT_NODE "conv2d_1_convolution"
-#define CONV_OUTPUT_NODE "dense_3_MatMul"
+#define CONV_INPUT_NODE "conv2d_1_input"
+#define CONV_OUTPUT_NODE "dense_3_Relu"
 #define OUTPUT_NUM 1
 
 #define CUT_SIZE 40

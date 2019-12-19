@@ -37,10 +37,10 @@ $(BUILD)/%.o : $(SRC)/%.cc
 	$(CXX) -c $(CFLAGS) $< -o $@
 
 
-$(COLLECT) : $(COLLECTOBJ)
+$(COLLECT) : $(addprefix $(BUILD)/, $(COLLECTOBJ))
 	$(CXX) $(CFLAGS) $^ -o $(BUILD)/$@ $(COLLECTLDFLAGS)
 
-$(RUN) : $(RUNOBJ)
+$(RUN) : $(addprefix $(BUILD)/, $(RUNOBJ))
 	$(CXX) $(CFLAGS) $^ $(MODEL) -o $(BUILD)/$@ $(RUNLDFLAGS)
 
 $(FPT) : $(addprefix $(BUILD)/, $(FPTOBJ))
