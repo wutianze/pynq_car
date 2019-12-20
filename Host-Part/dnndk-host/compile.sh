@@ -1,3 +1,12 @@
+###
+ # @Author: Sauron Wu
+ # @GitHub: wutianze
+ # @Email: 1369130123qq@gmail.com
+ # @Date: 2019-10-15 15:36:14
+ # @LastEditors: Sauron Wu
+ # @LastEditTime: 2019-12-20 11:39:21
+ # @Description: 
+ ###
 #!/bin/bash
 
 # delete previous results
@@ -19,7 +28,7 @@ dnnc \
        --output_dir=compile \
        --save_kernel \
        --mode normal \
-       --net_name=yolo6600Model
+       --net_name=testModel
 
 echo "#####################################"
 echo "COMPILATION COMPLETED"
