@@ -20,7 +20,7 @@ def calib_input(iter):
   path = "/home/xilinx/Host-Part/images/"
   files = os.listdir(path)
   for index in range(0, calib_batch_size):
-    if files[iter*calib_batch_size+index] == "train.csv" or (not os.path.exists(path+files[iter*calib_batch_size + index]) or os.path.getsize(path + files[iter*calib_batch_size + index])<9000):
+    if files[iter*calib_batch_size+index] == "train.csv" or (not os.path.exists(path+files[iter*calib_batch_size + index]) or os.path.getsize(path + files[iter*calib_batch_size + index])<1000):# it will ignore the images which are too small
         continue
     image = image_handle(cv2.imread(path + files[iter*calib_batch_size + index]))
     images.append(image)
