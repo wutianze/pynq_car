@@ -1,8 +1,8 @@
 '''
-@Author: your name
+@Author: sauron
 @Date: 2019-10-29 15:33:55
-@LastEditTime : 2019-12-18 17:55:50
-@LastEditors  : Please set LastEditors
+@LastEditTime : 2019-12-18 17:51:26
+@LastEditors  : Sauron Wu
 @Description: In User Settings Edit
 @FilePath: /pynq_car/Host-Part/dnndk-host/graph_input_fn.py
 '''

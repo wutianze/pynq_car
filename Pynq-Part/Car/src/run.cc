@@ -51,8 +51,13 @@ vector<string> kinds = {"left", "forward", "right"};
 //vector<string> kinds = {"steer"};
 float runSpeed;
 #define KERNEL_CONV "testModel_0"
-#define CONV_INPUT_NODE "conv2d_1_convolution"
-#define CONV_OUTPUT_NODE "dense_3_MatMul"
+#define CONV_INPUT_NODE "conv2d_1_input"
+#define CONV_OUTPUT_NODE "dense_3_Relu"
+#define OUTPUT_NUM 1
+
+#define CUT_SIZE 40
+#define STORESIZE_WIDTH 160
+#define STORESIZE_HEIGHT 120
 
 #define CUT_SIZE 40
 #define STORESIZE_WIDTH 160
@@ -132,10 +137,10 @@ void addCommand(int com){
     timeLock.unlock();
     int nowSize = generatedCommands.size();
     if( nowSize >= COMMANDMAXLEN){
-        if(generatedCommands.try_pop())generatedCommands.push(float(com));
+        if(generatedCommands.try_pop())generatedCommands.push(com);
         return;
     }else{
-        generatedCommands.push(float(com));
+        generatedCommands.push(com);
     }
 }
 
@@ -186,8 +191,9 @@ void run_model(DPUTask* task){
         _T(dpuRunTask(task));
         float scale = dpuGetOutputTensorScale(task, CONV_OUTPUT_NODE);
         int8_t* modelRes = dpuGetTensorAddress(dpuGetOutputTensor(task, CONV_OUTPUT_NODE));
-	//_T(dpuRunSoftmax(modelRes, smRes.data(), channel, 1, scale));
-	addCommand(((float*)smRes.data())[0]);
+        float steer = modelRes[0] * scale;
+	    //_T(dpuRunSoftmax(modelRes, smRes.data(), channel, 1, scale));
+	    addSteer(steer);
         //addCommand(topKind(smRes.data(), channel));        
     }
     exitLock.unlock();
@@ -252,7 +258,6 @@ void run_camera(){
 void run_command(){
     cout<<"Run Command\n";
     PYNQZ2 controller = PYNQZ2();
-    controller.throttleSet(0.0);
     controller.throttleSet(1.0);
     sleep(0.1);
     controller.throttleSet(runSpeed);
@@ -287,7 +292,7 @@ void run_command(){
     }
 
 void run_steer(){
-    cout<<"Run Command\n";
+    cout<<"Run Steer\n";
     PYNQZ2 controller = PYNQZ2();
     controller.throttleSet(runSpeed);
     while(true){
