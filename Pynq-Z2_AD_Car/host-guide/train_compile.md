@@ -17,7 +17,7 @@ Please run `pip install keras==2.2.0` to install keras if you want to use the co
 # Handle images
 1. First copy the images your generated(using the images from the car's collect function or from the simulator or from anywhere) to the Host-Part/images directory. If you want to use our simulator to generate images, please go to sdsandbox and read its guide.
 2. Run `python process_img.py --path=./images --store=./training_data_npz --method=0`, process_img reads images from path and store the result in store.
-3. Read the file `process_img.py` and all you need to edit is the function `image_handle()`, you can do anything you want to the images in the function.
+3. Read the file `process_img.py` and what you need to edit is the function `image_handle()`, you can do anything you want to the images in the function. If you change the image size in `image_handle()`, you need to reset the `IMAGE_SHAPE` in `main()`.
 4. If the `--method` parameter equals 0, it means that you want to ignore some training data(ex. data of one category is too much and you want to make a balance), you can define your own tactic in the `main()` in `process_img.py`.  
 ![process img](./process_img.png)
    

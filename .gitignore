@@ -11,10 +11,11 @@ Pynq-Part/system/
 **/*.o
 **/*.npz
 **/logs
+**/*.pb
+**/*.h5
 #**/log*
 **/images_*.jpg
 Virtual-Part/*.pyc
-Virtual-Part/*.h5
 Virtual-Part/simulator/Library
 Virtual-Part/simulator/log*/*
 Virtual-Part/simulator/obj

@@ -3,8 +3,8 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
- * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-12-02 11:53:26
+ * @LastEditors  : Please set LastEditors
+ * @LastEditTime : 2019-12-20 10:29:33
  * @Description: 
  */
 #include <assert.h>
@@ -132,17 +132,21 @@ void avoid(){
     tmpC.steer = 1;
     tmpC.throttle = -1.0;
     addCommand(tmpC);
-    std::this_thread::sleep_for(std::chrono::milliseconds(4200));
+    addCommand(tmpC);
+    addCommand(tmpC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(6200));
 
     //2. turn left
     tmpC.steer = -1;
     tmpC.throttle = -1.0;
     addCommand(tmpC);
-    std::this_thread::sleep_for(std::chrono::milliseconds(6000));
+    addCommand(tmpC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
     //2. straight to cross the obstacle
     tmpC.steer = 0;
     tmpC.throttle = -1.0;
+    addCommand(tmpC);
     addCommand(tmpC);
     std::this_thread::sleep_for(std::chrono::milliseconds(700));
 
@@ -150,13 +154,15 @@ void avoid(){
     tmpC.steer = -1;
     tmpC.throttle = -1.0;
     addCommand(tmpC);
-    std::this_thread::sleep_for(std::chrono::milliseconds(4900));
+    addCommand(tmpC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5300));
 
     //2. turn right
     tmpC.steer = 1;
     tmpC.throttle = -1.0;
     addCommand(tmpC);
-    std::this_thread::sleep_for(std::chrono::milliseconds(3400));
+    addCommand(tmpC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
 
     //2. straight again
     tmpC.steer = 0;
@@ -237,22 +243,18 @@ for(int nrow=0;nrow<imgThresholded.rows;nrow++)
 int last_command = -1;
 int pre_last_command = -1;
 
-#define IGNORE_OB_X  0.3
-#define IGNORE_OB_AREA 0.2
-#define SEE_OBSTACLE 2
+#define IGNORE_OB_AREA 0.01
 
 #define PERSON_OUT_X 0.1
-#define IGNORE_PER_AREA 0.1
-#define SEE_PER 2
+#define IGNORE_PER_AREA 0.01
 
-#define IGNORE_SIDEWALK_AREA 0.3
-#define SEE_SIDEWALK 2
+#define IGNORE_SIDEWALK_AREA 0.01
 
-#define IGNORE_LIGHT_AREA 0.3
 //-------------------
 
 void box_handler(vector<vector<float>>&res, Mat&img){
-    //person_place means where is the person, -1:no person;0:in the road;1:out of the road
+    cout<<"start box_handler\n";
+	//person_place means where is the person, -1:no person;0:in the road;1:out of the road
     int person_place = -1;
     bool has_ob = false;
     bool has_side = false;
@@ -277,7 +279,8 @@ void box_handler(vector<vector<float>>&res, Mat&img){
             }
             //obstacles
             case 1:case 2:case 3:{
-                if(res[i][0]-res[i][2]/2 > IGNORE_OB_X || res[i][2] * res[i][3] < IGNORE_OB_AREA){
+		cout<<"ob left:"<<(res[i][0] - res[i][2]/2)<<"ob squre:"<<res[i][2]*res[i][3]<<endl;
+                if(res[i][2] * res[i][3] < IGNORE_OB_AREA){
                     continue;
                 }
                 has_ob = true;
@@ -302,13 +305,16 @@ void box_handler(vector<vector<float>>&res, Mat&img){
         }
     }
 
+    cout<<"finish finding start judging\n";
     int now_command = -1;
     //second generate last_command
     if(has_ob){
+	    cout<<"has ob\n";
         now_command = 0;
     }else if(person_place == 0){
         now_command = 1;
     }else if(person_place == 1){
+	    cout<<"has person\n";
         if(has_side){
             switch(light){
                 case -1:case 1:{//if the light is not green or no light,stop
@@ -405,10 +411,14 @@ void run_model(DPUTask* task){
 	    }
         
         if(!takenImages.try_pop(tmpImage))continue;
+	//tmpImage = imread("test.jpg");
 	    set_input_image(task, tmpImage,INPUTNODE);
         dpuRunTask(task);
 	    vector<vector<float>> res = deal(task, tmpImage, sw, sh);
-        //imshow("yolo-v3", img);
+        for(int i=0;i<res.size();i++){
+cout<<"find in yolo:"<<categories[int(res[i][4])]<<endl;	
+	}
+	    //imshow("yolo-v3", img);
         //waitKey(0);	    //takenImages.wait_and_pop(tmpImage);
         box_handler(res,tmpImage);
     }
@@ -418,12 +428,12 @@ void run_model(DPUTask* task){
 
 #define STRAIGHT_LEFT_K -1.1
 #define STRAIGHT_RIGHT_K 1.1
-#define L_TOO_LEFT 85
+#define L_TOO_LEFT 110
 #define K_RANGE 0.2
 void run_cv(){
     cout<<"Run CV\n";
     Mat tmpImage;
-    CvSize frame_size = cvSize(LANE_DET_WIDTH, LANE_DET_HEIGHT/2);
+    CvSize frame_size = cvSize(LANE_DET_WIDTH, LANE_DET_HEIGHT/3);
     IplImage *temp_frame = cvCreateImage(frame_size, IPL_DEPTH_8U, 3);
 	IplImage *grey = cvCreateImage(frame_size, IPL_DEPTH_8U, 1);
 	IplImage *edges = cvCreateImage(frame_size, IPL_DEPTH_8U, 1);
@@ -441,7 +451,8 @@ void run_cv(){
             continue;
         }
         commanderLock.unlock();
-        if(!takenImages.try_pop(tmpImage))continue;
+        cout<<"cv_control\n";
+	if(!takenImages.try_pop(tmpImage))continue;
         IplImage frame_get = IplImage(tmpImage);
         int canFind = find_lane(&frame_get,temp_frame,grey,edges,houghStorage);
         
@@ -463,7 +474,7 @@ void run_cv(){
             float tmpB = laneL.b.get();
     	    float tmpK = laneL.k.get();
 	    if(tmpK > STRAIGHT_LEFT_K + K_RANGE && tmpK < 0)tmpC.steer = float(STRAIGHT_LEFT_K + K_RANGE - tmpK)/float(STRAIGHT_LEFT_K + K_RANGE);
-            else if(tmpK < STRAIGHT_LEFT_K - K_RANGE || tmpK > 0)tmpC.steer = -0.5;
+            else if(tmpK < STRAIGHT_LEFT_K - K_RANGE || tmpK > 0)tmpC.steer = -0.4;
 	    if(tmpB > L_TOO_LEFT)tmpC.steer += 0.3;
 	    cout<<"laneL k:"<<tmpK<<" b:"<<tmpB<<endl;
     	    //if(tmpK > 10 && -tmpB/tmpK > TOO_LEFT)tmpC.steer = 
@@ -501,9 +512,9 @@ void run_camera(){
         cap >> image;
         int nowSize = takenImages.size();
         if(nowSize >= IMAGEMAXLEN){
-            if(takenImages.try_pop())takenImages.push(image.rowRange(40,image.rows).clone());
+            if(takenImages.try_pop())takenImages.push(image);
         }else{
-            takenImages.push(image.rowRange(40,image.rows).clone());
+            takenImages.push(image);
         }
     }
     exitLock.unlock();
@@ -547,33 +558,33 @@ int main(int argc, char **argv)
       }
 
     signal(SIGTSTP,sig_handler);
-/*
+
     dpuOpen();
     DPUKernel *kernelConv = dpuLoadKernel(YOLOKERNEL);
     vector<DPUTask*> tasks(TASKNUM);
     generate(tasks.begin(),tasks.end(),std::bind(dpuCreateTask,kernelConv,0));    
-    */
+    
     vector<thread> threads;
     threads.push_back(thread(run_command));
     threads.push_back(thread(run_camera));
     threads.push_back(thread(run_cv));
  
-    /*
+    
     for(int i=0;i<TASKNUM;i++){
-    	threads.push_back(thread(run_model,tasks[i]));
+   	threads.push_back(thread(run_model,tasks[i]));
     }
-*/
-    //threads.push_back(thread(big_right));
+
+    //threads.push_back(thread(avoid));
     
     for(int i = 0; i < threads.size(); i++){
         threads[i].join();
         cout<<"one exit:"<<i<<endl;
     }
-/*
+
     for_each(tasks.begin(),tasks.end(),dpuDestroyTask);
 
     dpuDestroyKernel(kernelConv);
     dpuClose();
-*/
+
     return 0;
 }

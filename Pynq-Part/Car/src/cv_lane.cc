@@ -2,7 +2,7 @@
 using namespace std;
 
 ExpMovingAverage::ExpMovingAverage() {
-this->alpha = 0.7;
+this->alpha = 0.8;
 this->unset = true;
 }
   
@@ -50,7 +50,7 @@ float dist2line(CvPoint2D32f line0, CvPoint2D32f line1, CvPoint2D32f pt){
 //--------------------------------------------------------------------
 
 //#define USE_VIDEO 1
-#define SHOW_TMP_FRAME 1
+//#define SHOW_TMP_FRAME 1
 
 Status laneR, laneL;
 void crop(IplImage* src,  IplImage* dest, CvRect rect) {
@@ -272,7 +272,12 @@ int find_lane(IplImage* frame_get, IplImage* temp_frame, IplImage* grey, IplImag
 	IplImage* frame=cvCreateImage(newSz,frame_get->depth,frame_get->nChannels);
 	cvResize(frame_get,frame,CV_INTER_AREA);
 	// we're interested only in road below horizont - so crop top image portion off
-	crop(frame, temp_frame, cvRect(0,LANE_DET_HEIGHT/3,LANE_DET_WIDTH,LANE_DET_HEIGHT/2));
+	
+	int cutH = int((LANE_DET_HEIGHT*2)/3);
+	int cutHH = int(LANE_DET_HEIGHT/3);
+	//cout<<"cut height:"<<cutH<<" cutHH:"<<cutHH<<"temp height:"<<temp_frame->height<<" frame height:"<<frame->height<<endl;
+	crop(frame, temp_frame, cvRect(0,cutH,LANE_DET_WIDTH,cutHH));
+	//cout<<"crop success\n";
 	cvCvtColor(temp_frame, grey, CV_BGR2GRAY); // convert to grayscale
 	
 	// Perform a Gaussian blur ( Convolving with 5 X 5 Gaussian) & detect edges

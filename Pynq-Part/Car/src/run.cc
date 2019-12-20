@@ -59,6 +59,10 @@ float runSpeed;
 #define STORESIZE_WIDTH 160
 #define STORESIZE_HEIGHT 120
 
+#define CUT_SIZE 40
+#define STORESIZE_WIDTH 160
+#define STORESIZE_HEIGHT 120
+
 #define TASKNUM 1
 //#define SHOWTIME
 #ifdef SHOWTIME

@@ -78,7 +78,7 @@ networks.
    - `setInputImage()`: Replace it with your own image pre-process way
    - `topKind()`: It will use the results of softmax function and output the final kind
    - `runCV()`: This function is independent of DPU usage, you can add your cv control here
-   - If you use regression model, you don't need to use `topKind()` and softmax function, you should get the model output directly and add it in `addCommand()` and use it in `runCommand()`
+   - If you use regression model, you don't need to use `topKind()` and softmax function, you should get the model output directly and add it in `addCommand()` and use it in `runCommand()`. We also provide a function `addSteer()` to add only steer commands, you can use it if you want.
 
 ## Run the car
 ```shell

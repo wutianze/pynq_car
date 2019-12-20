@@ -3,8 +3,8 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-11-20 13:47:36
- * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-11-25 14:26:59
+ * @LastEditors  : Please set LastEditors
+ * @LastEditTime : 2019-12-20 10:30:25
  * @Description: 
  */
 #ifndef RUNYOLO_H
@@ -43,7 +43,7 @@ using namespace std::chrono;
 #define CONF 0.5
 #define NMS_THRE  0.1
 //dpu kernel info
-#define YOLOKERNEL "testModel"
+#define YOLOKERNEL "yolo6600Model"
 #define INPUTNODE "conv2d_1_convolution"
 
 extern vector<string>outputs_node;

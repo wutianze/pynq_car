@@ -3,8 +3,8 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-11-12 12:38:24
- * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-12-02 16:57:27
+ * @LastEditors  : Please set LastEditors
+ * @LastEditTime : 2019-12-20 10:28:03
  * @Description: 
  */
 #include <assert.h>
@@ -42,8 +42,8 @@ float dist2line(CvPoint2D32f line0, CvPoint2D32f line1, CvPoint2D32f pt);
 //----------------------------------------------------------------------
 
 
-#define LANE_DET_WIDTH 160
-#define LANE_DET_HEIGHT 120
+#define LANE_DET_WIDTH 320
+#define LANE_DET_HEIGHT 240
 struct Lane {
 	Lane(){}
 	Lane(CvPoint a, CvPoint b, float angle, float kl, float bl): p0(a),p1(b),angle(angle),
