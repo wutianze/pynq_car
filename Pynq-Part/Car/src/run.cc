@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors  : Sauron Wu
- * @LastEditTime : 2019-12-18 13:34:09
+ * @LastEditTime : 2019-12-20 11:40:01
  * @Description: 
  */
 #include <assert.h>
@@ -50,9 +50,9 @@ safe_queue<float> generatedCommands;
 vector<string> kinds = {"left", "forward", "right"};
 //vector<string> kinds = {"steer"};
 float runSpeed;
-#define KERNEL_CONV "testModel_0"
-#define CONV_INPUT_NODE "conv2d_1_input"
-#define CONV_OUTPUT_NODE "dense_3_Relu"
+#define KERNEL_CONV "testModel"
+#define CONV_INPUT_NODE "conv2d_1_convolution"
+#define CONV_OUTPUT_NODE "dense_3_MatMul"
 #define OUTPUT_NUM 1
 
 #define CUT_SIZE 40

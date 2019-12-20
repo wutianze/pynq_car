@@ -5,7 +5,7 @@ FPT = fpt
 CUR_DIR =   $(shell pwd)
 SRC     =   $(CUR_DIR)/src
 BUILD   =   $(CUR_DIR)/build
-MODEL   =   $(CUR_DIR)/model/dpu_testModel_0.elf
+MODEL   =   $(CUR_DIR)/model/dpu_testModel.elf
 YOLO    =   $(CUR_DIR)/model/yolo_model.elf
 ARCH    =     $(shell uname -m | sed -e s/arm.*/armv71/ \
 	-e s/aarch64.*/aarch64/ )
