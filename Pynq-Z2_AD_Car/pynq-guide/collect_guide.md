@@ -3,8 +3,8 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-14 14:57:47
- * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-31 15:34:00
+ * @LastEditors  : Sauron Wu
+ * @LastEditTime : 2019-12-24 11:41:09
  * @Description: 
  -->
 # What you will learn:
@@ -32,7 +32,7 @@ Now you will see a small window in your PC and you can use your keyboard to cont
 - a: turn left
 - d: turn right
 - s: stop
-- t: start to save images until the number of pictures reach the threshold you set before
+- t: start to save images until the number of pictures reach the threshold you set before, you can press it again to stop the save process until next press
 - Esc: stop the whole process
 The pictures and labels are saved in the directory `images`.
 
