@@ -2,7 +2,7 @@
 using namespace std;
 
 ExpMovingAverage::ExpMovingAverage() {
-this->alpha = 0.8;
+this->alpha = 0.7;
 this->unset = true;
 }
   
@@ -272,7 +272,7 @@ int find_lane(IplImage* frame_get, IplImage* temp_frame, IplImage* grey, IplImag
 	IplImage* frame=cvCreateImage(newSz,frame_get->depth,frame_get->nChannels);
 	cvResize(frame_get,frame,CV_INTER_AREA);
 	// we're interested only in road below horizont - so crop top image portion off
-	crop(frame, temp_frame, cvRect(0,LANE_DET_HEIGHT/2,LANE_DET_WIDTH,LANE_DET_HEIGHT/2));
+	crop(frame, temp_frame, cvRect(0,LANE_DET_HEIGHT/3,LANE_DET_WIDTH,LANE_DET_HEIGHT/2));
 	cvCvtColor(temp_frame, grey, CV_BGR2GRAY); // convert to grayscale
 	
 	// Perform a Gaussian blur ( Convolving with 5 X 5 Gaussian) & detect edges

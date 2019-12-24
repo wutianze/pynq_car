@@ -3,8 +3,8 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
- * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-11-12 14:52:58
+ * @LastEditors  : Sauron Wu
+ * @LastEditTime : 2019-12-24 11:12:26
  * @Description: 
  */
 #include <assert.h>
@@ -50,9 +50,14 @@ safe_queue<float> generatedCommands;
 vector<string> kinds = {"left", "forward", "right"};
 //vector<string> kinds = {"steer"};
 float runSpeed;
-#define KERNEL_CONV "testModel_0"
+#define KERNEL_CONV "testModel"
 #define CONV_INPUT_NODE "conv2d_1_convolution"
 #define CONV_OUTPUT_NODE "dense_3_MatMul"
+#define OUTPUT_NUM 1
+
+#define CUT_SIZE 40
+#define STORESIZE_WIDTH 160
+#define STORESIZE_HEIGHT 120
 
 #define TASKNUM 1
 //#define SHOWTIME
@@ -115,7 +120,7 @@ int topKind(const float *d, int size)
 }
 
 #define COMMANDMAXLEN 3
-void addCommand(int com){
+/*void addCommand(int com){
     timeLock.lock();
     clock_t now = clock();
     if(now < timeSet){
@@ -133,9 +138,8 @@ void addCommand(int com){
     }else{
         generatedCommands.push(float(com));
     }
-}
+}*/
 
-#define COMMANDMAXLEN 3
 void addSteer(float com){
     timeLock.lock();
     clock_t now = clock();
@@ -182,8 +186,20 @@ void run_model(DPUTask* task){
         _T(dpuRunTask(task));
         float scale = dpuGetOutputTensorScale(task, CONV_OUTPUT_NODE);
         int8_t* modelRes = dpuGetTensorAddress(dpuGetOutputTensor(task, CONV_OUTPUT_NODE));
-	//_T(dpuRunSoftmax(modelRes, smRes.data(), channel, 1, scale));
-	addCommand(((float*)smRes.data())[0]);
+        float steer = modelRes[0] * scale;
+	    //_T(dpuRunSoftmax(modelRes, smRes.data(), channel, 1, scale));
+	cout<<"output steer now:"<<steer<<endl;  
+
+    //you should edit the following code according to your model's performance
+	float changeV = steer*2.0 - 1.08;
+        if(changeV > 0){
+	changeV = changeV + 0.1;
+	}	
+	if(changeV < 0){
+		changeV = changeV - 0.4;
+	}
+
+	addSteer(changeV);
         //addCommand(topKind(smRes.data(), channel));        
     }
     exitLock.unlock();
@@ -222,9 +238,9 @@ void run_cv(){
 void run_camera(){
     cout<<"Run Camera\n";
     VideoCapture cap(0);
-    cap.set(CV_CAP_PROP_FRAME_WIDTH, 160);
-    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 120);
-    Mat image;
+    cap.set(CV_CAP_PROP_FRAME_WIDTH, STORESIZE_WIDTH);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, STORESIZE_HEIGHT);
+    Mat image,resizeImage;
     while(true){
 	exitLock.lock();
 	if(EXIT)break;
@@ -232,22 +248,22 @@ void run_camera(){
 	exitLock.unlock();
 	}
         cap >> image;
+        resize(image,resizeImage,Size(STORESIZE_WIDTH,STORESIZE_HEIGHT));
         int nowSize = takenImages.size();
         if(nowSize >= IMAGEMAXLEN){
-            if(takenImages.try_pop())takenImages.push(image.rowRange(40,image.rows).clone());
+            if(takenImages.try_pop())takenImages.push(resizeImage.rowRange(CUT_SIZE,resizeImage.rows).clone());
         }else{
-            takenImages.push(image.rowRange(40,image.rows).clone());
+            takenImages.push(resizeImage.rowRange(CUT_SIZE,resizeImage.rows).clone());
         }
     }
     exitLock.unlock();
     cout<<"Run Camera Exit\n";
     cap.release();
 }
-
+/*
 void run_command(){
     cout<<"Run Command\n";
     PYNQZ2 controller = PYNQZ2();
-    controller.throttleSet(0.0);
     controller.throttleSet(1.0);
     sleep(0.1);
     controller.throttleSet(runSpeed);
@@ -261,11 +277,11 @@ void run_command(){
 	else{
 	exitLock.unlock();
 	}
-        int tmpC;
+        float tmpC;
         if(!generatedCommands.try_pop(tmpC))continue;
 	//generatedCommands.wait_and_pop(tmpC);
     //    cout<<"the command is:"<<tmpC<<endl;
-        switch(tmpC){
+        switch(int(tmpC)){
             case 0:
             controller.steerSet(-1.0);
             break;
@@ -280,9 +296,9 @@ void run_command(){
     exitLock.unlock();
     cout<<"Run Command Exit\n";
     }
-
+*/
 void run_steer(){
-    cout<<"Run Command\n";
+    cout<<"Run Steer\n";
     PYNQZ2 controller = PYNQZ2();
     controller.throttleSet(runSpeed);
     while(true){

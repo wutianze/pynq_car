@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-15 09:17:19
  * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-31 15:54:46
+ * @LastEditTime: 2019-12-18 11:22:54
  * @Description: 
  -->
 # What you will learn:
@@ -78,13 +78,13 @@ networks.
    - `setInputImage()`: Replace it with your own image pre-process way
    - `topKind()`: It will use the results of softmax function and output the final kind
    - `runCV()`: This function is independent of DPU usage, you can add your cv control here
-   - If you use regression model, you don't need to use `topKind()` and softmax function, you should get the model output directly and add it in `addCommand()` and use it in `runCommand()`
+   - If you use regression model, you don't need to use `topKind()` and softmax function, you should get the model output directly and add it in `addCommand()` and use it in `runCommand()`. We also provide a function `addSteer()` to add only steer commands, you can use it if you want.
 
 ## Run the car
 ```shell
 cd ~/Car
 make run
-./build/run nn/cv # nn means just use ml, cv means use ml & cv.
+./build/run c/n 0.5 # Usage of this exe: ./car c/n 0.5(run speed)
 ```
 # References
 [libn2cube API](https://www.xilinx.com/support/documentation/sw_manuals/ai_inference/v1_5/ug1327-dnndk-user-guide.pdf)

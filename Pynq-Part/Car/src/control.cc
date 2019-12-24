@@ -9,9 +9,9 @@
  */
 #include"control.h"
 #include<cmath>
-#define THROTTLEINIT 200000
-#define THROTTLEVAL 35000
-#define THROTTLEZERO 150000
+#define THROTTLEINIT 500000
+#define THROTTLEVAL 60000
+#define THROTTLEZERO 140000
 #define STEERINIT 2000000
 #define STEERVAL 40000
 #define STEERZERO 151000

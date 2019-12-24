@@ -5,8 +5,6 @@ FPT = fpt
 CUR_DIR =   $(shell pwd)
 SRC     =   $(CUR_DIR)/src
 BUILD   =   $(CUR_DIR)/build
-MODEL   =   $(CUR_DIR)/model/dpu_testModel_0.elf
-YOLO    =   $(CUR_DIR)/model/yolo_model.elf
 ARCH    =     $(shell uname -m | sed -e s/arm.*/armv71/ \
 	-e s/aarch64.*/aarch64/ )
 
@@ -37,11 +35,11 @@ $(BUILD)/%.o : $(SRC)/%.cc
 	$(CXX) -c $(CFLAGS) $< -o $@
 
 
-$(COLLECT) : $(COLLECTOBJ)
+$(COLLECT) : $(addprefix $(BUILD)/, $(COLLECTOBJ))
 	$(CXX) $(CFLAGS) $^ -o $(BUILD)/$@ $(COLLECTLDFLAGS)
 
-$(RUN) : $(RUNOBJ)
-	$(CXX) $(CFLAGS) $^ $(MODEL) -o $(BUILD)/$@ $(RUNLDFLAGS)
+$(RUN) : $(addprefix $(BUILD)/, $(RUNOBJ))
+	$(CXX) $(CFLAGS) $^ -o $(BUILD)/$@ $(RUNLDFLAGS)
 
 $(FPT) : $(addprefix $(BUILD)/, $(FPTOBJ))
 	$(CXX) $(CFLAGS) $^ -o $(BUILD)/$@ $(RUNLDFLAGS)

@@ -42,8 +42,8 @@ float dist2line(CvPoint2D32f line0, CvPoint2D32f line1, CvPoint2D32f pt);
 //----------------------------------------------------------------------
 
 
-#define LANE_DET_WIDTH 320
-#define LANE_DET_HEIGHT 240
+#define LANE_DET_WIDTH 160
+#define LANE_DET_HEIGHT 120
 struct Lane {
 	Lane(){}
 	Lane(CvPoint a, CvPoint b, float angle, float kl, float bl): p0(a),p1(b),angle(angle),

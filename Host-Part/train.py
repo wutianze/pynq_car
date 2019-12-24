@@ -3,8 +3,8 @@
 @GitHub: wutianze
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
-@LastEditors: Please set LastEditors
-@LastEditTime: 2019-11-01 16:31:44
+@LastEditors  : Sauron Wu
+@LastEditTime : 2019-12-18 13:07:09
 @Description: 
 '''
 import keras
@@ -21,13 +21,15 @@ from keras.layers import Lambda, Conv2D, MaxPooling2D, Dropout, Dense, Flatten, 
 from keras.models import load_model, Model, Input
 from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard, ReduceLROnPlateau
 from keras.optimizers import Adam, SGD
+from keras.utils import plot_model
 import argparse
 
 np.random.seed(0)
 IMAGE_SHAPE = [120,160,3]
+global OUTPUT_NUM
 OUTPUT_NUM = 1
 CHUNK_SIZE = 256
-ORIGINAL_LABEL_NUM = 3
+ORIGINAL_LABEL_NUM = 1
 # step1,load data
 def load_data(read_path):
     training_data = glob.glob(read_path + '/*.npz')
@@ -68,7 +70,7 @@ def build_model(keep_prob,model_path):
     model.add(Dropout(keep_prob))
     model.add(Conv2D(64, (5, 5), strides=(2, 2), activation="relu"))
     model.add(Dropout(keep_prob))
-    model.add(Conv2D(64, (3, 3), strides=(2,2), activation="relu"))
+    model.add(Conv2D(64, (3, 3), strides=(1,1), activation="relu"))
     model.add(Dropout(keep_prob))
     model.add(Conv2D(64, (3, 3), strides=(1,1), activation="relu"))    
     model.add(Dropout(keep_prob))
@@ -80,6 +82,7 @@ def build_model(keep_prob,model_path):
     model.add(Dense(OUTPUT_NUM,activation="relu"))
     #model.add(Dense(OUTPUT_NUM,activation='softmax'))
     model.summary()
+    plot_model(model, to_file="model.png",show_shapes=True)
     return model
 
 # step3 Train Model
@@ -158,8 +161,7 @@ def main(model_path, read_path):
     print('parameters')
     print('-'*30)
 
-
-    keep_prob = 0.2
+    keep_prob = 0.1
     # learning_rate must be smaller than 0.0001
     learning_rate = 0.0001
     nb_epoch = 100
@@ -179,6 +181,8 @@ def main(model_path, read_path):
 
     # compile the model
     model = build_model(keep_prob,model_path)
+    print("build finished")
+
     # train model
     train_model(model, learning_rate, nb_epoch, samples_per_epoch, batch_size, train_list, valid_list,model_path)
     print("Model Train Finished")
@@ -186,7 +190,10 @@ def main(model_path, read_path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='prediction server')
-    parser.add_argument('--model', type=str, help='model dir', default="/home/xilinx/pynq_car/Host-Part/model_command")
-    parser.add_argument('--read', type=str, help='npz store dir', default="/home/xilinx/pynq_car/Host-Part/process_command255")
+    parser.add_argument('--model', type=str, help='model dir', default="/home/xilinx/pynq_car/Host-Part/model")
+    parser.add_argument('--read', type=str, help='npz store dir', default="/home/xilinx/pynq_car/Host-Part/training_data_npz")
+    parser.add_argument('--output_num', type=int, help='the output num of the model not the original label num', default=1)
     args = parser.parse_args()
+    OUTPUT_NUM = args.output_num
+    print("OUTPUT_NUM:%d"%OUTPUT_NUM)
     main(args.model,args.read)
