@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors  : Sauron Wu
- * @LastEditTime : 2019-12-20 11:40:01
+ * @LastEditTime : 2019-12-24 11:12:26
  * @Description: 
  */
 #include <assert.h>
@@ -54,10 +54,6 @@ float runSpeed;
 #define CONV_INPUT_NODE "conv2d_1_convolution"
 #define CONV_OUTPUT_NODE "dense_3_MatMul"
 #define OUTPUT_NUM 1
-
-#define CUT_SIZE 40
-#define STORESIZE_WIDTH 160
-#define STORESIZE_HEIGHT 120
 
 #define CUT_SIZE 40
 #define STORESIZE_WIDTH 160
@@ -124,7 +120,7 @@ int topKind(const float *d, int size)
 }
 
 #define COMMANDMAXLEN 3
-void addCommand(int com){
+/*void addCommand(int com){
     timeLock.lock();
     clock_t now = clock();
     if(now < timeSet){
@@ -137,14 +133,13 @@ void addCommand(int com){
     timeLock.unlock();
     int nowSize = generatedCommands.size();
     if( nowSize >= COMMANDMAXLEN){
-        if(generatedCommands.try_pop())generatedCommands.push(com);
+        if(generatedCommands.try_pop())generatedCommands.push(float(com));
         return;
     }else{
-        generatedCommands.push(com);
+        generatedCommands.push(float(com));
     }
-}
+}*/
 
-#define COMMANDMAXLEN 3
 void addSteer(float com){
     timeLock.lock();
     clock_t now = clock();
@@ -193,7 +188,18 @@ void run_model(DPUTask* task){
         int8_t* modelRes = dpuGetTensorAddress(dpuGetOutputTensor(task, CONV_OUTPUT_NODE));
         float steer = modelRes[0] * scale;
 	    //_T(dpuRunSoftmax(modelRes, smRes.data(), channel, 1, scale));
-	    addSteer(steer);
+	cout<<"output steer now:"<<steer<<endl;  
+
+    //you should edit the following code according to your model's performance
+	float changeV = steer*2.0 - 1.08;
+        if(changeV > 0){
+	changeV = changeV + 0.1;
+	}	
+	if(changeV < 0){
+		changeV = changeV - 0.4;
+	}
+
+	addSteer(changeV);
         //addCommand(topKind(smRes.data(), channel));        
     }
     exitLock.unlock();
@@ -254,7 +260,7 @@ void run_camera(){
     cout<<"Run Camera Exit\n";
     cap.release();
 }
-
+/*
 void run_command(){
     cout<<"Run Command\n";
     PYNQZ2 controller = PYNQZ2();
@@ -271,11 +277,11 @@ void run_command(){
 	else{
 	exitLock.unlock();
 	}
-        int tmpC;
+        float tmpC;
         if(!generatedCommands.try_pop(tmpC))continue;
 	//generatedCommands.wait_and_pop(tmpC);
     //    cout<<"the command is:"<<tmpC<<endl;
-        switch(tmpC){
+        switch(int(tmpC)){
             case 0:
             controller.steerSet(-1.0);
             break;
@@ -290,7 +296,7 @@ void run_command(){
     exitLock.unlock();
     cout<<"Run Command Exit\n";
     }
-
+*/
 void run_steer(){
     cout<<"Run Steer\n";
     PYNQZ2 controller = PYNQZ2();

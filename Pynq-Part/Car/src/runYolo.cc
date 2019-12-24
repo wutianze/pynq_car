@@ -1,11 +1,11 @@
 #include"runYolo.h"
 vector<string>outputs_node= {"conv2d_59_convolution", "conv2d_67_convolution", "conv2d_75_convolution"};
 //yolo parameters
-const int classification = 6;
+const int classification = 80;
 //categories should be the same as predefined_classes.txt
 vector<string>categories={"person","arrowOb","coneOb","yellowOb","sidewalk","lights"};
 const int anchor = 3;
-vector<float> biases { 113,78,  137,11,  179,20, 51,40,  58,289,  70,54, 27,152,  39,205,  40,27};
+vector<float> biases { 116,90,  156,198,  373,326, 30,61,  62,45,  59,119, 10,13,  16,30,  33,23};
 
 class image {
 	public:

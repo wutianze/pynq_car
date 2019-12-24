@@ -3,15 +3,15 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-14 09:10:53
- * @LastEditors  : Please set LastEditors
- * @LastEditTime : 2019-12-20 10:23:06
+ * @LastEditors: Sauron Wu
+ * @LastEditTime: 2019-10-28 17:18:06
  * @Description: 
  */
 #include"control.h"
 #include<cmath>
-#define THROTTLEINIT 200000
-#define THROTTLEVAL 40000
-#define THROTTLEZERO 150000
+#define THROTTLEINIT 500000
+#define THROTTLEVAL 60000
+#define THROTTLEZERO 140000
 #define STEERINIT 2000000
 #define STEERVAL 40000
 #define STEERZERO 151000
