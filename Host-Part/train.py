@@ -190,8 +190,8 @@ def main(model_path, read_path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='prediction server')
-    parser.add_argument('--model', type=str, help='model dir', default="/home/xilinx/pynq_car/Host-Part/model")
-    parser.add_argument('--read', type=str, help='npz store dir', default="/home/xilinx/pynq_car/Host-Part/training_data_npz")
+    parser.add_argument('--model', type=str, help='model dir', default="./model")
+    parser.add_argument('--read', type=str, help='npz store dir', default="./training_data_npz")
     parser.add_argument('--output_num', type=int, help='the output num of the model not the original label num', default=1)
     args = parser.parse_args()
     OUTPUT_NUM = args.output_num

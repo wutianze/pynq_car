@@ -16,7 +16,7 @@ CONV_INPUT = "conv2d_1_input"
 calib_batch_size = 50
 def calib_input(iter):
   images = []
-  path = "/home/xilinx/pynq_car/Host-Part/images/"
+  path = "../images/"
   files = os.listdir(path)
   for index in range(0, calib_batch_size):
       if files[iter*calib_batch_size+index] == "train.csv" or (not os.path.exists(path+files[iter*calib_batch_size + index]) or os.path.getsize(path + files[iter*calib_batch_size + index])<1000):# it will ignore the images which are too small
