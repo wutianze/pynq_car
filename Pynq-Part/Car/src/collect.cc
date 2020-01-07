@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-20 14:23:08
  * @LastEditors  : Sauron Wu
- * @LastEditTime : 2019-12-18 12:33:47
+ * @LastEditTime : 2020-01-07 11:49:19
  * @Description: 
  */
 #include <cmath>
@@ -26,6 +26,7 @@
 #include "safe_queue.h"
 #include <mutex>
 #include "control.h"
+#include<cstdio>
 using namespace cv;
 using namespace std;
 using namespace std::chrono;
@@ -36,6 +37,7 @@ safe_queue<pair<string,Mat>> queueStore;
 #define NOTSTART 0
 #define STARTRECORD 1
 #define EXIT 2
+#define DELETESOME 3
 
 #define STORESIZE_WIDTH 160
 #define STORESIZE_HEIGHT 120
@@ -47,8 +49,8 @@ string path = "./images/";
 
 void storeImage()
 {
-    ofstream outFile;
-    outFile.open(path + "train.csv", ios::out | ios::app);
+    fstream outFile;
+    outFile.open(path + "train.csv", ios::out | ios::trunc);
     int count = 0;
     while(count <= imgMax){
 	sleep(0.05);
@@ -58,6 +60,37 @@ void storeImage()
             break;
         }else if(startRecord == NOTSTART){
             mtxQueueStore.unlock();
+            continue;
+        }else if(startRecord == DELETESOME){
+            mtxQueueStore.unlock();
+            cout<<"how many pictures you want to delete?\n";
+            int dN;
+            cin>>dN;
+            if(dN >= count){
+                cout<<"not enough pictures to delete\n";
+                continue;
+            }
+            outFile.close();
+            ifstream in(path + "train.csv");
+            vector<string>lines;
+            string line;
+            while(getline(in,line)){
+                lines.push_back(line);
+            }
+            in.close();
+            outFile.clear();
+            outFile.open(path + "train.csv", ios::out | ios::trunc);
+            for(int i =0;i<lines.size()-dN;i++){
+                outFile<<lines[i]<<endl;
+            }
+            for(int i = lines.size()-dN;i< lines.size();i++){
+                if(remove((path+lines[i].substr(0,lines[i].find(","))).c_str())!=0){
+                    cout<<"delete some file failed\n";
+                }
+            }
+            count = count-dN;
+            cout<<"delete pictures finished, now picture number:"<<count<<endl;
+            startRecord = NOTSTART;
             continue;
         }
         mtxQueueStore.unlock();
@@ -127,7 +160,7 @@ int main(int argc, char **argv)
             //controller.throttleSet(runSpeed);
             controller.setLeds(8);
             break;
-	case 't':
+	    case 't':
             mtxQueueStore.lock();
             if(startRecord == NOTSTART)startRecord = STARTRECORD;
             else{
@@ -135,6 +168,12 @@ int main(int argc, char **argv)
             }
             mtxQueueStore.unlock();
 	        cout<<"Start or Stop Record\n";
+	        break;
+        case 'r':
+            mtxQueueStore.lock();
+            startRecord = DELETESOME;
+            mtxQueueStore.unlock();
+	        cout<<"Delete some pictures\n";
 	        break;
         case 27://Esc
             mtxQueueStore.lock();

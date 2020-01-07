@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-14 14:57:47
  * @LastEditors  : Sauron Wu
- * @LastEditTime : 2019-12-24 11:41:09
+ * @LastEditTime : 2020-01-07 12:02:56
  * @Description: 
  -->
 # What you will learn:
@@ -33,6 +33,7 @@ Now you will see a small window in your PC and you can use your keyboard to cont
 - d: turn right
 - s: stop
 - t: start to save images until the number of pictures reach the threshold you set before, you can press it again to stop the save process until next press
+- r: remove some images when you control your car in a wrong way and don't want to start all over. You need to input the number to delete in terminal, remember to change back to the cv window after finished and press `t` to collect.
 - Esc: stop the whole process
 The pictures and labels are saved in the directory `images`.
 

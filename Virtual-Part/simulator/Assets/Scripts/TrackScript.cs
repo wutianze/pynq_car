@@ -86,13 +86,18 @@ public class TrackScript
 
         TextAsset bindata = Resources.Load(filename) as TextAsset;
 
-		if(bindata == null)
+		if(bindata == null){
+            Debug.LogError("loading fail");
 			return false;
-
+        }
+        else{
+            Debug.Log("file content: " + bindata.text);
+        }
         string[] lines = bindata.text.Split('\n');
 
         foreach(string line in lines)
         {
+            Debug.Log("reading the line: " + line);
             string[] tokens = line.Split(' ');
 
             if (tokens.Length < 2)
