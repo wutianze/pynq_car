@@ -1,8 +1,8 @@
 '''
 @Author: sauron
 @Date: 2019-10-29 15:33:55
-@LastEditTime : 2019-12-20 11:38:13
-@LastEditors  : Sauron Wu
+@LastEditTime : 2020-01-03 14:36:19
+@LastEditors  : Please set LastEditors
 @Description: In User Settings Edit
 @FilePath: /pynq_car/Host-Part/dnndk-host/graph_input_fn.py
 '''
@@ -10,7 +10,8 @@ import cv2
 from PIL import Image
 import os
 import numpy as np
-
+def image_handle(img):
+    return (img[40:,:])/255.0-0.5
 CONV_INPUT = "conv2d_1_input"
 calib_batch_size = 50
 
