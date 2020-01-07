@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors  : Sauron Wu
-@LastEditTime : 2019-12-19 16:19:46
+@LastEditTime : 2020-01-07 12:25:07
 @Description: 
 '''
 import os
@@ -15,7 +15,7 @@ import csv
 import argparse
 import random
 import cv2
-from PIL import Image
+#from PIL import Image
 
 CHUNK_SIZE = 256
 IMAGE_SHAPE = [120,160,3]
