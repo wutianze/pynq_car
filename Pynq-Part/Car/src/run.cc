@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors  : Sauron Wu
- * @LastEditTime : 2019-12-24 11:12:26
+ * @LastEditTime : 2020-01-07 13:15:30
  * @Description: 
  */
 #include <assert.h>
@@ -186,12 +186,12 @@ void run_model(DPUTask* task){
         _T(dpuRunTask(task));
         float scale = dpuGetOutputTensorScale(task, CONV_OUTPUT_NODE);
         int8_t* modelRes = dpuGetTensorAddress(dpuGetOutputTensor(task, CONV_OUTPUT_NODE));
-        float steer = modelRes[0] * scale;
+        float steer = modelRes[0] * scale * 2 - 1.0;
 	    //_T(dpuRunSoftmax(modelRes, smRes.data(), channel, 1, scale));
 	cout<<"output steer now:"<<steer<<endl;  
 
     //you should edit the following code according to your model's performance
-	float changeV = steer*2.0 - 1.08;
+	float changeV = steer - 0.08;
         if(changeV > 0){
 	changeV = changeV + 0.1;
 	}	
