@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-14 14:57:47
  * @LastEditors  : Sauron Wu
- * @LastEditTime : 2020-01-07 12:02:56
+ * @LastEditTime : 2020-01-07 15:20:23
  * @Description: 
  -->
 # What you will learn:
@@ -28,10 +28,10 @@ make collect
 ./build/collect 50000 0.5 # 50000 means how many pictures you need to collect, 0.5 means the speed of your car
 ```
 Now you will see a small window in your PC and you can use your keyboard to control your car:
-- w: move forward
+- w: move forward and faster
 - a: turn left
 - d: turn right
-- s: stop
+- s: move slower
 - t: start to save images until the number of pictures reach the threshold you set before, you can press it again to stop the save process until next press
 - r: remove some images when you control your car in a wrong way and don't want to start all over. You need to input the number to delete in terminal, remember to change back to the cv window after finished and press `t` to collect.
 - Esc: stop the whole process
