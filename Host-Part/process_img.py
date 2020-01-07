@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors  : Sauron Wu
-@LastEditTime : 2020-01-07 12:25:07
+@LastEditTime : 2020-01-07 13:06:32
 @Description: 
 '''
 import os
@@ -43,8 +43,8 @@ def process_img(img_path, key):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='prediction server')
-    parser.add_argument('--path', type=str, help='images dir', default="/home/xilinx/images")
-    parser.add_argument('--store', type=str, help='npz store dir', default="/home/xilinx/pynq_car/Host-Part/training_data_npz")
+    parser.add_argument('--path', type=str, help='images dir', default="./images")
+    parser.add_argument('--store', type=str, help='npz store dir', default="./training_data_npz")
     parser.add_argument('--method', type=int, help='whether to reduce some categories\' number, 0 for true', default=1)
     parser.add_argument('--filter_size', type=int, help='size of smallest file', default=1000)
     parser.add_argument('--cut_head_size', type=int, help='top head of the image to cut', default=40)
