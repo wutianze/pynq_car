@@ -19,7 +19,9 @@ public class TrackParams
         ForkB,   //when starting the second line that splits from the fork
         MergeA,  //when we should look for the nearest track to merge from a fork
         MergeB,  //when we should look for the nearest track to merge from a fork
-        End     //terminate current line
+        End,     //terminate current line
+        CONE,    // the cone in road
+        BLOCK
     }
 
     public State state;
@@ -100,24 +102,24 @@ public class TrackScript
             Debug.Log("reading the line: " + line);
             string[] tokens = line.Split(' ');
 
-            if (tokens.Length < 2)
-                continue;
-
             string command = tokens[0];
-            string args = tokens[1];
+            string args = "0";
+            if (tokens.Length >= 2){
+                args = tokens[1];
+            }
 
             if (command.StartsWith("//"))
                 continue;
 
             TrackScriptElem tse = new TrackScriptElem();
 
-            if (command == "U")
+            if (command == "U")// 
             {
                 tse.state = TrackParams.State.CurveZ;
                 tse.value = 1f;
                 tse.numToSet = int.Parse(args);
             }
-            else if(command == "S")
+            else if(command == "S")// straight line, value is the length
             {
                 tse.state = TrackParams.State.Straight;
                 tse.value = 1f;
@@ -129,13 +131,13 @@ public class TrackScript
                 tse.value = -1f;
                 tse.numToSet = int.Parse(args);
             }
-            else if (command == "L")
+            else if (command == "L")// turn left, value is the length
             {
                 tse.state = TrackParams.State.CurveY;
                 tse.value = -1f;
                 tse.numToSet = int.Parse(args);
             }
-            else if (command == "R")
+            else if (command == "R")// turn right,value is the length
             {
                 tse.state = TrackParams.State.CurveY;
                 tse.value = 1f;
@@ -165,7 +167,7 @@ public class TrackScript
                 tse.value = float.Parse(args);
                 tse.numToSet = 0;
             }
-            else if (command == "DY")
+            else if (command == "DY")// set the turn angle
             {
                 tse.state = TrackParams.State.AngleDY;
                 tse.value = float.Parse(args);
@@ -205,6 +207,18 @@ public class TrackScript
             {
                 tse.state = TrackParams.State.End;
                 tse.value = float.Parse(args);
+                tse.numToSet = 0;
+            }
+            else if(command == "CONE")
+            {
+                tse.state = TrackParams.State.CONE;
+                tse.value = 0;
+                tse.numToSet = 0;
+            }
+            else if(command == "BLOCK")
+            {
+                tse.state = TrackParams.State.BLOCK;
+                tse.value = 0;
                 tse.numToSet = 0;
             }
             else

@@ -6,6 +6,8 @@ public class PathManager : MonoBehaviour {
 	public CarPath path;
 
 	public GameObject prefab;
+	public GameObject cone;
+	public GameObject block;
 
 	public Transform startPos;
 
@@ -52,6 +54,7 @@ public class PathManager : MonoBehaviour {
 
 	public void InitNewRoad()
 	{
+
 		if(doMakeRandomPath)
 		{
 			MakeRandomPath();
@@ -186,6 +189,7 @@ public class PathManager : MonoBehaviour {
 
 			foreach(TrackScriptElem se in script.track)
 			{
+				Debug.Log(se.state.ToString());
 				if(se.state == TrackParams.State.AngleDY)
 				{
 					turnVal = se.value;
@@ -194,6 +198,20 @@ public class PathManager : MonoBehaviour {
 				{
 					turn = 0.0f;
 					dY = se.value * turnVal;
+				}
+				else if(se.state == TrackParams.State.CONE)
+				{
+					GameObject coneO=Instantiate(cone, s, Quaternion.identity) as GameObject;
+					coneO.AddComponent<Rigidbody>();
+					coneO.AddComponent<BoxCollider>();
+					coneO.tag = "pathNode";
+				}
+				else if(se.state == TrackParams.State.BLOCK)
+				{
+					GameObject blockO=Instantiate(block, s, Quaternion.identity) as GameObject;
+					blockO.AddComponent<Rigidbody>();
+					blockO.AddComponent<BoxCollider>();
+					blockO.tag = "pathNode";
 				}
 				else
 				{
@@ -211,7 +229,7 @@ public class PathManager : MonoBehaviour {
 
 					turn = dY;
 
-					Quaternion rot = Quaternion.Euler(0.0f, turn, 0f);
+					Quaternion rot = Quaternion.Euler(0.0f, turn, 0f);// y turn
 					span = rot * span.normalized;
 					span *= spanDist;
 					s = s + span;

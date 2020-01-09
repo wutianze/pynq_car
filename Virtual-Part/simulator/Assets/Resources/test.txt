@@ -1,0 +1,7 @@
+S 5
+DY 1
+L 4
+S 5
+BLOCK 
+S 10
+CONE 

@@ -89,7 +89,7 @@ public class PIDController : MonoBehaviour {
                 car.RequestThrottle(throttleVal);
             }
 
-            car.RestorePosRot();
+            //car.RestorePosRot();
         }
 	}
 
