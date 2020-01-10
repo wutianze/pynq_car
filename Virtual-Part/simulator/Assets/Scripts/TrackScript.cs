@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
+using System.IO;
 
 public class TrackParams
 {
@@ -86,6 +87,7 @@ public class TrackScript
 
         Debug.Log("loading: " + filename);
 
+        /*
         TextAsset bindata = Resources.Load(filename) as TextAsset;
 
 		if(bindata == null){
@@ -96,6 +98,8 @@ public class TrackScript
             Debug.Log("file content: " + bindata.text);
         }
         string[] lines = bindata.text.Split('\n');
+        */
+        string[] lines = File.ReadAllLines(filename);
 
         foreach(string line in lines)
         {

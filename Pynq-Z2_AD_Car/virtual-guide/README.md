@@ -3,8 +3,8 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-23 10:12:28
- * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-31 15:19:15
+ * @LastEditors  : Sauron Wu
+ * @LastEditTime : 2020-01-10 11:45:10
  * @Description: 
  -->
 # Introduction
@@ -33,7 +33,19 @@ python src/predict_server.py --model=path-to-your-model/model.h5
  
 2) Load the Unity project Virtual-Part/simulator in Unity. Double click on Assets/Scenes/main to open that scene.  
 
-3) Hit the start button to launch. Then "Use NN Steering".  
+3) Hit the start button to launch. Then "Use NN Steering". 
+
+## Build Your Own Road
+- S n
+    This means to build straight road for n length.
+- DY n
+    This means the road will curve, the bigger n means bigger angle.
+- L n
+    This always follows DY, means build road with the pre-set angle by DY, and the road will turn left, n is the length.
+- R n
+    Like L, this means to turn right.
+- BLOCK, CONE
+    This will add a block/cone in the road.
 
 ## Generate training data
 

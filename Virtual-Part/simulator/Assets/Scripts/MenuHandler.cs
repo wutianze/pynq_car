@@ -11,6 +11,7 @@ public class MenuHandler : MonoBehaviour {
 	public GameObject NetworkSteering;
 	public GameObject menuPanel;
 	public GameObject drivePanel;
+	public GameObject buildPanel;
     public GameObject carJSControl;
 	public CameraFollow cameraFollow;
     public TrainingManager trainingManager;
@@ -24,6 +25,7 @@ public class MenuHandler : MonoBehaviour {
         Application.targetFrameRate = 60;
 
         drivePanel.SetActive(false);
+		buildPanel.SetActive(false);
 		cameraFollow = GameObject.FindObjectOfType<CameraFollow>();
     }
 
@@ -31,7 +33,22 @@ public class MenuHandler : MonoBehaviour {
 	{
 		Logger.SetActive(false);
 		menuPanel.SetActive(false);
+		buildPanel.SetActive(false);
 		drivePanel.SetActive(true);
+		GameObject.Find("Record/Text").GetComponent<Text>().text = "Start Record";
+	}
+
+	public void OnStartBuild()
+	{
+		Logger.SetActive(false);
+		menuPanel.SetActive(false);
+		drivePanel.SetActive(false);
+		buildPanel.SetActive(true);
+	}
+	public void OnStartPoint()
+	{
+		if(trainingManager != null)
+			trainingManager.BackToStartPoint();
 	}
 
 	public void OnMainMenu(){
@@ -42,12 +59,13 @@ public class MenuHandler : MonoBehaviour {
 			carJSControl.SetActive(false);
 
 		NetworkSteering.SetActive(false);
-		GameObject.Find("Record/Text").GetComponent<Text>().text = "Start Record";
 		ifRecord = false;
 		Logger.SetActive(false);
 		menuPanel.SetActive(true);
 		drivePanel.SetActive(false);
-		cameraFollow.ifFollow = false;
+		buildPanel.SetActive(false);
+		trainingManager.BackToStartPoint();
+		cameraFollow.ifFollow = true;
 	}
 	public void OnPidDrive()
 	{
@@ -101,15 +119,17 @@ public class MenuHandler : MonoBehaviour {
 			trainingManager.OnMenuNextTrack();
     }
 
-	public void OnLoadPathScript(){
-		if(trainingManager != null)
-			trainingManager.OnMenuRegenTrack();
-	}
-    public void OnRandomTrack()
+    public void OnBuildRandom()
 	{
 		if(trainingManager != null)
-			trainingManager.OnMenuRegenTrack();
+			trainingManager.OnMenuRegenRandom();
     }
+
+	public void OnBuildScript()
+	{
+		if(trainingManager != null)
+			trainingManager.OnMenuBuildScript();
+	}
 	public void OnCameraFollow()
 	{
 		cameraFollow.ifFollow = !cameraFollow.ifFollow;

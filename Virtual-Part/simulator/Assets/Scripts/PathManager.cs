@@ -23,11 +23,11 @@ public class PathManager : MonoBehaviour {
 
 	public int randSeed = 2;
 
-	public bool doMakeRandomPath = true;
+	//public bool doMakeRandomPath = true;
 
-	public bool doLoadScriptPath = false;
+	//public bool doLoadScriptPath = false;
 
-	public bool doLoadPointPath = false;
+	//public bool doLoadPointPath = false;
 
 	public bool doBuildRoad = false;
 
@@ -37,7 +37,7 @@ public class PathManager : MonoBehaviour {
 
 	public bool doShowPath = false;
 
-    public string pathToLoad = "none";
+    //public string pathToLoad = "none";
 
 	public RoadBuilder roadBuilder;
 	public RoadBuilder semanticSegRoadBuilder;
@@ -49,12 +49,21 @@ public class PathManager : MonoBehaviour {
 		if(sameRandomPath)
 			Random.InitState(randSeed);
 
-		InitNewRoad();			
+		InitNewRoad(0);			
 	}
 
-	public void InitNewRoad()
+	// method 0: randomPath, method 1: script road
+	public void InitNewRoad(int method)
 	{
-
+		switch(method){
+			case 0: MakeRandomPath();
+			break;
+			case 1: MakeScriptedPath();
+			break;
+			default:MakeRandomPath();
+			break;
+		}
+		/*
 		if(doMakeRandomPath)
 		{
 			MakeRandomPath();
@@ -67,7 +76,7 @@ public class PathManager : MonoBehaviour {
 		{
 			MakePointPath();
 		}
-
+		*/
 		if(smoothPathIter > 0)
 			SmoothPath();
 
@@ -130,6 +139,7 @@ public class PathManager : MonoBehaviour {
 		}
 	}
 
+	/*
 	void MakePointPath()
 	{
 		string filename = "thunder_path";
@@ -164,12 +174,13 @@ public class PathManager : MonoBehaviour {
 		}
 			
 	}
+	*/
 
 	void MakeScriptedPath()
 	{
 		TrackScript script = new TrackScript();
 
-		if(script.Read(pathToLoad))
+		if(script.Read(GlobalState.script_path))
 		{
 			path = new CarPath();
 			TrackParams tparams = new TrackParams();

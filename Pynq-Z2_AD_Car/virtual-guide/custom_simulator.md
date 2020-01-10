@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-16 10:23:58
  * @LastEditors  : Sauron Wu
- * @LastEditTime : 2020-01-09 17:58:27
+ * @LastEditTime : 2020-01-10 11:40:29
  * @Description: 
  -->
 # Notice
@@ -44,9 +44,6 @@ If you want to make changes to the simulator, at least you should be familiar wi
 # PIDController.cs
 - We all know that the quantity of training data is key to a good trained model. However, if your Joystick controller code is bull shit or you are not a good game player, it's hard to generate good training data. But since we are the master in virtual world, we can generate the training data automatically.
 - Read `Update()` and find where it uses `RequestThrottle() & RequestSteering()` then you will understand how the PID controller works, and will be able to define your own functions.
-
-# Road
-- 
 
 # More
 The simulator has more features for you to explore, you can build your own terrain, road, obstacles etc. You can checkout to the dev branch of original sdsandbox to learn more.

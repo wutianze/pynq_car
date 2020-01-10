@@ -230,7 +230,7 @@ namespace tk
 
                 UnityEngine.Random.InitState(rand_seed);
                 train_mgr.SetRoadStyle(road_style);
-                train_mgr.OnMenuRegenTrack();
+                train_mgr.OnMenuRegenRandom();
             }
 
             yield return null;
@@ -263,20 +263,31 @@ namespace tk
         }
         
         // Update is called once per frame
+        int sleepCount = 0;
         void Update () 
         {    
             if(state == State.UnConnected)
             {
+                UnityEditor.EditorUtility.DisplayDialog("Tip", "Start Connect!", "OK");
                 timer += Time.deltaTime;
-
-                if(timer > connectTimer)
+                if(sleepCount == 200){
+                    sleepCount = 0;
+                }
+                else{
+                    sleepCount++;
+                    return;
+                }
+                if(timer > connectTimer && sleepCount == 0)
                 {
                     timer = 0.0f;
-
+                    
                     if(Connect())
                     {
                         SendCarLoaded();
                         state = State.SendTelemetry;
+                    }else{
+                        UnityEditor.EditorUtility.DisplayDialog("Tip", "Connection Failed, Please Check, The Next Try Will Begin Soon.", "OK");
+                        sleepCount = 1;
                     }
                 }
             }
