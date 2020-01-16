@@ -38,12 +38,16 @@ public class TrackScriptElem
     public TrackParams.State state;
     public int numToSet;
     public float value;
+    public float value2;
 
-    public TrackScriptElem(TrackParams.State s = TrackParams.State.Straight, float si = 1.0f, int num = 1)
+
+
+    public TrackScriptElem(TrackParams.State s = TrackParams.State.Straight, float si = 1.0f, float si2 = 1.0f, int num = 1)
     {
         state = s;
         numToSet = num;
         value = si;
+        value2 = si2;
     }
 }
 
@@ -107,25 +111,19 @@ public class TrackScript
             string[] tokens = line.Split(' ');
 
             string command = tokens[0];
-            string args = "0";
+            /*string args = "0";
             if (tokens.Length >= 2){
                 args = tokens[1];
-            }
+            }*/
 
             if (command.StartsWith("//"))
                 continue;
 
             TrackScriptElem tse = new TrackScriptElem();
 
-            if (command == "U")// 
+            /*else if (command == "U") 
             {
                 tse.state = TrackParams.State.CurveZ;
-                tse.value = 1f;
-                tse.numToSet = int.Parse(args);
-            }
-            else if(command == "S")// straight line, value is the length
-            {
-                tse.state = TrackParams.State.Straight;
                 tse.value = 1f;
                 tse.numToSet = int.Parse(args);
             }
@@ -133,18 +131,6 @@ public class TrackScript
             {
                 tse.state = TrackParams.State.CurveZ;
                 tse.value = -1f;
-                tse.numToSet = int.Parse(args);
-            }
-            else if (command == "L")// turn left, value is the length
-            {
-                tse.state = TrackParams.State.CurveY;
-                tse.value = -1f;
-                tse.numToSet = int.Parse(args);
-            }
-            else if (command == "R")// turn right,value is the length
-            {
-                tse.state = TrackParams.State.CurveY;
-                tse.value = 1f;
                 tse.numToSet = int.Parse(args);
             }
             else if (command == "RL")
@@ -168,12 +154,6 @@ public class TrackScript
             else if (command == "DX")
             {
                 tse.state = TrackParams.State.AngleDX;
-                tse.value = float.Parse(args);
-                tse.numToSet = 0;
-            }
-            else if (command == "DY")// set the turn angle
-            {
-                tse.state = TrackParams.State.AngleDY;
                 tse.value = float.Parse(args);
                 tse.numToSet = 0;
             }
@@ -213,17 +193,44 @@ public class TrackScript
                 tse.value = float.Parse(args);
                 tse.numToSet = 0;
             }
-            else if(command == "CONE")
+            */
+            if(command == "S")// straight line, value is the length
+            {
+                tse.state = TrackParams.State.Straight;
+                tse.value = 1f;
+                tse.numToSet = int.Parse(tokens[1]);
+            }
+            else if (command == "L")// turn left, value is the length
+            {
+                tse.state = TrackParams.State.CurveY;
+                tse.value = -1f;
+                tse.numToSet = int.Parse(tokens[1]);
+            }
+            else if (command == "R")// turn right,value is the length
+            {
+                tse.state = TrackParams.State.CurveY;
+                tse.value = 1f;
+                tse.numToSet = int.Parse(tokens[1]);
+            }
+            else if (command == "DY")// set the turn angle
+            {
+                tse.state = TrackParams.State.AngleDY;
+                tse.value = float.Parse(tokens[1]);
+                tse.numToSet = 0;
+            }
+            else if(command == "CONE")// value is how far from the start middle(road point, not the road middle), every thing will take one road length
             {
                 tse.state = TrackParams.State.CONE;
-                tse.value = 0;
-                tse.numToSet = 0;
+                tse.value = float.Parse(tokens[1]);
+                tse.value2 = float.Parse(tokens[2]);
+                tse.numToSet = 1;
             }
             else if(command == "BLOCK")
             {
                 tse.state = TrackParams.State.BLOCK;
-                tse.value = 0;
-                tse.numToSet = 0;
+                tse.value = float.Parse(tokens[1]);
+                tse.value2 = float.Parse(tokens[2]);
+                tse.numToSet = 1;
             }
             else
             {

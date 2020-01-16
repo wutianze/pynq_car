@@ -13,6 +13,7 @@ public class Logger : MonoBehaviour {
 	public CameraSensor camSensor;
     public CameraSensor optionlB_CamSensor;
 	public Lidar lidar;
+	public Text storeNum;
 
 	//what's the current frame index
     public int frameCounter = 0;
@@ -21,7 +22,7 @@ public class Logger : MonoBehaviour {
     public int lapCounter = 0;
 
 	//is there an upper bound on the number of frames to log
-	public int maxFramesToLog = 14000;
+	public int maxFramesToLog = 50000;
 
 	//should we log when we are enabled
 	public bool bDoLog = true;
@@ -86,7 +87,7 @@ public class Logger : MonoBehaviour {
 		
 	// Update is called once per frame
 	void Update () 
-	{
+	{	
 		if(!bDoLog)
 			return;
 
@@ -138,7 +139,9 @@ public class Logger : MonoBehaviour {
             Shutdown();
             this.gameObject.SetActive(false);
         }
-
+		if(storeNum != null){
+			storeNum.text = string.Format("Now/Total: {0}/{1}", frameCounter, maxFramesToLog);
+		}
         frameCounter = frameCounter + 1;
 
         if (logDisplay != null)

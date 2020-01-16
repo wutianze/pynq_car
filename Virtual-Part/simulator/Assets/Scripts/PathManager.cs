@@ -6,14 +6,12 @@ public class PathManager : MonoBehaviour {
 	public CarPath path;
 
 	public GameObject prefab;
-	public GameObject cone;
-	public GameObject block;
-
+	
 	public Transform startPos;
 
 	Vector3 span = Vector3.zero;
 
-	public float spanDist = 5f;
+	public float spanDist = 5f;// length of one part 
 
 	public int numSpans = 100;
 
@@ -189,7 +187,7 @@ public class PathManager : MonoBehaviour {
 			tparams.lastPos = startPos.position;
 
 			float dY = 0.0f;
-			float turn = 0f;
+			//float turn = 0f;
 
 			Vector3 s = startPos.position;
 			s.y = 0.5f;
@@ -197,50 +195,67 @@ public class PathManager : MonoBehaviour {
 			span.y = 0f;
 			span.z = spanDist;
 			float turnVal = 10.0f;
-
+			float totalTurn = 0.0f;// record the direction
 			foreach(TrackScriptElem se in script.track)
 			{
 				Debug.Log(se.state.ToString());
+				string thing = "";// "" means just road, others can be things in the road
+				float thing_offset = 0.0f;
+				float thing_rot = 0.0f;
 				if(se.state == TrackParams.State.AngleDY)
 				{
-					turnVal = se.value;
+					turnVal = se.value;// set how many degrees every node turn
 				}
 				else if(se.state == TrackParams.State.CurveY)
 				{
-					turn = 0.0f;
+					//turn = 0.0f;
 					dY = se.value * turnVal;
 				}
 				else if(se.state == TrackParams.State.CONE)
 				{
+					thing = "cone";
+					thing_offset = se.value;
+					thing_rot = se.value2;
+					/*
 					GameObject coneO=Instantiate(cone, s, Quaternion.identity) as GameObject;
 					coneO.AddComponent<Rigidbody>();
 					coneO.AddComponent<BoxCollider>();
 					coneO.tag = "pathNode";
+					*/
 				}
 				else if(se.state == TrackParams.State.BLOCK)
 				{
+					thing = "block";
+					thing_offset = se.value;
+					thing_rot = se.value2;
+					/*
 					GameObject blockO=Instantiate(block, s, Quaternion.identity) as GameObject;
 					blockO.AddComponent<Rigidbody>();
 					blockO.AddComponent<BoxCollider>();
 					blockO.tag = "pathNode";
+					*/
 				}
 				else
 				{
 					dY = 0.0f;
-					turn = 0.0f;
+					//turn = 0.0f;
 				}
 
 				for(int i = 0; i < se.numToSet; i++)
 				{
-
+					totalTurn += dY;
 					Vector3 np = s;
 					PathNode p = new PathNode();
 					p.pos = np;
+					p.thing = thing;
+					p.thing_offset = thing_offset;
+
+					p.thing_rot = Quaternion.Euler(0.0f, thing_rot + totalTurn, 0f);
 					path.nodes.Add(p);
 
-					turn = dY;
+					//turn = dY;
 
-					Quaternion rot = Quaternion.Euler(0.0f, turn, 0f);// y turn
+					Quaternion rot = Quaternion.Euler(0.0f, dY, 0f);// y turn
 					span = rot * span.normalized;
 					span *= spanDist;
 					s = s + span;
