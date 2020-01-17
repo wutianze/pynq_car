@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors  : Sauron Wu
-@LastEditTime : 2020-01-07 15:17:27
+@LastEditTime : 2020-01-17 15:06:05
 @Description: 
 '''
 import keras
@@ -25,11 +25,11 @@ from keras.utils import plot_model
 import argparse
 
 np.random.seed(0)
-IMAGE_SHAPE = [120,160,3]
+IMAGE_SHAPE = [120,160,3]# will be set autonomously
 global OUTPUT_NUM
-OUTPUT_NUM = 1
+OUTPUT_NUM = 1# need to be set
 CHUNK_SIZE = 256
-ORIGINAL_LABEL_NUM = 1
+ORIGINAL_LABEL_NUM = 1# will be set autonomously
 # step1,load data
 def load_data(read_path):
     training_data = glob.glob(read_path + '/*.npz')
@@ -148,8 +148,10 @@ def batch_generator(name_list, batch_size):
             #    labels[i] = [0.,0.,1.]
             #else:
             #    labels[i] = [0.,1.,0.]
-            labels[i] = [(y[index][0]+1.)/2.]
-            #labels[i] = [(y[index][0]+1.)/2.,(y[index][1])]
+            if OUTPUT_NUM == 1:
+                labels[i] = [(y[index][0]+1.)/2.]
+            elif OUTPUT_NUM ==2:
+                labels[i] = [(y[index][0]+1.)/2.,(y[index][1]+1.)/2.]
             #print(labels[i])
             i += 1
             if i == batch_size:

@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors  : Sauron Wu
-@LastEditTime : 2020-01-07 13:06:32
+@LastEditTime : 2020-01-17 15:09:01
 @Description: 
 '''
 import os
@@ -22,7 +22,7 @@ IMAGE_SHAPE = [120,160,3]
 global CUT_SIZE
 CUT_SIZE = 40
 global OUTPUT_NUM
-OUTPUT_NUM = 1
+OUTPUT_NUM = 1# will be set autonomously, the label value may not be all used when training the model, so the number of OUTPUT_NUM here is more than OUTPUT_NUM in train.py
 def image_handle(img):
     #print("img:")
     #print(img)
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     IMAGE_SHAPE[1] = image_for_shape.shape[1]
     IMAGE_SHAPE[2] = image_for_shape.shape[2]
     OUTPUT_NUM = len(files[0]) - 1
-    print("OUTPUT_NUM is:%d"%OUTPUT_NUM)    
+    print("LABEL NUM is:%d"%OUTPUT_NUM)    
     turns = int(math.ceil(len(names) / CHUNK_SIZE))      
     print("number of files: {}".format(len(names)))
     print("turns: {}".format(turns))
