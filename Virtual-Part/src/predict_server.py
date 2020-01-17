@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-23 10:12:28
 @LastEditors  : Sauron Wu
-@LastEditTime : 2020-01-17 14:21:14
+@LastEditTime : 2020-01-17 14:50:22
 @Description: 
 '''
 #!/usr/bin/env python
@@ -174,7 +174,7 @@ class PynqSimMsgHandler(IMesgHandler):
         msg = { 'msg_type' : 'pynq_command', 'command':command[0] }
         self.sock.queue_message(msg)
 
-    def send_control(self, steer, speed):
+    def send_control1(self, steer, speed):
         msg = { 'msg_type' : 'pynq_speed', 'steering': steer.__str__(), 'speed':throttle.__str__()}
         self.sock.queue_message(msg) 
 
