@@ -3,8 +3,8 @@
 @GitHub: wutianze
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-23 10:12:28
-@LastEditors: Please set LastEditors
-@LastEditTime: 2019-10-28 13:55:07
+@LastEditors  : Sauron Wu
+@LastEditTime : 2020-01-17 14:21:14
 @Description: 
 '''
 #!/usr/bin/env python
@@ -108,7 +108,7 @@ class PynqSimMsgHandler(IMesgHandler):
         self.on_parsed_outputs(res)
 
     def on_parsed_outputs(self, outputs):
-        #print(self.control_method)
+        # softmax output
         if self.control_method == 0:
             comSend = ''
             toSend = 0
@@ -126,36 +126,56 @@ class PynqSimMsgHandler(IMesgHandler):
             else:
                 comSend = 's'
             self.send_control0(comSend)
-        elif self.control_method == 1:
-            #*4 to make the car more sensitive
-            steer_com = ((outputs[0]*2.)-1.)*4.
-            print(steer_com)
-            self.send_control1(steer_com, 0.3)
-        elif self.control_method == 2:
-            #print("on parsed outputs")
-            print(outputs)
-            comSend = ''
-            toSend = 0
-            nowMax = 0.0
-            outputs[1] = outputs[1] -0.2
-            for i in range(len(outputs)):
-                if outputs[i] > nowMax:
-                    nowMax = outputs[i] 
-                    toSend = i
-            steerSend = 0.0
-            if toSend == 0:
-                steerSend = -0.5
-            elif toSend == 2:
-                steerSend = 0.5
-            self.send_control1(steerSend, 0.3)
+        else:# regression model
+            self.send_control1(outputs[0],outputs[1])# send steering and speed
+
+        #if self.control_method == 0:
+        #    comSend = ''
+        #    toSend = 0
+        #    nowMax = 0.0
+        #    for i in range(len(outputs)):
+        #        if outputs[i] > nowMax:
+        #            nowMax = outputs[i] 
+        #            toSend = i
+        #    if toSend == 0:
+        #        comSend = 'a'
+        #    elif toSend == 1:
+        #        comSend = 'w'
+        #    elif toSend == 2:
+        #        comSend = 'd'
+        #    else:
+        #        comSend = 's'
+        #    self.send_control0(comSend)
+        #elif self.control_method == 1:
+        #    #*4 to make the car more sensitive
+        #    steer_com = ((outputs[0]*2.)-1.)*4.
+        #    print(steer_com)
+        #    self.send_control1(steer_com, 0.3)
+        #elif self.control_method == 2:
+        #    #print("on parsed outputs")
+        #    print(outputs)
+        #    comSend = ''
+        #    toSend = 0
+        #    nowMax = 0.0
+        #    outputs[1] = outputs[1] -0.2
+        #    for i in range(len(outputs)):
+        #        if outputs[i] > nowMax:
+        #            nowMax = outputs[i] 
+        #            toSend = i
+        #    steerSend = 0.0
+        #    if toSend == 0:
+        #        steerSend = -0.5
+        #    elif toSend == 2:
+        #        steerSend = 0.5
+        #    self.send_control1(steerSend, 0.3)
 
         
     def send_control0(self, command):
-        msg = { 'msg_type' : 'pynq_control', 'command':command[0] }
+        msg = { 'msg_type' : 'pynq_command', 'command':command[0] }
         self.sock.queue_message(msg)
 
-    def send_control1(self, steer, throttle):
-        msg = { 'msg_type' : 'control', 'steering': steer.__str__(), 'throttle':throttle.__str__(), 'brake': '0.0' }
+    def send_control(self, steer, speed):
+        msg = { 'msg_type' : 'pynq_speed', 'steering': steer.__str__(), 'speed':throttle.__str__()}
         self.sock.queue_message(msg) 
 
     def on_close(self):
@@ -180,8 +200,8 @@ if __name__ == "__main__":
     parser.add_argument('--model', type=str, help='model filename')
     parser.add_argument('--host', type=str, default='0.0.0.0', help='bind to ip')
     parser.add_argument('--port', type=int, default=9090, help='bind to port')
-    parser.add_argument('--constant_throttle', type=float, default=0.0, help='apply constant throttle')
-    parser.add_argument('--control_method', type=int, default=2, help='0 for command, 1 for steer')
+    #parser.add_argument('--constant_throttle', type=float, default=0.0, help='apply constant throttle')
+    parser.add_argument('--control_method', type=int, default=1, help='0 for command, 1 for steer')
     args = parser.parse_args()
 
     address = (args.host, args.port)

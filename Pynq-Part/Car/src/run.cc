@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-19 12:44:06
  * @LastEditors  : Sauron Wu
- * @LastEditTime : 2020-01-07 13:15:30
+ * @LastEditTime : 2020-01-07 15:11:45
  * @Description: 
  */
 #include <assert.h>
@@ -187,6 +187,7 @@ void run_model(DPUTask* task){
         float scale = dpuGetOutputTensorScale(task, CONV_OUTPUT_NODE);
         int8_t* modelRes = dpuGetTensorAddress(dpuGetOutputTensor(task, CONV_OUTPUT_NODE));
         float steer = modelRes[0] * scale * 2 - 1.0;
+        //float throttle = modelRes[1] * scale;
 	    //_T(dpuRunSoftmax(modelRes, smRes.data(), channel, 1, scale));
 	cout<<"output steer now:"<<steer<<endl;  
 

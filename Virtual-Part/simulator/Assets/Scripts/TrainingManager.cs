@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class TrainingManager : MonoBehaviour {
 
 	public PIDController controller;
@@ -16,6 +15,8 @@ public class TrainingManager : MonoBehaviour {
 
 	public int numTrainingRuns = 1;
 	int iRun = 0;
+
+	int lastMethod = 0;
 
 	void Awake()
 	{
@@ -64,12 +65,16 @@ public class TrainingManager : MonoBehaviour {
 		roadBuilder.SetNewRoadVariation(iRun);
 	}
 
-	void StartNewRun()
+	public void BackToStartPoint()
+	{
+		car.RestorePosRot();
+	}
+	void StartNewRun(int method)
 	{
 		car.RestorePosRot();
 		pathManager.DestroyRoad();
 		SwapRoadToNewTextureVariation();
-		pathManager.InitNewRoad();
+		pathManager.InitNewRoad(method);
 		controller.StartDriving();
         RepositionOverheadCamera();
 	}
@@ -101,15 +106,29 @@ public class TrainingManager : MonoBehaviour {
 		if(iRun >= numTrainingRuns)
             iRun = 0;
 
-        StartNewRun();
+        StartNewRun(lastMethod);
         car.RequestFootBrake(1);
     }
 
-    public void OnMenuRegenTrack()
+    public void OnMenuRegenRandom()
     {
-        StartNewRun();
+        StartNewRun(0);
+		lastMethod = 0;
         car.RequestFootBrake(1);
     }
+
+	public void OnMenuBuildScript()
+	{
+		if(GlobalState.script_path == "default")
+		{
+			return;
+		}
+		else{
+			lastMethod = 1;
+			StartNewRun(1);
+        	car.RequestFootBrake(1);
+		}
+	}
 
 	void OnPathDone()
 	{
@@ -121,7 +140,9 @@ public class TrainingManager : MonoBehaviour {
 		}
 		else
 		{
-			StartNewRun();
+			Debug.Log("Path Done");
+
+			//StartNewRun();
 		}
 	}
 
@@ -131,7 +152,7 @@ public class TrainingManager : MonoBehaviour {
             return;
 
 		//watch the car and if we fall off the road, reset things.
-		if(car.GetTransform().position.y < -1.0f)
+		if(car.GetTransform().position.y < 0.0f)
 		{
 			OnPathDone();
 		}

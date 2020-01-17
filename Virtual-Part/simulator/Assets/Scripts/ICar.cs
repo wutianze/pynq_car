@@ -15,6 +15,8 @@ public interface ICar
 	void RequestFootBrake(float val);
 
 	void RequestHandBrake(float val);
+	void RequestSpeed(float val);
+	
 
 	//Pynq car control
 	char GetComNow();
@@ -24,6 +26,8 @@ public interface ICar
 	float GetSteering();
 
 	float GetThrottle();
+
+	float GetMaxSpeed();
 
 	float GetFootBrake();
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets.Vehicles.Car;
+using UnityEngine.UI; 
 
 public class MenuHandler : MonoBehaviour {
 
@@ -9,9 +10,10 @@ public class MenuHandler : MonoBehaviour {
 	public GameObject Logger;
 	public GameObject NetworkSteering;
 	public GameObject menuPanel;
-	public GameObject stopPanel;
+	public GameObject drivePanel;
+	public GameObject buildPanel;
     public GameObject carJSControl;
-
+	public CameraFollow cameraFollow;
     public TrainingManager trainingManager;
 
     public void Awake()
@@ -22,45 +24,49 @@ public class MenuHandler : MonoBehaviour {
         //Set desired frame rate as high as possible.
         Application.targetFrameRate = 60;
 
-        stopPanel.SetActive(false);
+        drivePanel.SetActive(false);
+		buildPanel.SetActive(false);
+		cameraFollow = GameObject.FindObjectOfType<CameraFollow>();
     }
 
-	public void OnPidGenerateTrainingData()
+	public void OnStartDrive()
 	{
-		if(PIDContoller != null)
-			PIDContoller.SetActive(true);
-
-		if(carJSControl != null)
-			carJSControl.SetActive(false);
-	
-		Logger.SetActive(true);
+		Logger.SetActive(false);
 		menuPanel.SetActive(false);
-        stopPanel.SetActive(true);
-    }
+		buildPanel.SetActive(false);
+		drivePanel.SetActive(true);
+		GameObject.Find("Record/Text").GetComponent<Text>().text = "Start Record";
+	}
 
-	public void OnManualGenerateTrainingData()
+	public void OnStartBuild()
 	{
+		Logger.SetActive(false);
+		menuPanel.SetActive(false);
+		drivePanel.SetActive(false);
+		buildPanel.SetActive(true);
+	}
+	public void OnStartPoint()
+	{
+		if(trainingManager != null)
+			trainingManager.BackToStartPoint();
+	}
+
+	public void OnMainMenu(){
 		if(PIDContoller != null)
 			PIDContoller.SetActive(false);
 
 		if(carJSControl != null)
-			carJSControl.SetActive(true);
-	
-		Logger.SetActive(true);
-		menuPanel.SetActive(false);
-        stopPanel.SetActive(true);
-    }
-
-	public void OnUseNNNetworkSteering()
-	{
-		if(carJSControl != null)
 			carJSControl.SetActive(false);
-		
-		NetworkSteering.SetActive(true);
-		menuPanel.SetActive(false);
-        stopPanel.SetActive(true);
-    }
 
+		NetworkSteering.SetActive(false);
+		ifRecord = false;
+		Logger.SetActive(false);
+		menuPanel.SetActive(true);
+		drivePanel.SetActive(false);
+		buildPanel.SetActive(false);
+		trainingManager.BackToStartPoint();
+		cameraFollow.ifFollow = true;
+	}
 	public void OnPidDrive()
 	{
 		if(PIDContoller != null)
@@ -69,11 +75,21 @@ public class MenuHandler : MonoBehaviour {
 		if(carJSControl != null)
 			carJSControl.SetActive(false);
 
-		menuPanel.SetActive(false);
-        stopPanel.SetActive(true);
+		NetworkSteering.SetActive(false);
     }
 
-	public void OnManualDrive()
+	public void OnNNDrive()
+	{
+		if(PIDContoller != null)
+			PIDContoller.SetActive(false);
+
+		if(carJSControl != null)
+			carJSControl.SetActive(false);
+
+		NetworkSteering.SetActive(true);
+    }
+
+	public void OnHumanDrive()
 	{
 		if(PIDContoller != null)
 			PIDContoller.SetActive(false);
@@ -81,8 +97,20 @@ public class MenuHandler : MonoBehaviour {
 		if(carJSControl != null)
 			carJSControl.SetActive(true);
 
-		menuPanel.SetActive(false);
-        stopPanel.SetActive(true);
+		NetworkSteering.SetActive(false);
+    }
+
+	bool ifRecord = false;
+	public void OnRecord()
+	{
+		if(ifRecord){
+			GameObject.Find("Record/Text").GetComponent<Text>().text = "Start Record";
+			Logger.SetActive(false);
+		}else{
+			GameObject.Find("Record/Text").GetComponent<Text>().text = "Stop Record";
+			Logger.SetActive(true);
+		}
+		ifRecord = !ifRecord;
     }
 
     public void OnNextTrack()
@@ -91,26 +119,19 @@ public class MenuHandler : MonoBehaviour {
 			trainingManager.OnMenuNextTrack();
     }
 
-    public void OnRegenTrack()
+    public void OnBuildRandom()
 	{
 		if(trainingManager != null)
-			trainingManager.OnMenuRegenTrack();
+			trainingManager.OnMenuRegenRandom();
     }
 
-    public void OnStop()
-    {
-        if (PIDContoller != null)
-            PIDContoller.SetActive(false);
-
-        if (carJSControl != null)
-            carJSControl.SetActive(false);
-
-        Logger.SetActive(false);
-        NetworkSteering.SetActive(false);
-
-
-        menuPanel.SetActive(true);
-        stopPanel.SetActive(false);
-    }
-
+	public void OnBuildScript()
+	{
+		if(trainingManager != null)
+			trainingManager.OnMenuBuildScript();
+	}
+	public void OnCameraFollow()
+	{
+		cameraFollow.ifFollow = !cameraFollow.ifFollow;
+	}
 }

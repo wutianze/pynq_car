@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-20 14:23:08
  * @LastEditors  : Sauron Wu
- * @LastEditTime : 2020-01-07 11:49:19
+ * @LastEditTime : 2020-01-07 15:19:48
  * @Description: 
  */
 #include <cmath>
@@ -110,7 +110,7 @@ void storeImage()
 int main(int argc, char **argv)
 {
     if (argc != 4) {
-          cout << "Usage of this exe: ./collect 50000(img number to collect) 0.23(run speed) 0/1(1 means see the image)"
+          cout << "Usage of this exe: ./collect 50000(img number to collect) 0.23(start speed) 0/1(1 means see the image)"
              << endl;
         return -1;
       }
@@ -138,27 +138,36 @@ int main(int argc, char **argv)
         char c = (char)waitKey(1);
         //cout << c << endl;
         //cout<<controller.nowS->steerRate<<endl;
+        controller.throttleSet(-runSpeed);
 	switch (c)
         {
         case 'w':
             //controller.steerSet(0);
+            if(runSpeed <= 1.0)runSpeed += 0.2;
+            else{
+                runSpeed = 1.0;
+            }
             controller.throttleSet(-runSpeed);
-            controller.setLeds(1);
+            //controller.setLeds(1);
             break;
         case 'a':
             controller.steerChange(-0.8);
             //controller.throttleSet(runSpeed);
-            controller.setLeds(2);
+            //controller.setLeds(2);
             break;
         case 's':
+        if(runSpeed >= 0)runSpeed -= 0.3;
+            else{
+                runSpeed = 0.0;
+            }
             //controller.steerSet(0.2);
             controller.throttleSet(0);
-            controller.setLeds(4);
+            //controller.setLeds(4);
             break;
         case 'd':
             controller.steerChange(0.8); 
             //controller.throttleSet(runSpeed);
-            controller.setLeds(8);
+            //controller.setLeds(8);
             break;
 	    case 't':
             mtxQueueStore.lock();

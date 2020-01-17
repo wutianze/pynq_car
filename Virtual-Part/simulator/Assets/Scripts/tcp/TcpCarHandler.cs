@@ -30,6 +30,7 @@ namespace tk
 
         float ai_steering = 0.0f;
         float ai_throttle = 0.0f;
+        float ai_speed = 0.0f;
         float ai_brake = 0.0f;
 
         char commandGet = 's';
@@ -73,10 +74,10 @@ namespace tk
             client.dispatcher.Register("quit_app", new tk.Delegates.OnMsgRecv(OnQuitApp));
             client.dispatcher.Register("regen_road", new tk.Delegates.OnMsgRecv(OnRegenRoad));
 
-            client.dispatcher.Register("pynq_control",new tk.Delegates.OnMsgRecv(OnPynqControlsRecv));
+            client.dispatcher.Register("pynq_command",new tk.Delegates.OnMsgRecv(OnPynqCommandRecv));
+            client.dispatcher.Register("pynq_speed",new tk.Delegates.OnMsgRecv(OnPynqSpeedRecv));
 
         }
-
         bool Connect()
         {
             return client.Connect();
@@ -143,6 +144,8 @@ namespace tk
             {
                 ai_steering = float.Parse(json["steering"].str, CultureInfo.InvariantCulture.NumberFormat) * car.GetMaxSteering();
                 ai_throttle = float.Parse(json["throttle"].str, CultureInfo.InvariantCulture.NumberFormat);
+                ai_speed = float.Parse(json["speed"].str, CultureInfo.InvariantCulture.NumberFormat);
+
                 ai_brake = float.Parse(json["brake"].str, CultureInfo.InvariantCulture.NumberFormat);
 
                 car.RequestSteering(ai_steering);
@@ -154,7 +157,23 @@ namespace tk
                 Debug.Log(e.ToString());
             }
         }
-        void OnPynqControlsRecv(JSONObject json)
+        void OnPynqSpeedRecv(JSONObject json)
+        {
+            try
+            {
+                ai_steering = float.Parse(json["steering"].str, CultureInfo.InvariantCulture.NumberFormat) * car.GetMaxSteering();
+                ai_speed = float.Parse(json["speed"].str, CultureInfo.InvariantCulture.NumberFormat) * car.GetMaxSpeed();
+
+                car.RequestSteering(ai_steering);
+                car.RequestSpeed(ai_speed);
+
+            }
+            catch(Exception e)
+            {
+                Debug.Log(e.ToString());
+            }
+        }
+        void OnPynqCommandRecv(JSONObject json)
         {
             try
             {
@@ -230,7 +249,7 @@ namespace tk
 
                 UnityEngine.Random.InitState(rand_seed);
                 train_mgr.SetRoadStyle(road_style);
-                train_mgr.OnMenuRegenTrack();
+                train_mgr.OnMenuRegenRandom();
             }
 
             yield return null;
@@ -263,20 +282,31 @@ namespace tk
         }
         
         // Update is called once per frame
+        int sleepCount = 0;
         void Update () 
         {    
             if(state == State.UnConnected)
             {
+                //UnityEngine.DisplayDialog("Tip", "Start Connect!", "OK");
                 timer += Time.deltaTime;
-
-                if(timer > connectTimer)
+                if(sleepCount == 200){
+                    sleepCount = 0;
+                }
+                else{
+                    sleepCount++;
+                    return;
+                }
+                if(timer > connectTimer && sleepCount == 0)
                 {
                     timer = 0.0f;
-
+                    
                     if(Connect())
                     {
                         SendCarLoaded();
                         state = State.SendTelemetry;
+                    }else{
+                        //UnityEngine.DisplayDialog("Tip", "Connection Failed, Please Check, The Next Try Will Begin Soon.", "OK");
+                        sleepCount = 1;
                     }
                 }
             }

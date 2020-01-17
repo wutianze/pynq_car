@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-16 10:23:58
  * @LastEditors  : Sauron Wu
- * @LastEditTime : 2019-12-31 17:23:40
+ * @LastEditTime : 2020-01-10 11:40:29
  * @Description: 
  -->
 # Notice
@@ -18,7 +18,7 @@ If you want to make changes to the simulator, at least you should be familiar wi
 5. The tcp control can be changed in `Script/tcp/TcpCarHandler.cs`, and you need to change the `predict_server.py` to communicate with the car correctly.
 6. I recommend to use PID function to generate training data, you can define your own PID control in `PIDController.cs`.
 7. You can read road info and build it by setting the `Do Build Road & Do Load Script Path` and indicating the `Path To Load`.
-8. Set the MainCamera's `ifFollow` to 
+8. Set the MainCamera's `ifFollow` to decide whether to watch following the car. 
 
 # Car.cs
 - `RequestThrottle() & RequestSteering()` are two main functions which are used to control the car.
@@ -44,8 +44,6 @@ If you want to make changes to the simulator, at least you should be familiar wi
 # PIDController.cs
 - We all know that the quantity of training data is key to a good trained model. However, if your Joystick controller code is bull shit or you are not a good game player, it's hard to generate good training data. But since we are the master in virtual world, we can generate the training data automatically.
 - Read `Update()` and find where it uses `RequestThrottle() & RequestSteering()` then you will understand how the PID controller works, and will be able to define your own functions.
-
-# Road
 
 # More
 The simulator has more features for you to explore, you can build your own terrain, road, obstacles etc. You can checkout to the dev branch of original sdsandbox to learn more.

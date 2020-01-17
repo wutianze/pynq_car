@@ -4,7 +4,7 @@
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
 @LastEditors  : Sauron Wu
-@LastEditTime : 2019-12-18 13:07:09
+@LastEditTime : 2020-01-07 15:17:27
 @Description: 
 '''
 import keras
@@ -149,6 +149,7 @@ def batch_generator(name_list, batch_size):
             #else:
             #    labels[i] = [0.,1.,0.]
             labels[i] = [(y[index][0]+1.)/2.]
+            #labels[i] = [(y[index][0]+1.)/2.,(y[index][1])]
             #print(labels[i])
             i += 1
             if i == batch_size:

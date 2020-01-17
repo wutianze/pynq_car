@@ -1,0 +1,9 @@
+S 5
+DY 1
+L 10
+S 5
+DY 3
+R 10
+BLOCK 1 0
+L 10
+CONE 0 0

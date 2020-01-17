@@ -56,6 +56,10 @@ namespace tk
             client.onDataRecvCB += new TcpClient.OnDataRecv(OnDataRecv);
         }
 
+        public bool SetIp(string ip){
+            nnIPAddress = ip;
+            return true;
+        }
         public bool Connect()
         {
             return client.Connect(nnIPAddress, nnPort);

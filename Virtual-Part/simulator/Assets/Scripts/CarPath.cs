@@ -6,7 +6,11 @@ public class PathNode
 {
 	public Vector3 pos;
 	public CarModel cm;
+
 	public string activity;
+	public string thing;
+	public float thing_offset;
+	public Quaternion thing_rot;
 }
 
 public class CarPath 

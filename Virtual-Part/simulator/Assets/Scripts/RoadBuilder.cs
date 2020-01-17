@@ -13,6 +13,9 @@ public class RoadBuilder : MonoBehaviour {
 	public bool doFlattenArroundRoad = true;
 	public bool doLiftRoadToTerrain = false;
 
+	public GameObject cone;
+	public GameObject block;
+
 	public Terrain terrain;
 
 	public GameObject roadPrefabMesh;
@@ -111,7 +114,7 @@ public class RoadBuilder : MonoBehaviour {
 
 		go.tag = "road_mesh";
 
-		int numQuads = path.nodes.Count - 1;
+		int numQuads = path.nodes.Count - 1; // two points can decide one quad, each quad is composed by two triangles, two quads needs 3*2=6 vertices, vertices num is the same as uv's
 		int numVerts = (numQuads + 1) * 2;
 		int numTris = numQuads * 2;
 
@@ -131,23 +134,25 @@ public class RoadBuilder : MonoBehaviour {
 
 		int iNode = 0;
 
-		Vector3 posA = Vector3.zero;
-		Vector3 posB = Vector3.zero;
+		Vector3 posA = Vector3.zero; //first point
+		Vector3 posB = Vector3.zero; //second point
 
-		Vector3 vLength = Vector3.one;
-		Vector3 vWidth = Vector3.one;
+		Vector3 vLength = Vector3.one; // the road length between two points
+		Vector3 vWidth = Vector3.one; // the road width
 
 		for(int iVert = 0; iVert < numVerts; iVert += 2)
 		{
+			PathNode nodeA;
+			PathNode nodeB;
 			if(iNode + 1 < path.nodes.Count)
 			{
-				PathNode nodeA = path.nodes[iNode];
-				PathNode nodeB = path.nodes[iNode + 1];
+				nodeA = path.nodes[iNode];
+				nodeB = path.nodes[iNode + 1];
 				posA = nodeA.pos;
 				posB = nodeB.pos;
 
 				vLength = posB - posA;
-				vWidth = Vector3.Cross(vLength, Vector3.up);
+				vWidth = Vector3.Cross(vLength, Vector3.up); // width's half value equals the length
 
 				if(terToolkit != null && doFlattenArroundRoad  && (iVert % 10) == 0)
 				{
@@ -163,13 +168,27 @@ public class RoadBuilder : MonoBehaviour {
 			}
 			else
 			{
-				PathNode nodeA = path.nodes[iNode];
+				nodeA = path.nodes[iNode];
 				posA = nodeA.pos;
 				posA.y += roadHeightOffset;
 			}
 
-			Vector3 leftPos = posA + vWidth.normalized * roadWidth + vWidth.normalized * roadOffsetW;
-			Vector3 rightPos = posA - vWidth.normalized * roadWidth + vWidth.normalized * roadOffsetW;
+			Vector3 placeTmp = posA + vWidth.normalized * nodeA.thing_offset;
+			placeTmp.y = placeTmp.y + 0.3f;
+			if(nodeA.thing == "cone"){
+				GameObject coneO=Instantiate(cone, placeTmp, nodeA.thing_rot) as GameObject;
+				coneO.AddComponent<Rigidbody>();
+				coneO.AddComponent<BoxCollider>();
+				coneO.tag = "pathNode";
+			}else if(nodeA.thing == "block"){
+				GameObject blockO=Instantiate(block, placeTmp, nodeA.thing_rot) as GameObject;
+				blockO.AddComponent<Rigidbody>();
+				blockO.AddComponent<BoxCollider>();
+				blockO.tag = "pathNode";
+			}
+
+			Vector3 leftPos = posA + vWidth.normalized * roadWidth + vWidth.normalized * roadOffsetW; // left side in the road of first point, roadOffsetW means how far from the middle
+			Vector3 rightPos = posA - vWidth.normalized * roadWidth + vWidth.normalized * roadOffsetW; // right side in the road of first point
 
 			vertices[iVert] = leftPos;
 			vertices[iVert + 1] = rightPos;
@@ -183,7 +202,7 @@ public class RoadBuilder : MonoBehaviour {
 		int iVertOffset = 0;
 		int iTriOffset = 0;
 
-		for(int iQuad = 0; iQuad < numQuads; iQuad++)
+		for(int iQuad = 0; iQuad < numQuads; iQuad++)// the triangle points are left and right points of the road, but the texture is related to quads
 		{
 			tri[0 + iTriOffset] = 0 + iVertOffset;
 			tri[1 + iTriOffset] = 2 + iVertOffset;

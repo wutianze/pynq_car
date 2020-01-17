@@ -3,14 +3,14 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-10-14 09:10:53
- * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-28 17:18:06
+ * @LastEditors  : Sauron Wu
+ * @LastEditTime : 2020-01-07 15:10:45
  * @Description: 
  */
 #include"control.h"
 #include<cmath>
 #define THROTTLEINIT 500000
-#define THROTTLEVAL 60000
+#define THROTTLEVAL 100000
 #define THROTTLEZERO 140000
 #define STEERINIT 2000000
 #define STEERVAL 40000
