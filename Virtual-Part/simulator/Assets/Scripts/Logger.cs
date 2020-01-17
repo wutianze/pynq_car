@@ -106,7 +106,9 @@ public class Logger : MonoBehaviour {
                 string image_filename = GetPynqStyleImageFilename();
                 float steering = car.GetSteering() / car.GetMaxSteering();
                 float throttle = car.GetThrottle();
-				writer.WriteLine(string.Format("{0},{1},{2}", image_filename,steering.ToString(),throttle.ToString()));
+				float speed = car.GetVelocity().magnitude / car.GetMaxSpeed();
+				//writer.WriteLine(string.Format("{0},{1},{2}", image_filename,steering.ToString(),throttle.ToString()));
+				writer.WriteLine(string.Format("{0},{1},{2}", image_filename,steering.ToString(),speed.ToString()));
             }
 		}
 

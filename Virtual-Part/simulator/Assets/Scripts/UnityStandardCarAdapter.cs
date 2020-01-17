@@ -9,8 +9,10 @@ public class UnityStandardCarAdapter : MonoBehaviour, ICar {
 	public float MaximumSteerAngle = 25.0f; //has to be kept in sync with the car, as that's a private var.
 	float steering = 0.0f;
 	float throttle = 0.0f;
+	float speed = 0.0f;
 	float footBrake = 0.0f;
 	float handBrake = 0.0f;
+	float maxSpeed = 0.0f;
 	Vector3 vel = Vector3.zero;
 	Vector3 accel = Vector3.zero;
 	public string activity = "keep_lane";
@@ -35,6 +37,8 @@ public class UnityStandardCarAdapter : MonoBehaviour, ICar {
 
 	public void RequestHandBrake(float val) { handBrake = val; }
 
+	public void RequestSpeed(float val){speed = val;}
+
 	//Pynq car control
 	public char comNow;
 	public char GetComNow(){return comNow;}
@@ -44,7 +48,7 @@ public class UnityStandardCarAdapter : MonoBehaviour, ICar {
 	public float GetSteering() { return steering; }
 
 	public float GetThrottle() { return throttle; }
-
+	public float GetMaxSpeed(){ return maxSpeed; }
 	public float GetFootBrake() { return footBrake; }
 
 	public float GetHandBrake() { return handBrake; }

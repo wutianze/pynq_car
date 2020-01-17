@@ -8,13 +8,14 @@ public class Car : MonoBehaviour, ICar {
 	public Transform[] wheelMeshes;
 
 	public float maxTorque = 50f;
-	public float maxSpeed = 5f;
+	public float maxSpeed = 6f;
 
 	public Transform centrOfMass;
 
 	public float requestTorque = 0f;
 	public float requestBrake = 0f;
 	public float requestSteering = 0f;
+	public float requestSpeed = 0f;
 
 	public Vector3 acceleration = Vector3.zero;
 	public Vector3 prevVel = Vector3.zero;
@@ -126,6 +127,10 @@ public class Car : MonoBehaviour, ICar {
 		//Debug.Log("request steering: " + val);
 	}
 
+	public void RequestSpeed(float val){
+		RequestThrottle(val - rb.velocity.magnitude/maxSpeed);
+	}
+
 	public void Set(Vector3 pos, Quaternion rot)
 	{
 		rb.position = pos;
@@ -163,7 +168,9 @@ public class Car : MonoBehaviour, ICar {
 	{
 		return requestTorque;
 	}
-
+	public float GetMaxSpeed(){
+		return maxSpeed;
+	}
 	public float GetFootBrake()
 	{
 		return requestBrake;
@@ -243,15 +250,16 @@ public class Car : MonoBehaviour, ICar {
 		//four wheel drive at the moment
 		foreach(WheelCollider wc in wheelColliders)
 		{
-			if(rb.velocity.magnitude < maxSpeed)
+			if(rb.velocity.magnitude >= maxSpeed)
 			{
-				wc.motorTorque = throttle;
+				wc.motorTorque = -0.15f;
 			}
 			else
 			{
-				wc.motorTorque = 0.0f;
+				wc.motorTorque = throttle;
 			}
 
+			// most time zero
 			wc.brakeTorque = 400f * brake;
 		}
 

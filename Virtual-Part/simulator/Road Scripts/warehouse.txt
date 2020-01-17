@@ -2,7 +2,7 @@ S 11
 DY 7
 L 7
 DY 10
-R 12
+R 11
 BLOCK 0 0
 DY 15.5
 R 7
@@ -10,7 +10,7 @@ S 19
 DY 3
 L 25
 DY 24
-R 7
+R 6
 BLOCK 0 0
 S 11
 DY 8

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class TrainingManager : MonoBehaviour {
 
 	public PIDController controller;
@@ -122,7 +121,6 @@ public class TrainingManager : MonoBehaviour {
 	{
 		if(GlobalState.script_path == "default")
 		{
-			UnityEditor.EditorUtility.DisplayDialog("Tip", "Please Set Script File First!", "OK");
 			return;
 		}
 		else{

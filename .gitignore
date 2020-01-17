@@ -31,4 +31,5 @@ Virtual-Part/env
 Pynq-Z2_AD_Car/_book/*
 Papers/*
 !Papers/**/*.pdf
+Virtual-Part/Game/**
 
