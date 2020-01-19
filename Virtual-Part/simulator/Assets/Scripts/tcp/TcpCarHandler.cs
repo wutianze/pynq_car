@@ -329,7 +329,7 @@ namespace tk
                 }
                 
                 if(ai_text != null)
-                    ai_text.text = string.Format("NN: {0} : {1}", ai_steering, ai_throttle);
+                    ai_text.text = string.Format("Model steer: {0}\nthrottle: {1}\nspeed: {2}", ai_steering, ai_throttle, ai_speed);
                     
             }
         }
