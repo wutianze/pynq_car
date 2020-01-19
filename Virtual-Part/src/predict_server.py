@@ -3,8 +3,8 @@
 @GitHub: wutianze
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-23 10:12:28
-@LastEditors  : Sauron Wu
-@LastEditTime : 2020-01-17 14:50:22
+@LastEditors  : Please set LastEditors
+@LastEditTime : 2020-01-19 12:58:44
 @Description: 
 '''
 #!/usr/bin/env python
@@ -175,7 +175,9 @@ class PynqSimMsgHandler(IMesgHandler):
         self.sock.queue_message(msg)
 
     def send_control1(self, steer, speed):
-        msg = { 'msg_type' : 'pynq_speed', 'steering': steer.__str__(), 'speed':throttle.__str__()}
+        steer = steer*2.0 - 1.0
+        speed = speed*2.0 - 1.0
+        msg = { 'msg_type' : 'pynq_speed', 'steering': steer.__str__(), 'speed':speed.__str__()}
         self.sock.queue_message(msg) 
 
     def on_close(self):

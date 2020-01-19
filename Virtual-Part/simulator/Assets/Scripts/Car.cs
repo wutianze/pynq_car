@@ -16,6 +16,7 @@ public class Car : MonoBehaviour, ICar {
 	public float requestBrake = 0f;
 	public float requestSteering = 0f;
 	public float requestSpeed = 0f;
+	private bool useSpeed = false;
 
 	public Vector3 acceleration = Vector3.zero;
 	public Vector3 prevVel = Vector3.zero;
@@ -105,6 +106,7 @@ public class Car : MonoBehaviour, ICar {
 	{
 		requestTorque = val;
 		requestBrake = 0f;
+		useSpeed = false;
 		//Debug.Log("request throttle: " + val);
 	}
 
@@ -128,7 +130,10 @@ public class Car : MonoBehaviour, ICar {
 	}
 
 	public void RequestSpeed(float val){
-		RequestThrottle(val - rb.velocity.magnitude/maxSpeed);
+		requestSpeed = val;
+		requestBrake = 0f;
+		useSpeed = true;
+		//RequestThrottle(val - rb.velocity.magnitude/maxSpeed);
 	}
 
 	public void Set(Vector3 pos, Quaternion rot)
@@ -240,6 +245,7 @@ public class Car : MonoBehaviour, ICar {
 
 		float throttle = requestTorque * maxTorque;
 		float steerAngle = requestSteering;
+		float speed = requestSpeed;
         float brake = requestBrake;
 
 
@@ -256,6 +262,12 @@ public class Car : MonoBehaviour, ICar {
 			}
 			else
 			{
+				//Debug.Log("now speed:"+rb.velocity.magnitude);
+				//Debug.Log("request speed:"+speed);
+				if(useSpeed){
+					throttle = ((speed - rb.velocity.magnitude)/maxSpeed)*maxTorque;
+				}
+				//Debug.Log("request throttle:"+throttle);
 				wc.motorTorque = throttle;
 			}
 
