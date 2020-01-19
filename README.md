@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-03 16:28:15
  * @LastEditors  : Sauron Wu
- * @LastEditTime : 2020-01-19 11:52:39
+ * @LastEditTime : 2020-01-19 13:05:04
  * @Description: 
  -->
 # Build your own autonomous Car
@@ -13,7 +13,7 @@ Enjoy your own autonomous driving car with the power of DPU and feel free to try
 
 ## Material
 
-Download the image we provided [here](https://pan.baidu.com/s/1gOJaoJJ8z2jf-BaLklID3Q) and buy the car in [here](). To understand the whole project well, you can read the paper we published in FPT2019 [here](https://easychair.org/publications/preprint/GMvL).
+Download the image we provided [here](https://pan.baidu.com/s/1gOJaoJJ8z2jf-BaLklID3Q). To understand the whole project well, you can read the paper we published in FPT2019 [here](https://easychair.org/publications/preprint/GMvL). And here is one simple guide written in Chinese, [Xilinx HydraMini试玩教程](https://blog.csdn.net/qq_25762163/article/details/103591878)
 
 
 ## Preparations
