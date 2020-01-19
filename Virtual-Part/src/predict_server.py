@@ -175,7 +175,9 @@ class PynqSimMsgHandler(IMesgHandler):
         self.sock.queue_message(msg)
 
     def send_control1(self, steer, speed):
-        msg = { 'msg_type' : 'pynq_speed', 'steering': steer.__str__(), 'speed':throttle.__str__()}
+        steer = steer*2.0 - 1.0
+        speed = speed*2.0 - 1.0
+        msg = { 'msg_type' : 'pynq_speed', 'steering': steer.__str__(), 'speed':speed.__str__()}
         self.sock.queue_message(msg) 
 
     def on_close(self):

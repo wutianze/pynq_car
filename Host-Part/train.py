@@ -3,8 +3,8 @@
 @GitHub: wutianze
 @Email: 1369130123qq@gmail.com
 @Date: 2019-09-20 14:23:08
-@LastEditors  : Sauron Wu
-@LastEditTime : 2020-01-17 15:06:05
+@LastEditors  : Please set LastEditors
+@LastEditTime : 2020-01-19 10:57:07
 @Description: 
 '''
 import keras
@@ -27,7 +27,7 @@ import argparse
 np.random.seed(0)
 IMAGE_SHAPE = [120,160,3]# will be set autonomously
 global OUTPUT_NUM
-OUTPUT_NUM = 1# need to be set
+OUTPUT_NUM = 2# need to be set by --output_num
 CHUNK_SIZE = 256
 ORIGINAL_LABEL_NUM = 1# will be set autonomously
 # step1,load data
@@ -195,7 +195,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='prediction server')
     parser.add_argument('--model', type=str, help='model dir', default="./model")
     parser.add_argument('--read', type=str, help='npz store dir', default="./training_data_npz")
-    parser.add_argument('--output_num', type=int, help='the output num of the model not the original label num', default=1)
+    parser.add_argument('--output_num', type=int, help='the output num of the model not the original label num', default=2)
     args = parser.parse_args()
     OUTPUT_NUM = args.output_num
     print("OUTPUT_NUM:%d"%OUTPUT_NUM)
