@@ -3,8 +3,8 @@
  * @GitHub: wutianze
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-03 16:28:15
- * @LastEditors: Sauron Wu
- * @LastEditTime: 2019-10-31 15:25:25
+ * @LastEditors  : Sauron Wu
+ * @LastEditTime : 2020-01-19 11:52:39
  * @Description: 
  -->
 # Build your own autonomous Car
@@ -19,6 +19,6 @@ Download the image we provided [here](https://pan.baidu.com/s/1gOJaoJJ8z2jf-BaLk
 ## Preparations
 - The host pc should be ubuntu 16.04, you can refer to [this](https://github.com/wutianze/dnndk3.0-pynqz2) to build an environment for DNNDK_v3.0 using tensorflow. If you want to run the simulator, refer to Virtual-Part to set the Unity3d environment.
 - Power the Pynq-Z2 in your car and run `nmtui` to connect the car to your switch(make sure your PC connected to the same).
-- Read the guides in both `Host-Part`, `Pynq-Part` and `Virtual-Part`(If you want to try the simulator we provided), you can start with `Pynq-Part/collect_guide`.
+- Read the guides.
 
 

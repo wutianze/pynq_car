@@ -4,7 +4,7 @@
  * @Email: 1369130123qq@gmail.com
  * @Date: 2019-09-23 10:12:28
  * @LastEditors  : Sauron Wu
- * @LastEditTime : 2020-01-17 14:44:03
+ * @LastEditTime : 2020-01-19 11:53:32
  * @Description: 
  -->
 # Introduction
@@ -38,7 +38,7 @@ python src/predict_server.py --model=path-to-your-model/model.h5
 
 ## Use & Modify predict_server.py
 The script is used for build a server, the server will receive image data from the game and send the control commands back. Now let's see how it works.
-- You can set the ip address and port by `--host= --port=`
+- You can set the ip address and port by `--host= --port=`.
 - We provide two control method for you to choose. You can set it by `--control_method=`. The code is in `on_parsed_outputs()`.
     1. Method `0` means the model output is softmax output. The output array has three elements. The first element means turn left, second means go straight, third means turn left. The throttle will always on.
     2. Method `1` means the model output is two value. The first means steer value, the second means the speed value. The max speed now is 6.
