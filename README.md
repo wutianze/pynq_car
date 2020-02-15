@@ -7,7 +7,7 @@
  * @LastEditTime : 2020-01-19 13:06:36
  * @Description: 
  -->
-# Notice:The whole project has been moved to [HydraMini](https://github.com/wutianze/HydraMini) and [Autonomous-Driving-Simulator](https://github.com/wutianze/Autonomous-Driving-Simulator), pynq_car will no longer updated and may be deleted soon. So please turn to my new addresses.
+# Notice:The whole project has been moved to [HydraMini](https://github.com/wutianze/HydraMini) and [Autonomous-Driving-Simulator](https://github.com/wutianze/Autonomous-Driving-Simulator), pynq_car will no longer be updated and may be deleted soon. So please turn to my new addresses.
 # You can read the gitbook [here](https://app.gitbook.com/@1369130123/s/pynq-z2-ad-car/)
 # Build your own autonomous Car
 ## Introduction
