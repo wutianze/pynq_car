@@ -24,4 +24,4 @@
 ![compile](./compile.png)
 7. Copy the .elf files in `compile/` to the `Pynq-Part/Car/model/` and then move the Car directory to your Pynq-Z2 board.
 
-# Now please read the `Pynq-Part/Car/guides/run_guide.md`.
+# Now please read the `Pynq-Z2_AD_Car/pynq-guide/run_guide.md`.
